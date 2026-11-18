@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Theft Auto VI — Официальный сайт</title>
+    <!-- Шрифты Rockstar / GTA стиля -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0b0b0d;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Шапка сайта */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: rgba(11, 11, 13, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            letter-spacing: 3px;
+            background: linear-gradient(45deg, #ff7b00, #ff007f, #9900ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #ff007f;
+        }
+
+        /* Кнопка переключения языка */
+        .lang-btn {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 6px 14px;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            border-color: #ff007f;
+            color: #ff007f;
+        }
+
+        /* Главный экран (Hero) */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(11,11,13,0.3), #0b0b0d), 
+                        url('https://avatars.mds.yandex.net/i?id=2ce5b1be6fbe8acfeebee493fc457ab0_l-7086169-images-thumbs&n=13') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(60px, 12vw, 120px);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            background: linear-gradient(180deg, #ffffff 20%, #ffb6c1 60%, #ff1493 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(255, 20, 147, 0.5);
+        }
+
+        .hero p {
+            font-size: clamp(16px, 2vw, 22px);
+            max-width: 600px;
+            color: #cfcfd4;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff007f, #ff7b00);
+            color: white;
+            padding: 16px 40px;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+            width: 100%;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 35px rgba(255, 0, 127, 0.7);
+        }
+
+        /* Секция покупки */
+        .buy-section {
+            padding: 140px 20px 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .buy-section h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 48px;
+            letter-spacing: 2px;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+        }
+
+        .editions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            text-align: left;
+        }
+
+        .edition-card {
+            background: #16161c;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        .edition-card:hover {
+            border-color: #ff007f;
+            transform: translateY(-5px);
+        }
+
+        .edition-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 32px;
+            font-weight: 900;
+            color: #ff007f;
+            margin-bottom: 20px;
+        }
+
+        .edition-card ul {
+            list-style: none;
+            margin-bottom: 30px;
+            color: #aaa;
+        }
+
+        .edition-card ul li {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        /* Футер */
+        footer {
+            background: #070709;
+            padding: 40px 20px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media(max-width: 768px) {
+            header {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Шапка -->
+    <header>
+        <div class="logo">GTA VI</div>
+        <div class="nav-right">
+            <nav>
+                <a href="#hero" data-ru="Главная" data-en="Home">Главная</a>
+                <a href="#buy" data-ru="Купить сейчас" data-en="Buy Now">Купить сейчас</a>
+            </nav>
+            <button class="lang-btn" onclick="toggleLanguage()" id="langToggleBtn">EN</button>
+        </div>
+    </header>
+
+    <!-- Главный экран -->
+    <section class="hero" id="hero">
+        <h1 data-ru="Grand Theft Auto VI" data-en="Grand Theft Auto VI">Grand Theft Auto VI</h1>
+        <p data-ru="Погрузитесь в самую масштабную историю преступного мира штата Леонида. Покупайте игру прямо сейчас." data-en="Dive into the biggest story in the criminal underworld of Leonida state. Buy the game right now.">Погрузитесь в самую масштабную историю преступного мира штата Леонида. Покупайте игру прямо сейчас.</p>
+        <a href="#buy" class="btn" style="max-width: 300px;" data-ru="Купить игру" data-en="Buy Game">Купить игру</a>
+    </section>
+
+    <!-- Секция покупки -->
+    <section class="buy-section" id="buy">
+        <h2 data-ru="Выберите издание для покупки" data-en="Choose Your Edition">Выберите издание для покупки</h2>
+        <div class="editions-grid">
+            
+            <!-- Стандартное издание -->
+            <div class="edition-card">
+                <div>
+                    <h3>Standard Edition</h3>
+                    <div class="price" data-ru="5 999 ₽" data-en="$69.99">5 999 ₽</div>
+                    <ul>
+                        <li data-ru="✔ Основная игра GTA VI" data-en="✔ Base Game GTA VI">✔ Основная игра GTA VI</li>
+                        <li data-ru="✔ Бонусы предзаказа" data-en="✔ Pre-order Bonuses">✔ Бонусы предзаказа</li>
+                        <li data-ru="✔ Доступ к онлайн-режиму" data-en="✔ Online Mode Access">✔ Доступ к онлайн-режиму</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="redirectToCheckout('Standard Edition', '5 999 ₽')" data-ru="Купить сейчас" data-en="Buy Now">Купить сейчас</button>
+            </div>
+
+            <!-- Расширенное издание -->
+            <div class="edition-card" style="border-color: rgba(255, 0, 127, 0.4);">
+                <div>
+                    <h3>Special Edition</h3>
+                    <div class="price" data-ru="7 499 ₽" data-en="$89.99">7 499 ₽</div>
+                    <ul>
+                        <li data-ru="✔ Основная игра GTA VI" data-en="✔ Base Game GTA VI">✔ Основная игра GTA VI</li>
+                        <li data-ru="✔ Эксклюзивный транспорт" data-en="✔ Exclusive Vehicles">✔ Эксклюзивный транспорт</li>
+                        <li data-ru="✔ Дополнительные миссии" data-en="✔ Additional Missions">✔ Дополнительные миссии</li>
+                        <li data-ru="✔ Ранний доступ к оружию" data-en="✔ Early Weapon Access">✔ Ранний доступ к оружию</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="redirectToCheckout('Special Edition', '7 499 ₽')" data-ru="Купить сейчас" data-en="Buy Now">Купить сейчас</button>
+            </div>
+
+            <!-- Коллекционное издание -->
+            <div class="edition-card">
+                <div>
+                    <h3>Ultimate Edition</h3>
+                    <div class="price" data-ru="12 999 ₽" data-en="$149.99">12 999 ₽</div>
+                    <ul>
+                        <li data-ru="✔ Все преимущества Special Edition" data-en="✔ All Special Edition Perks">✔ Все преимущества Special Edition</li>
+                        <li data-ru="✔ Валюта GTA$ 5,000,000" data-en="✔ GTA$ 5,000,000 Currency">✔ Валюта GTA$ 5,000,000</li>
+                        <li data-ru="✔ Цифровой артбук и саундтрек" data-en="✔ Digital Artbook & Soundtrack">✔ Цифровой артбук и саундтрек</li>
+                        <li data-ru="✔ Уникальные комплекты одежды" data-en="✔ Unique Outfit Packs">✔ Уникальные комплекты одежды</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="redirectToCheckout('Ultimate Edition', '12 999 ₽')" data-ru="Купить сейчас" data-en="Buy Now">Купить сейчас</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer>
+        <p>&copy; 2026 Rockstar Games, Inc. <span data-ru="Все права защищены." data-en="All rights reserved.">Все права защищены.</span></p>
+    </footer>
+
+    <script>
+        let currentLang = 'ru';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ru' ? 'en' : 'ru';
+            document.getElementById('langToggleBtn').innerText = currentLang === 'ru' ? 'EN' : 'RU';
+            document.getElementById('htmlRoot').setAttribute('lang', currentLang);
+
+            const elements = document.querySelectorAll('[data-ru]');
+            elements.forEach(el => {
+                el.innerText = el.getAttribute(`data-${currentLang}`);
+            });
+        }
+
+        function redirectToCheckout(edition, price) {
+            // Укажите здесь вашу реальную ссылку для оплаты (например, на ЮKassa, Robokassa, СБП или Telegram-бота)
+            const paymentUrl = "https://yoomoney.ru"; // Замените на нужный вам URL
+            
+            // Перенаправление на сайт оплаты
+            window.location.href = paymentUrl;
+        }
+    </script>
+
+</body>
+</html>
