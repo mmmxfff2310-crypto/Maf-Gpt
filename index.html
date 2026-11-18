@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand Theft Auto VI — Официальный сайт</title>
+    
+    <!-- Сюда можно вставить метатег подтверждения от Яндекса (если выберете способ "Метатег"): -->
+    <!-- <meta name="yandex-verification" content="ВАШ_КОД_ИЗ_ВЕБМАСТЕРА" /> -->
+
     <!-- Шрифты Rockstar / GTA стиля -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -18,6 +22,7 @@
             background-color: #0b0b0d;
             color: #ffffff;
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
         /* Шапка сайта */
@@ -30,7 +35,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 50px;
-            background: rgba(11, 11, 13, 0.85);
+            background: rgba(11, 11, 13, 0.9);
             backdrop-filter: blur(10px);
             z-index: 1000;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -49,6 +54,11 @@
             display: flex;
             align-items: center;
             gap: 30px;
+        }
+
+        nav {
+            display: flex;
+            gap: 25px;
         }
 
         nav a {
@@ -311,10 +321,7 @@
         }
 
         function redirectToCheckout(edition, price) {
-            // Укажите здесь вашу реальную ссылку для оплаты (например, на ЮKassa, Robokassa, СБП или Telegram-бота)
-            const paymentUrl = "https://yoomoney.ru"; // Замените на нужный вам URL
-            
-            // Перенаправление на сайт оплаты
+            const paymentUrl = "https://yoomoney.ru"; // Замените на вашу ссылку оплаты
             window.location.href = paymentUrl;
         }
     </script>
