@@ -708,6 +708,7 @@
     const STORAGE_KEYS = {
       CHATS: 'maf_gpt_chats_bw_v1',
       ACTIVE_CHAT: 'maf_gpt_active_chat_bw_v1',
+      CUSTOM_KEY: 'maf_gpt_custom_api_key_v1',
     };
 
     const state = {
@@ -722,10 +723,39 @@
 
     const codeStore = {};
     let codeBlockCounter = 0;
-    const EMBEDDED_API_KEY = 'AQ.Ab8RN6Ji-GEn3s31WweLAKSKAkfaTT0CIMqbdJ6GR1nQpnQTJw';
+    const EMBEDDED_API_KEY = '';
 
     function getEffectiveApiKey() {
-      return EMBEDDED_API_KEY;
+      try {
+        const saved = localStorage.getItem(STORAGE_KEYS.CUSTOM_KEY);
+        if (saved && saved.trim()) return saved.trim();
+      } catch (_) {}
+      return EMBEDDED_API_KEY.trim();
+    }
+
+    async function saveCustomApiKeyFromInline(inputId) {
+      const el = document.getElementById(inputId);
+      const val = el ? el.value.trim() : '';
+      if (!val) {
+        showToast('Вставьте API-ключ из Google AI Studio');
+        return;
+      }
+      try {
+        localStorage.setItem(STORAGE_KEYS.CUSTOM_KEY, val);
+      } catch (_) {}
+      showToast('Ключ сохранён, повторяю запрос...');
+
+      const chat = getActiveChat();
+      if (chat && chat.messages.length >= 2) {
+        const lastModel = chat.messages[chat.messages.length - 1];
+        const lastUser = chat.messages[chat.messages.length - 2];
+        if (lastModel && lastModel.role === 'model' && lastModel.isKeyError && lastUser && lastUser.role === 'user') {
+          chat.messages.splice(chat.messages.length - 2, 2);
+          saveChats();
+          renderChatMessages();
+          await sendMessage(lastUser.text || '');
+        }
+      }
     }
 
     function buildGeminiHeaders(apiKey) {
@@ -734,6 +764,51 @@
         headers['x-goog-api-key'] = apiKey;
       }
       return headers;
+    }
+
+    /**
+     * Единый запрос к Gemini API с поддержкой ключей AIza... и AQ....
+     */
+    async function geminiApiRequest(modelPath, bodyObj, signal) {
+      const apiKey = getEffectiveApiKey();
+      const endpoints = [
+        {
+          url: `https://generativelanguage.googleapis.com/v1beta/models/${modelPath}?key=${encodeURIComponent(apiKey)}`,
+          headers: { 'Content-Type': 'application/json' },
+        },
+        {
+          url: `https://generativelanguage.googleapis.com/v1beta/models/${modelPath}`,
+          headers: buildGeminiHeaders(apiKey),
+        },
+        {
+          url: `https://aiplatform.googleapis.com/v1beta1/publishers/google/models/${modelPath}`,
+          headers: buildGeminiHeaders(apiKey),
+        },
+      ];
+
+      let lastRes = null;
+      let lastData = {};
+
+      for (const ep of endpoints) {
+        const res = await fetch(ep.url, {
+          method: 'POST',
+          headers: ep.headers,
+          signal,
+          body: JSON.stringify(bodyObj),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          return { res, data };
+        }
+        lastRes = res;
+        lastData = data;
+        const errMsg = data?.error?.message || '';
+        if (!/api key|not valid|permission|unauthenticated|unsupported|400|401|403/i.test(errMsg + ' ' + res.status)) {
+          break;
+        }
+      }
+
+      return { res: lastRes, data: lastData };
     }
 
     function loadChats() {
@@ -1097,6 +1172,32 @@
         ? `<div class="text-[15px] font-medium text-neutral-400">Думаю над ответом...</div>`
         : '';
 
+      const keyRecoveryHtml = msg.isKeyError
+        ? `
+          <div class="mt-3 flex w-full max-w-md flex-col gap-2.5 rounded-2xl bg-[#161618] p-4">
+            <div class="text-xs leading-relaxed text-neutral-300">
+              Старый ключ недействителен или был отозван. Создайте бесплатный ключ вида <span class="font-mono text-white">AIzaSy...</span> в <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="underline text-blue-400">Google AI Studio</a>, вставьте его ниже и нажмите <span class="font-medium text-white">Сохранить</span>:
+            </div>
+            <div class="flex items-center gap-2">
+              <input
+                id="inlineKeyInput_${index}"
+                type="password"
+                placeholder="AIzaSy..."
+                onkeydown="if(event.key==='Enter') saveCustomApiKeyFromInline('inlineKeyInput_${index}')"
+                class="flex-1 rounded-xl bg-[#0d0d0e] px-3 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none"
+              />
+              <button
+                type="button"
+                onclick="saveCustomApiKeyFromInline('inlineKeyInput_${index}')"
+                class="shrink-0 rounded-xl bg-[#2563eb] px-3.5 py-2 text-xs font-medium text-white hover:bg-[#1d4ed8]"
+              >
+                Сохранить
+              </button>
+            </div>
+          </div>
+        `
+        : '';
+
       const feedback = msg.feedback || null;
       const actionBarHtml = !msg.isStreaming
         ? `
@@ -1158,6 +1259,7 @@
         <div class="msg-appear flex w-full max-w-full flex-col items-start">
           ${generatedImgHtml}
           ${renderedBody}
+          ${keyRecoveryHtml}
           ${actionBarHtml}
         </div>
       `;
@@ -1660,6 +1762,7 @@
         if (last && last.role === 'model') {
           last.isStreaming = false;
           last.isImagePending = false;
+          last.isKeyError = /api key|not valid|permission|unauthenticated|401|403/i.test(msg);
           last.text = `Не удалось получить ответ (${escapePlainError(msg)}). Попробуйте ещё раз.`;
         }
       } finally {
@@ -1671,41 +1774,60 @@
     }
 
     async function generateImageResponse(chat, promptText, signal) {
-      const apiKey = getEffectiveApiKey();
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict${apiKey ? '?key=' + encodeURIComponent(apiKey) : ''}`;
-
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: buildGeminiHeaders(apiKey),
-        signal,
-        body: JSON.stringify({
+      // 1. Пробуем Imagen 3 через единый шлюз (чистый заголовок x-goog-api-key без дублирования ?key=)
+      const { res, data } = await geminiApiRequest(
+        'imagen-3.0-generate-002:predict',
+        {
           instances: [{ prompt: promptText }],
           parameters: { sampleCount: 1 },
-        }),
-      });
+        },
+        signal
+      );
 
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data?.error?.message || `HTTP ${res.status}`);
+      if (res && res.ok) {
+        const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
+        const mime = data?.predictions?.[0]?.mimeType || 'image/png';
+        if (b64) {
+          const last = chat.messages[chat.messages.length - 1];
+          if (last && last.role === 'model') {
+            last.isImagePending = false;
+            last.isStreaming = false;
+            last.generatedImageUrl = `data:${mime};base64,${b64}`;
+            last.text = '';
+          }
+          return;
+        }
       }
 
-      const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
-      const mime = data?.predictions?.[0]?.mimeType || 'image/png';
-      if (!b64) {
-        throw new Error('Не удалось сгенерировать изображение');
+      // 2. Резервная генерация изображения через Gemini Image (если Imagen 3 недоступен для ключа)
+      const imgFallback = await geminiApiRequest(
+        'gemini-2.5-flash-image:generateContent',
+        {
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: { responseModalities: ['IMAGE'] },
+        },
+        signal
+      );
+
+      if (imgFallback.res && imgFallback.res.ok) {
+        const parts = imgFallback.data?.candidates?.[0]?.content?.parts || [];
+        const imgPart = parts.find((p) => p.inlineData && p.inlineData.data);
+        if (imgPart) {
+          const last = chat.messages[chat.messages.length - 1];
+          if (last && last.role === 'model') {
+            last.isImagePending = false;
+            last.isStreaming = false;
+            last.generatedImageUrl = `data:${imgPart.inlineData.mimeType || 'image/png'};base64,${imgPart.inlineData.data}`;
+            last.text = '';
+          }
+          return;
+        }
       }
 
-      const last = chat.messages[chat.messages.length - 1];
-      if (last && last.role === 'model') {
-        last.isImagePending = false;
-        last.isStreaming = false;
-        last.generatedImageUrl = `data:${mime};base64,${b64}`;
-        last.text = '';
-      }
+      throw new Error(data?.error?.message || imgFallback.data?.error?.message || `HTTP ${res ? res.status : 400}`);
     }
 
     async function generateTextResponse(chat, signal) {
-      const apiKey = getEffectiveApiKey();
       const systemInstruction = {
         parts: [
           {
@@ -1745,21 +1867,14 @@
         },
       };
 
-      const modelsToTry = ['gemini-3.8-flash', 'gemini-3-flash-preview'];
+      const modelsToTry = ['gemini-2.5-flash', 'gemini-3-flash-preview', 'gemini-2.0-flash'];
       let lastError = null;
 
       for (const modelName of modelsToTry) {
         try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent${apiKey ? '?key=' + encodeURIComponent(apiKey) : ''}`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: buildGeminiHeaders(apiKey),
-            signal,
-            body: JSON.stringify(bodyPayload),
-          });
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok) {
-            throw new Error(data?.error?.message || `HTTP ${res.status}`);
+          const { res, data } = await geminiApiRequest(`${modelName}:generateContent`, bodyPayload, signal);
+          if (!res || !res.ok) {
+            throw new Error(data?.error?.message || `HTTP ${res ? res.status : 400}`);
           }
           const replyText =
             data?.candidates?.[0]?.content?.parts
@@ -1777,7 +1892,7 @@
         } catch (err) {
           if (err && err.name === 'AbortError') throw err;
           lastError = err;
-          if (/permission denied|api key|forbidden|403|401/i.test(err?.message || '')) {
+          if (/api key|not valid|permission denied|forbidden|403|401/i.test(err?.message || '')) {
             throw err;
           }
         }
@@ -2213,36 +2328,29 @@
       try {
         const wavBlob = float32ChunksToWavBlob(pcmChunks, liveState.sampleRate);
         const audioBase64 = await blobToBase64Raw(wavBlob);
-        const apiKey = getEffectiveApiKey();
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent${apiKey ? '?key=' + encodeURIComponent(apiKey) : ''}`;
 
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: buildGeminiHeaders(apiKey),
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [
-                  {
-                    text: 'Расшифруй точно на русском языке, что сказал человек в этой аудиозаписи. Верни ТОЛЬКО произнесённый текст без кавычек и пояснений. Если речи нет и слышна только тишина или шум, верни слово ТИШИНА.',
+        const { res, data } = await geminiApiRequest('gemini-3.8-flash:generateContent', {
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                {
+                  text: 'Расшифруй точно на русском языке, что сказал человек в этой аудиозаписи. Верни ТОЛЬКО произнесённый текст без кавычек и пояснений. Если речи нет и слышна только тишина или шум, верни слово ТИШИНА.',
+                },
+                {
+                  inlineData: {
+                    mimeType: 'audio/wav',
+                    data: audioBase64,
                   },
-                  {
-                    inlineData: {
-                      mimeType: 'audio/wav',
-                      data: audioBase64,
-                    },
-                  },
-                ],
-              },
-            ],
-            generationConfig: { temperature: 0.0, maxOutputTokens: 256 },
-          }),
+                },
+              ],
+            },
+          ],
+          generationConfig: { temperature: 0.0, maxOutputTokens: 256 },
         });
 
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          const errMsg = data?.error?.message || `Ошибка ${res.status}`;
+        if (!res || !res.ok) {
+          const errMsg = data?.error?.message || `Ошибка ${res ? res.status : 400}`;
           const sub = document.getElementById('liveCallSubtitle');
           if (sub) sub.textContent = errMsg;
           liveState.isProcessing = false;
@@ -2349,34 +2457,27 @@
 
       // 1. Живой мужской голос Gemini TTS (Puck)
       try {
-        const apiKey = getEffectiveApiKey();
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent${apiKey ? '?key=' + encodeURIComponent(apiKey) : ''}`;
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: buildGeminiHeaders(apiKey),
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [{ text: `Произнеси естественно, живо и по-дружески в разговорном темпе: ${text}` }],
-              },
-            ],
-            generationConfig: {
-              responseModalities: ['AUDIO'],
-              speechConfig: {
-                voiceConfig: {
-                  prebuiltVoiceConfig: { voiceName: 'Puck' },
-                },
+        const { res, data } = await geminiApiRequest('gemini-2.5-flash-preview-tts:generateContent', {
+          contents: [
+            {
+              parts: [{ text: `Произнеси естественно, живо и по-дружески в разговорном темпе: ${text}` }],
+            },
+          ],
+          generationConfig: {
+            responseModalities: ['AUDIO'],
+            speechConfig: {
+              voiceConfig: {
+                prebuiltVoiceConfig: { voiceName: 'Puck' },
               },
             },
-          }),
+          },
         });
 
-        const data = await res.json().catch(() => ({}));
         const part = data?.candidates?.[0]?.content?.parts?.[0];
         const audioData = part?.inlineData?.data;
         const mimeType = part?.inlineData?.mimeType || '';
 
-        if (res.ok && audioData && liveState.active) {
+        if (res && res.ok && audioData && liveState.active) {
           const rateMatch = mimeType.match(/rate=(\d+)/);
           const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
           const pcmBytes = base64ToUint8Array(audioData);
