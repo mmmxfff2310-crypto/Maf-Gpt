@@ -91,7 +91,7 @@
       animation: voice-orb-pulse 2s ease-in-out infinite;
     }
     .voice-orb-speaking {
-      animation: voice-orb-pulse 0.78s ease-in-out infinite;
+      animation: voice-orb-pulse 0.65s ease-in-out infinite;
     }
 
     .sky-orb {
@@ -185,7 +185,7 @@
 </head>
 <body class="flex flex-col md:flex-row bg-black text-white select-none">
 
-  <!-- ЭКРАН ВВОДА API KEY ПРИ КАЖДОМ ВХОДЕ -->
+  <!-- ЭКРАН ВВОДА API KEY (ПОКАЗЫВАЕТСЯ ТОЛЬКО ЕСЛИ КЛЮЧ ЕЩЁ НЕ СОХРАНЁН) -->
   <div id="activationScreen" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 screen-transition screen-visible">
     <div class="w-full max-w-sm bg-[#141414] border border-[#2b2b2b] rounded-3xl p-7 text-center shadow-2xl">
       <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/30">
@@ -196,7 +196,7 @@
       </div>
       <h1 class="text-2xl font-bold tracking-tight mb-2">Maf GPT</h1>
       <p class="text-sm text-neutral-400 mb-5 leading-relaxed">
-        Введите ваш API Key для запуска сессии. Ключ хранится только в текущей сессии и сбрасывается при перезаходе.
+        Введите ваш API Key один раз — он сохранится в браузере и не потребуется при следующих входах.
       </p>
 
       <input
@@ -212,6 +212,30 @@
         Активировать
       </button>
       <p id="keyErrorMsg" class="text-xs text-red-400 mt-3 min-h-[16px]"></p>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО ПРОСМОТРА СОХРАНЁННОГО КОДА -->
+  <div id="codeMemoryModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 screen-transition screen-hidden">
+    <div class="w-full max-w-2xl bg-[#141414] border border-[#2c2c2c] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[82dvh]">
+      <div class="px-5 py-3.5 bg-[#1c1c1c] border-b border-[#2a2a2a] flex items-center justify-between">
+        <div>
+          <div id="codeModalTitle" class="text-sm font-semibold text-white">Сохранённый код</div>
+          <div id="codeModalMeta" class="text-[11px] text-neutral-400">lang</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="insertSavedCodeToPrompt()" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-medium text-white cursor-pointer">
+            Вставить в запрос
+          </button>
+          <button onclick="copySavedCodeModal()" class="px-3 py-1.5 rounded-xl bg-[#2a2a2a] hover:bg-[#363636] text-xs font-medium text-white cursor-pointer">
+            Копировать
+          </button>
+          <button onclick="closeCodeMemoryModal()" class="w-8 h-8 rounded-xl bg-[#262626] hover:bg-[#333333] text-neutral-300 flex items-center justify-center cursor-pointer">
+            ×
+          </button>
+        </div>
+      </div>
+      <pre id="codeModalBody" class="p-4 overflow-auto text-xs font-mono text-neutral-100 leading-relaxed flex-1 select-text"></pre>
     </div>
   </div>
 
@@ -246,13 +270,20 @@
       </button>
     </div>
 
-    <div class="px-4 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+    <!-- ПАМЯТЬ КОДА -->
+    <div class="px-4 pt-2 pb-1 flex items-center justify-between">
+      <span class="text-[11px] font-semibold uppercase tracking-wider text-blue-400/90">Память кода</span>
+      <button onclick="clearCodeMemory()" class="text-[11px] text-neutral-500 hover:text-neutral-300 cursor-pointer">Сброс</button>
+    </div>
+    <div id="codeMemoryList" class="max-h-36 overflow-y-auto px-2.5 pb-2 space-y-1 border-b border-[#181818]"></div>
+
+    <div class="px-4 pt-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
       История разговоров
     </div>
     <div id="chatHistoryList" class="flex-1 overflow-y-auto px-2.5 space-y-1"></div>
 
     <div class="p-3 border-t border-[#1c1c1c] flex items-center justify-between text-xs text-neutral-500">
-      <span>Maf GPT</span>
+      <span>Голос: Мужской • Быстро</span>
       <button onclick="clearAllHistory()" class="text-neutral-400 hover:text-white px-2 py-1 rounded-lg hover:bg-[#1c1c1c] cursor-pointer">
         Очистить
       </button>
@@ -370,7 +401,7 @@
         </div>
         <div>
           <div class="font-semibold text-sm">Maf GPT Live</div>
-          <div class="text-[11px] text-blue-400">Голосовой режим</div>
+          <div class="text-[11px] text-blue-400">Мужской голос • Быстрый темп</div>
         </div>
       </div>
 
@@ -404,8 +435,9 @@
   </div>
 
   <script>
-    // Ключ хранится только в оперативной памяти текущей вкладки и сбрасывается при перезаходе
-    let sessionApiKey = "";
+    const API_KEY_STORAGE_KEY = "mafgpt_saved_api_key_v1";
+    let sessionApiKey = localStorage.getItem(API_KEY_STORAGE_KEY) || "";
+    let activeModalSnippetId = null;
 
     const MODELS_PRIORITY = [
       "gemini-3.8-flash",
@@ -423,7 +455,8 @@
     ];
 
     let state = {
-      chats: JSON.parse(localStorage.getItem("mafgpt_chats_v6") || "[]"),
+      chats: JSON.parse(localStorage.getItem("mafgpt_chats_v8") || "[]"),
+      codeMemory: JSON.parse(localStorage.getItem("mafgpt_code_memory_v1") || "[]"),
       currentChatId: null,
       attachedImageBase64: null,
       attachedImageMime: null,
@@ -442,14 +475,136 @@
       processor: null,
       pcmChunks: [],
       speechStarted: false,
-      silenceStart: 0
+      silenceStart: 0,
+      currentAudio: null
     };
+
+    // --- ПАМЯТЬ КОДА ---
+    function saveCodeMemory() {
+      localStorage.setItem("mafgpt_code_memory_v1", JSON.stringify(state.codeMemory.slice(0, 30)));
+      renderCodeMemoryList();
+    }
+
+    function extractAndSaveCode(rawText, sourceLabel = "Maf GPT") {
+      if (!rawText) return;
+      const regex = /```([\w-]*)\n([\s\S]*?)```/g;
+      let match;
+      let added = false;
+
+      while ((match = regex.exec(rawText)) !== null) {
+        const lang = (match[1] || "code").trim();
+        const code = match[2].trim();
+        if (code.length < 4) continue;
+
+        const existingIndex = state.codeMemory.findIndex(item => item.code === code);
+        if (existingIndex !== -1) {
+          state.codeMemory.splice(existingIndex, 1);
+        }
+
+        const firstLine = code.split("\n").map(l => l.trim()).find(Boolean) || lang;
+        state.codeMemory.unshift({
+          id: "code_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+          lang,
+          title: firstLine.slice(0, 34),
+          code,
+          source: sourceLabel,
+          updatedAt: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
+        });
+        added = true;
+      }
+
+      if (added) {
+        saveCodeMemory();
+      }
+    }
+
+    function renderCodeMemoryList() {
+      const el = document.getElementById("codeMemoryList");
+      if (!el) return;
+      if (!state.codeMemory.length) {
+        el.innerHTML = `<div class="text-[11px] text-neutral-600 px-2 py-2">Код будет сохраняться сюда автоматически</div>`;
+        return;
+      }
+
+      el.innerHTML = state.codeMemory.map(item => `
+        <button onclick="openSavedCodeModal('${item.id}')" class="w-full text-left px-2.5 py-1.5 rounded-lg bg-[#141414] hover:bg-[#1f1f1f] text-xs flex items-center justify-between gap-2 cursor-pointer">
+          <span class="truncate text-neutral-200 font-mono">${escapeHtml(item.title)}</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-300 shrink-0">${escapeHtml(item.lang)}</span>
+        </button>
+      `).join("");
+    }
+
+    function openSavedCodeModal(id) {
+      const item = state.codeMemory.find(c => c.id === id);
+      if (!item) return;
+      activeModalSnippetId = id;
+      document.getElementById("codeModalTitle").textContent = item.title;
+      document.getElementById("codeModalMeta").textContent = `${item.lang} • ${item.source} • ${item.updatedAt}`;
+      document.getElementById("codeModalBody").textContent = item.code;
+
+      const modal = document.getElementById("codeMemoryModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      requestAnimationFrame(() => {
+        modal.classList.remove("screen-hidden");
+        modal.classList.add("screen-visible");
+      });
+    }
+
+    function closeCodeMemoryModal() {
+      const modal = document.getElementById("codeMemoryModal");
+      modal.classList.remove("screen-visible");
+      modal.classList.add("screen-hidden");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }, 250);
+    }
+
+    function copySavedCodeModal() {
+      const item = state.codeMemory.find(c => c.id === activeModalSnippetId);
+      if (!item) return;
+      navigator.clipboard.writeText(item.code);
+    }
+
+    function insertSavedCodeToPrompt() {
+      const item = state.codeMemory.find(c => c.id === activeModalSnippetId);
+      if (!item) return;
+      const input = document.getElementById("promptInput");
+      input.value = `Доработай этот код (${item.lang}):\n\`\`\`${item.lang}\n${item.code}\n\`\`\``;
+      updateActionButton();
+      closeCodeMemoryModal();
+      toggleMobileSidebar(false);
+    }
+
+    function clearCodeMemory() {
+      state.codeMemory = [];
+      saveCodeMemory();
+    }
+
+    function buildCodeContextInstruction() {
+      if (!state.codeMemory.length) return "";
+      const recentSnippets = state.codeMemory.slice(0, 4).map((c, idx) =>
+        `[${idx + 1}] (${c.lang}):\n\`\`\`${c.lang}\n${c.code.slice(0, 2200)}\n\`\`\``
+      ).join("\n\n");
+
+      return `\n\nСохранённый в памяти код пользователя (помни и учитывай его при ответах и правках):\n${recentSnippets}`;
+    }
+
+    // --- СОХРАНЕНИЕ И АКТИВАЦИЯ API KEY ---
+    function hideActivationScreenImmediate() {
+      const screen = document.getElementById("activationScreen");
+      if (!screen) return;
+      screen.classList.remove("screen-visible");
+      screen.classList.add("screen-hidden");
+      screen.style.display = "none";
+    }
 
     function openKeyModal() {
       const errEl = document.getElementById("keyErrorMsg");
       const inputEl = document.getElementById("sessionApiKeyInput");
       if (errEl) errEl.textContent = "";
-      if (inputEl) inputEl.value = "";
+      if (inputEl) inputEl.value = sessionApiKey || "";
       const screen = document.getElementById("activationScreen");
       screen.style.display = "flex";
       requestAnimationFrame(() => {
@@ -461,7 +616,7 @@
     function activateMafGpt() {
       const inputEl = document.getElementById("sessionApiKeyInput");
       const errEl = document.getElementById("keyErrorMsg");
-      const entered = (inputEl?.value || "").trim();
+      const entered = (inputEl?.value || sessionApiKey || "").trim();
 
       if (!entered) {
         if (errEl) errEl.textContent = "Введите ваш API Key.";
@@ -469,6 +624,7 @@
       }
 
       sessionApiKey = entered;
+      localStorage.setItem(API_KEY_STORAGE_KEY, entered);
       if (errEl) errEl.textContent = "";
 
       try {
@@ -477,7 +633,10 @@
           voiceState.audioCtx = new AudioCtx();
           if (voiceState.audioCtx.state === "suspended") voiceState.audioCtx.resume();
         }
-        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        if ("speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.getVoices();
+        }
       } catch (e) {}
 
       const screen = document.getElementById("activationScreen");
@@ -489,14 +648,14 @@
     async function callGeminiAPI(payload) {
       if (!sessionApiKey) {
         openKeyModal();
-        throw new Error("API Key не введён для текущей сессии.");
+        throw new Error("API Key не введён.");
       }
 
       let lastError = "Превышено время ожидания ответа";
 
       for (const model of MODELS_PRIORITY) {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 8000);
+        const timer = setTimeout(() => controller.abort(), 9000);
 
         try {
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(sessionApiKey)}`;
@@ -520,11 +679,7 @@
           }
         } catch (err) {
           clearTimeout(timer);
-          if (err.name === "AbortError") {
-            lastError = `Таймаут модели ${model}`;
-          } else {
-            lastError = err.message || "Ошибка сети";
-          }
+          lastError = err.name === "AbortError" ? `Таймаут модели ${model}` : (err.message || "Ошибка сети");
           if (/API key not valid/i.test(lastError)) {
             throw new Error(lastError);
           }
@@ -534,8 +689,9 @@
       throw new Error(lastError);
     }
 
+    // --- ЧАТЫ ---
     function saveChats() {
-      localStorage.setItem("mafgpt_chats_v6", JSON.stringify(state.chats));
+      localStorage.setItem("mafgpt_chats_v8", JSON.stringify(state.chats));
       renderHistoryList();
     }
 
@@ -659,6 +815,8 @@
       const imgMime = state.attachedImageMime;
       if (!text && !imgBase64) return;
 
+      extractAndSaveCode(text, "Пользователь");
+
       const chat = getCurrentChat();
       if (chat.messages.length === 0 && text) chat.title = text.slice(0, 36);
 
@@ -692,11 +850,14 @@
 
         const reply = await callGeminiAPI({
           systemInstruction: {
-            parts: [{ text: "Ты Maf GPT. Отвечай на русском языке чётко и по делу." }]
+            parts: [{
+              text: "Ты Maf GPT. Отвечай на русском языке чётко, энергично и по делу. Помни код пользователя и опирайся на него." + buildCodeContextInstruction()
+            }]
           },
           contents
         });
 
+        extractAndSaveCode(reply, "Maf GPT");
         chat.messages.pop();
         chat.messages.push({ role: "model", text: reply });
       } catch (err) {
@@ -794,7 +955,7 @@
         processed = processed.replace(`@@CODEBLOCK_${i}@@`, `
           <div class="code-wrapper">
             <div class="code-header">
-              <span>${escapeHtml(blk.lang)}</span>
+              <span>${escapeHtml(blk.lang)} • в памяти</span>
               <button onclick="copyCodeBlock(this, '${encoded}')" class="px-2.5 py-1 rounded-lg bg-[#3c3c3c] hover:bg-[#4b4b4b] text-xs text-white cursor-pointer">
                 Копировать
               </button>
@@ -822,6 +983,25 @@
         .replace(/"/g, "&quot;");
     }
 
+    // --- ГОЛОСОВОЙ РАЗГОВОР + ЭНЕРГИЧНЫЙ БЫСТРЫЙ МУЖСКОЙ ГОЛОС ---
+    function pickEnergeticMaleVoice() {
+      if (!("speechSynthesis" in window)) return null;
+      const voices = window.speechSynthesis.getVoices() || [];
+      if (!voices.length) return null;
+
+      const ruVoices = voices.filter(v => /ru/i.test(v.lang));
+      const pool = ruVoices.length ? ruVoices : voices;
+
+      const maleKeywords = /(dmitry|pavel|boris|maxim|ivan|alex|daniel|arthur|george|male|man|guy)/i;
+      const femaleKeywords = /(svetlana|irina|elena|milena|katya|anna|maria|alice|siri|google русский)/i;
+
+      const explicitMale = pool.find(v => maleKeywords.test(v.name) && !femaleKeywords.test(v.name));
+      if (explicitMale) return explicitMale;
+
+      const nonFemale = pool.find(v => !femaleKeywords.test(v.name));
+      return nonFemale || pool[0];
+    }
+
     async function startVoiceCall() {
       if (!sessionApiKey) {
         openKeyModal();
@@ -841,6 +1021,10 @@
       voiceState.muted = false;
       voiceState.isProcessing = false;
       voiceState.isSpeaking = false;
+
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.getVoices();
+      }
 
       updateVoiceStatus("Говорите...", "Подключаю микрофон...");
 
@@ -883,7 +1067,7 @@
             voiceState.pcmChunks.push(new Float32Array(data));
           } else if (voiceState.speechStarted) {
             voiceState.pcmChunks.push(new Float32Array(data));
-            if (now - voiceState.silenceStart > 680) {
+            if (now - voiceState.silenceStart > 620) {
               voiceState.speechStarted = false;
               const chunks = voiceState.pcmChunks.slice();
               voiceState.pcmChunks = [];
@@ -912,7 +1096,7 @@
         const result = await callGeminiAPI({
           systemInstruction: {
             parts: [{
-              text: "Распознай речь на русском языке. Формат: первая строка 'ВОПРОС: <текст>', далее 'ОТВЕТ: <краткий ответ>'. Если слов нет, верни 'ПУСТО'."
+              text: "Распознай речь на русском языке. Формат: первая строка 'ВОПРОС: <текст>', далее 'ОТВЕТ: <короткий, бодрый и энергичный ответ вслух>'. Если слов нет, верни 'ПУСТО'." + buildCodeContextInstruction()
             }]
           },
           contents: [{
@@ -934,6 +1118,9 @@
         const aMatch = result.match(/ОТВЕТ:\s*([\s\S]+)/i);
         const question = qMatch ? qMatch[1].trim() : "Голосовой вопрос";
         const answer = aMatch ? aMatch[1].trim() : result.trim();
+
+        extractAndSaveCode(question, "Голос");
+        extractAndSaveCode(answer, "Maf GPT");
 
         const chat = getCurrentChat();
         if (chat.messages.length === 0) chat.title = question.slice(0, 36);
@@ -958,30 +1145,38 @@
         voiceState.isProcessing = false;
         return;
       }
-      const clean = text.replace(/```[\s\S]*?```/g, "Код в чате.").replace(/[*#`]/g, "");
+
+      const clean = text.replace(/```[\s\S]*?```/g, "Код готов в чате.").replace(/[*#`]/g, "");
       voiceState.isSpeaking = true;
       updateVoiceStatus("Говорит Maf GPT...", clean.slice(0, 110));
       document.getElementById("liveOrb").classList.add("voice-orb-speaking");
 
+      const finishSpeaking = () => {
+        voiceState.isSpeaking = false;
+        voiceState.isProcessing = false;
+        document.getElementById("liveOrb").classList.remove("voice-orb-speaking");
+        if (voiceState.active) updateVoiceStatus("Говорите...", "Я слушаю вас");
+      };
+
       if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(clean);
-        utter.lang = "ru-RU";
-        utter.onend = () => {
-          voiceState.isSpeaking = false;
-          voiceState.isProcessing = false;
-          document.getElementById("liveOrb").classList.remove("voice-orb-speaking");
-          if (voiceState.active) updateVoiceStatus("Говорите...", "Я слушаю вас");
-        };
-        utter.onerror = () => {
-          voiceState.isSpeaking = false;
-          voiceState.isProcessing = false;
-          document.getElementById("liveOrb").classList.remove("voice-orb-speaking");
-        };
+        const chosenVoice = pickEnergeticMaleVoice();
+        if (chosenVoice) {
+          utter.voice = chosenVoice;
+          utter.lang = chosenVoice.lang || "ru-RU";
+        } else {
+          utter.lang = "ru-RU";
+        }
+        utter.rate = 1.26;
+        utter.pitch = 0.86;
+        utter.volume = 1.0;
+
+        utter.onend = finishSpeaking;
+        utter.onerror = finishSpeaking;
         window.speechSynthesis.speak(utter);
       } else {
-        voiceState.isSpeaking = false;
-        voiceState.isProcessing = false;
+        finishSpeaking();
       }
     }
 
@@ -1102,6 +1297,10 @@
     }, 3600);
 
     document.addEventListener("DOMContentLoaded", () => {
+      if (sessionApiKey) {
+        hideActivationScreenImmediate();
+      }
+      renderCodeMemoryList();
       renderHistoryList();
       renderMessages();
     });
