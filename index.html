@@ -1,330 +1,2958 @@
 <!DOCTYPE html>
-<html lang="ru" id="htmlRoot">
+<html lang="ru" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand Theft Auto VI — Официальный сайт</title>
-    
-    <!-- Сюда можно вставить метатег подтверждения от Яндекса (если выберете способ "Метатег"): -->
-    <!-- <meta name="yandex-verification" content="ВАШ_КОД_ИЗ_ВЕБМАСТЕРА" /> -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Maf GPT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            appBg: '#000000',
+            sideBg: '#0a0a0a',
+            cardBg: '#121212',
+            cardHover: '#1c1c1c',
+            userBubble: '#1a1a1a',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      background: #000000;
+      color: #ffffff;
+      margin: 0;
+    }
 
-    <!-- Шрифты Rockstar / GTA стиля -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      min-width: 0;
+    }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #0b0b0d;
-            color: #ffffff;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
+    /* Полупрозрачное тёмное поле ввода в стиле современного ChatGPT с тонкой серой обводкой как на фото */
+    .composer-box {
+      background: #212121;
+      border: 1px solid #383838;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.65);
+      transition: background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
 
-        /* Шапка сайта */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 50px;
-            background: rgba(11, 11, 13, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    .composer-box:focus-within {
+      background: #242424;
+      border-color: #525252;
+      box-shadow: 0 10px 34px rgba(0, 0, 0, 0.8);
+    }
 
-        .logo {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 36px;
-            letter-spacing: 3px;
-            background: linear-gradient(45deg, #ff7b00, #ff007f, #9900ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    /* Все кнопки без обводки */
+    button {
+      border: none !important;
+      outline: none !important;
+    }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
+    /* Анимация живой голосовой сферы во время звонка */
+    @keyframes voice-orb-pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 36px rgba(37, 99, 235, 0.45), inset 0 0 26px rgba(255, 255, 255, 0.25);
+      }
+      50% {
+        transform: scale(1.07);
+        box-shadow: 0 0 60px rgba(59, 130, 246, 0.75), inset 0 0 36px rgba(255, 255, 255, 0.4);
+      }
+    }
 
-        nav {
-            display: flex;
-            gap: 25px;
-        }
+    .voice-orb-active {
+      animation: voice-orb-pulse 2s ease-in-out infinite;
+    }
 
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 14px;
-            text-transform: uppercase;
-            transition: color 0.3s;
-        }
+    .voice-orb-speaking {
+      animation: voice-orb-pulse 0.8s ease-in-out infinite;
+    }
 
-        nav a:hover {
-            color: #ff007f;
-        }
+    /* Текстура голубого неба с облаками внутри сферы как на фото */
+    .sky-orb {
+      background:
+        radial-gradient(circle at 35% 28%, #93c5fd 0%, #3b82f6 42%, #1d4ed8 72%),
+        linear-gradient(180deg, #2563eb 0%, #60a5fa 60%, #eff6ff 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .sky-orb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 88%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.45) 36%, transparent 70%);
+      pointer-events: none;
+    }
 
-        /* Кнопка переключения языка */
-        .lang-btn {
-            background: transparent;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 6px 14px;
-            font-weight: 700;
-            font-size: 13px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+    /* Плавная анимация смены стартового заголовка */
+    .greeting-fade {
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .greeting-hidden {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .greeting-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-        .lang-btn:hover {
-            border-color: #ff007f;
-            color: #ff007f;
-        }
+    /* Плавное появление сообщений */
+    @keyframes msg-slide-up {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .msg-appear {
+      animation: msg-slide-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
 
-        /* Главный экран (Hero) */
-        .hero {
-            height: 100vh;
-            background: linear-gradient(to bottom, rgba(11,11,13,0.3), #0b0b0d), 
-                        url('https://avatars.mds.yandex.net/i?id=2ce5b1be6fbe8acfeebee493fc457ab0_l-7086169-images-thumbs&n=13') no-repeat center center/cover;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 20px;
-            position: relative;
-        }
+    /* Белый мигающий курсор печати */
+    .streaming-cursor::after {
+      content: '▍';
+      display: inline-block;
+      margin-left: 3px;
+      color: #ffffff;
+      animation: cursor-blink 0.8s steps(2, start) infinite;
+    }
+    @keyframes cursor-blink {
+      to { visibility: hidden; }
+    }
 
-        .hero h1 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(60px, 12vw, 120px);
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            background: linear-gradient(180deg, #ffffff 20%, #ffb6c1 60%, #ff1493 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px rgba(255, 20, 147, 0.5);
-        }
+    /* Чистая типографика ответов */
+    .prose-maf p {
+      margin-bottom: 0.85rem;
+      line-height: 1.72;
+      color: #f5f5f5;
+    }
+    .prose-maf p:last-child {
+      margin-bottom: 0;
+    }
+    .prose-maf h1, .prose-maf h2, .prose-maf h3 {
+      color: #ffffff;
+      font-weight: 600;
+      margin-top: 1.25rem;
+      margin-bottom: 0.55rem;
+      line-height: 1.35;
+    }
+    .prose-maf h1 { font-size: 1.28rem; }
+    .prose-maf h2 { font-size: 1.12rem; }
+    .prose-maf h3 { font-size: 1.02rem; color: #e5e5e5; }
 
-        .hero p {
-            font-size: clamp(16px, 2vw, 22px);
-            max-width: 600px;
-            color: #cfcfd4;
-            margin-bottom: 40px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-        }
+    .prose-maf ul, .prose-maf ol {
+      margin: 0.55rem 0 0.95rem 1.35rem;
+      line-height: 1.7;
+      color: #f5f5f5;
+    }
 
-        .btn {
-            background: linear-gradient(135deg, #ff007f, #ff7b00);
-            color: white;
-            padding: 16px 40px;
-            font-size: 16px;
-            font-weight: 900;
-            text-transform: uppercase;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-decoration: none;
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
-            width: 100%;
-            display: inline-block;
-            text-align: center;
-        }
+    /* Блоки кода в стиле 2-го фото */
+    .code-wrapper {
+      margin: 0.95rem 0;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #2f2f2f;
+      max-width: 100%;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
 
-        .btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 35px rgba(255, 0, 127, 0.7);
-        }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.15rem;
+      background: #2f2f2f;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #f5f5f5;
+      font-family: 'Inter', sans-serif;
+    }
 
-        /* Секция покупки */
-        .buy-section {
-            padding: 140px 20px 100px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }
+    .code-body {
+      margin: 0;
+      padding: 0.25rem 1.25rem 1.25rem 1.25rem;
+      overflow-x: auto;
+      max-width: 100%;
+      max-height: 460px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      line-height: 1.65;
+      color: #f5f5f5;
+      tab-size: 2;
+      transition: max-height 0.25s ease;
+    }
 
-        .buy-section h2 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 48px;
-            letter-spacing: 2px;
-            margin-bottom: 50px;
-            text-transform: uppercase;
-        }
+    .code-body.code-collapsed {
+      max-height: 160px;
+      overflow-y: hidden;
+    }
 
-        .editions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            text-align: left;
-        }
+    .tok-kw { color: #60a5fa; font-weight: 500; }
+    .tok-tag { color: #60a5fa; }
+    .tok-attr { color: #e5e7eb; }
+    .tok-str { color: #86efac; }
+    .tok-num { color: #fbbf24; }
+    .tok-cmt { color: #8e8e93; font-style: italic; }
 
-        .edition-card {
-            background: #16161c;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: border-color 0.3s, transform 0.3s;
-        }
+    /* Статичная карточка создания изображения без каких-либо анимаций */
+    .static-image-placeholder {
+      background-color: #141414;
+      border: 1px solid #262626;
+    }
 
-        .edition-card:hover {
-            border-color: #ff007f;
-            transform: translateY(-5px);
-        }
-
-        .edition-card h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-
-        .price {
-            font-size: 32px;
-            font-weight: 900;
-            color: #ff007f;
-            margin-bottom: 20px;
-        }
-
-        .edition-card ul {
-            list-style: none;
-            margin-bottom: 30px;
-            color: #aaa;
-        }
-
-        .edition-card ul li {
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        /* Футер */
-        footer {
-            background: #070709;
-            padding: 40px 20px;
-            text-align: center;
-            color: #666;
-            font-size: 13px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-
-        @media(max-width: 768px) {
-            header {
-                padding: 15px 20px;
-            }
-        }
-    </style>
+    textarea#promptInput {
+      field-sizing: content;
+      max-height: 200px;
+      min-height: 26px;
+      caret-color: #ffffff;
+    }
+  </style>
 </head>
-<body>
+<body class="bg-appBg text-white antialiased selection:bg-white/25 selection:text-white">
+  <div class="flex h-dvh w-full max-w-full overflow-hidden">
+    <!-- Затемнение для мобильного меню -->
+    <div
+      id="sidebarBackdrop"
+      onclick="toggleSidebar(false)"
+      class="fixed inset-0 z-30 hidden bg-black/80 backdrop-blur-xs transition-opacity duration-200 md:hidden"
+    ></div>
 
-    <!-- Шапка -->
-    <header>
-        <div class="logo">GTA VI</div>
-        <div class="nav-right">
-            <nav>
-                <a href="#hero" data-ru="Главная" data-en="Home">Главная</a>
-                <a href="#buy" data-ru="Купить сейчас" data-en="Buy Now">Купить сейчас</a>
-            </nav>
-            <button class="lang-btn" onclick="toggleLanguage()" id="langToggleBtn">EN</button>
+    <!-- Боковая панель: на ПК статичная, на мобильном телефоне — выдвижное меню по кнопке с 3 палочками с кнопкой закрытия -->
+    <aside
+      id="sidebar"
+      class="fixed inset-y-0 left-0 z-40 flex w-[280px] max-w-[82vw] shrink-0 -translate-x-full flex-col bg-[#0d0d0d] shadow-2xl transition-transform duration-200 ease-out md:static md:w-64 md:max-w-none md:translate-x-0 md:shadow-none"
+    >
+      <!-- Верх боковой панели: Новый чат и кнопка закрытия на телефоне -->
+      <div class="flex items-center justify-between gap-2 px-3 pt-4 pb-2 md:pt-3.5">
+        <button
+          id="newChatBtn"
+          onclick="createNewChat()"
+          class="flex flex-1 items-center gap-2.5 rounded-xl bg-[#1a1a1a] px-3.5 py-2.5 text-sm font-medium text-white transition hover:bg-[#262626] active:scale-[0.99]"
+        >
+          <svg class="h-4 w-4 shrink-0 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+          </svg>
+          <span>Новый чат</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="toggleSidebar(false)"
+          title="Закрыть меню"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1a1a1a] text-neutral-300 transition hover:bg-[#262626] hover:text-white active:scale-95 md:hidden"
+          aria-label="Закрыть меню"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Список истории диалогов -->
+      <div class="mt-2 flex-1 overflow-y-auto px-2.5 pb-4">
+        <div class="px-2.5 py-2 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+          История разговоров
         </div>
-    </header>
+        <div id="chatHistoryList" class="flex flex-col gap-1"></div>
+      </div>
 
-    <!-- Главный экран -->
-    <section class="hero" id="hero">
-        <h1 data-ru="Grand Theft Auto VI" data-en="Grand Theft Auto VI">Grand Theft Auto VI</h1>
-        <p data-ru="Погрузитесь в самую масштабную историю преступного мира штата Леонида. Покупайте игру прямо сейчас." data-en="Dive into the biggest story in the criminal underworld of Leonida state. Buy the game right now.">Погрузитесь в самую масштабную историю преступного мира штата Леонида. Покупайте игру прямо сейчас.</p>
-        <a href="#buy" class="btn" style="max-width: 300px;" data-ru="Купить игру" data-en="Buy Game">Купить игру</a>
-    </section>
+      <!-- Низ боковой панели: очистка истории -->
+      <div class="p-2.5">
+        <button
+          type="button"
+          onclick="clearAllChats()"
+          class="flex w-full items-center gap-2.5 rounded-xl bg-transparent px-3 py-2.5 text-xs text-neutral-400 transition hover:bg-[#1a1a1a] hover:text-white"
+        >
+          <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+          </svg>
+          <span>Очистить историю</span>
+        </button>
+      </div>
+    </aside>
 
-    <!-- Секция покупки -->
-    <section class="buy-section" id="buy">
-        <h2 data-ru="Выберите издание для покупки" data-en="Choose Your Edition">Выберите издание для покупки</h2>
-        <div class="editions-grid">
-            
-            <!-- Стандартное издание -->
-            <div class="edition-card">
-                <div>
-                    <h3>Standard Edition</h3>
-                    <div class="price" data-ru="5 999 ₽" data-en="$69.99">5 999 ₽</div>
-                    <ul>
-                        <li data-ru="✔ Основная игра GTA VI" data-en="✔ Base Game GTA VI">✔ Основная игра GTA VI</li>
-                        <li data-ru="✔ Бонусы предзаказа" data-en="✔ Pre-order Bonuses">✔ Бонусы предзаказа</li>
-                        <li data-ru="✔ Доступ к онлайн-режиму" data-en="✔ Online Mode Access">✔ Доступ к онлайн-режиму</li>
-                    </ul>
-                </div>
-                <button class="btn" onclick="redirectToCheckout('Standard Edition', '5 999 ₽')" data-ru="Купить сейчас" data-en="Buy Now">Купить сейчас</button>
+    <!-- Основная рабочая область -->
+    <main class="relative flex min-w-0 flex-1 flex-col overflow-x-hidden bg-appBg">
+      <!-- Шапка: на мобильном скраю 3 палочки + логотип + быстрый новый чат; на ПК всё как и было -->
+      <header class="flex h-14 shrink-0 items-center justify-between px-3 sm:px-6">
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            onclick="toggleSidebar(true)"
+            title="История разговоров"
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-transparent text-white transition hover:bg-[#1a1a1a] active:scale-95 md:hidden"
+            aria-label="Открыть меню"
+          >
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          <!-- Фирменный значок Maf GPT скраю -->
+          <div class="flex items-center gap-2.5 select-none">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#161618] shadow-md">
+              <svg class="h-5 w-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="mafLogoGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#60a5fa" />
+                    <stop offset="55%" stop-color="#2563eb" />
+                    <stop offset="100%" stop-color="#ffffff" />
+                  </linearGradient>
+                </defs>
+                <!-- Геометрическая монограмма M + нейронная искра -->
+                <path d="M6.5 23.5V9.5L16 17.5L25.5 9.5V23.5" stroke="url(#mafLogoGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="16" cy="7.5" r="2.1" fill="#60a5fa" />
+              </svg>
             </div>
-
-            <!-- Расширенное издание -->
-            <div class="edition-card" style="border-color: rgba(255, 0, 127, 0.4);">
-                <div>
-                    <h3>Special Edition</h3>
-                    <div class="price" data-ru="7 499 ₽" data-en="$89.99">7 499 ₽</div>
-                    <ul>
-                        <li data-ru="✔ Основная игра GTA VI" data-en="✔ Base Game GTA VI">✔ Основная игра GTA VI</li>
-                        <li data-ru="✔ Эксклюзивный транспорт" data-en="✔ Exclusive Vehicles">✔ Эксклюзивный транспорт</li>
-                        <li data-ru="✔ Дополнительные миссии" data-en="✔ Additional Missions">✔ Дополнительные миссии</li>
-                        <li data-ru="✔ Ранний доступ к оружию" data-en="✔ Early Weapon Access">✔ Ранний доступ к оружию</li>
-                    </ul>
-                </div>
-                <button class="btn" onclick="redirectToCheckout('Special Edition', '7 499 ₽')" data-ru="Купить сейчас" data-en="Buy Now">Купить сейчас</button>
-            </div>
-
-            <!-- Коллекционное издание -->
-            <div class="edition-card">
-                <div>
-                    <h3>Ultimate Edition</h3>
-                    <div class="price" data-ru="12 999 ₽" data-en="$149.99">12 999 ₽</div>
-                    <ul>
-                        <li data-ru="✔ Все преимущества Special Edition" data-en="✔ All Special Edition Perks">✔ Все преимущества Special Edition</li>
-                        <li data-ru="✔ Валюта GTA$ 5,000,000" data-en="✔ GTA$ 5,000,000 Currency">✔ Валюта GTA$ 5,000,000</li>
-                        <li data-ru="✔ Цифровой артбук и саундтрек" data-en="✔ Digital Artbook & Soundtrack">✔ Цифровой артбук и саундтрек</li>
-                        <li data-ru="✔ Уникальные комплекты одежды" data-en="✔ Unique Outfit Packs">✔ Уникальные комплекты одежды</li>
-                    </ul>
-                </div>
-                <button class="btn" onclick="redirectToCheckout('Ultimate Edition', '12 999 ₽')" data-ru="Купить сейчас" data-en="Buy Now">Купить сейчас</button>
-            </div>
-
+            <span class="text-base font-semibold tracking-tight text-white">Maf GPT</span>
+          </div>
         </div>
-    </section>
 
-    <!-- Футер -->
-    <footer>
-        <p>&copy; 2026 Rockstar Games, Inc. <span data-ru="Все права защищены." data-en="All rights reserved.">Все права защищены.</span></p>
-    </footer>
+        <div class="flex items-center gap-1.5">
+          <!-- Быстрая кнопка нового чата на мобильном телефоне -->
+          <button
+            type="button"
+            onclick="createNewChat()"
+            title="Новый чат"
+            aria-label="Новый чат"
+            class="flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-neutral-300 transition hover:bg-[#1a1a1a] hover:text-white active:scale-95 md:hidden"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+          </button>
 
-    <script>
-        let currentLang = 'ru';
+          <button
+            type="button"
+            id="stopGeneratingBtn"
+            onclick="stopStreaming()"
+            class="hidden items-center gap-1.5 rounded-full bg-[#212121] px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-[#2f2f2f]"
+          >
+            <span class="h-2 w-2 rounded-xs bg-white"></span>
+            <span>Остановить</span>
+          </button>
+        </div>
+      </header>
 
-        function toggleLanguage() {
-            currentLang = currentLang === 'ru' ? 'en' : 'ru';
-            document.getElementById('langToggleBtn').innerText = currentLang === 'ru' ? 'EN' : 'RU';
-            document.getElementById('htmlRoot').setAttribute('lang', currentLang);
+      <!-- Лента сообщений (всегда видна, в том числе над свёрнутым звонком) -->
+      <div id="messagesScroll" class="flex-1 overflow-y-auto overflow-x-hidden px-3 py-6 sm:px-6">
+        <div id="messagesInner" class="mx-auto flex w-full max-w-[820px] min-w-0 flex-col gap-6 overflow-x-hidden pb-4">
+          <!-- Контент чата -->
+        </div>
+      </div>
 
-            const elements = document.querySelectorAll('[data-ru]');
-            elements.forEach(el => {
-                el.innerText = el.getAttribute(`data-${currentLang}`);
-            });
+      <!-- Всплывающее уведомление -->
+      <div
+        id="toastBanner"
+        class="pointer-events-none fixed bottom-28 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#262626] px-4 py-2 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200"
+      >
+        Готово
+      </div>
+
+      <!-- Компактная голосовая сфера прямо над полем ввода (когда звонок свёрнут вниз как на фото) -->
+      <div
+        id="dockedCallBar"
+        class="mx-auto hidden w-full max-w-[820px] shrink-0 flex-col items-center justify-center overflow-x-hidden bg-appBg px-3 pt-2 pb-1"
+      >
+        <button
+          type="button"
+          onclick="setLiveCallCollapsed(false)"
+          title="Развернуть звонок"
+          class="group relative flex flex-col items-center gap-1.5 bg-transparent"
+        >
+          <div
+            id="dockedVoiceOrb"
+            class="sky-orb voice-orb-active h-20 w-20 rounded-full shadow-2xl transition-transform duration-200 group-hover:scale-105"
+          ></div>
+          <span id="dockedCallStatus" class="text-[11px] font-medium text-neutral-400">Говорите...</span>
+        </button>
+      </div>
+
+      <!-- Область ввода -->
+      <div class="shrink-0 overflow-x-hidden bg-appBg px-3 pb-5 pt-1 sm:px-6 sm:pb-7">
+        <div class="mx-auto w-full max-w-[820px] min-w-0">
+          <!-- Превью прикреплённого фото -->
+          <div id="imagePreviewContainer" class="mb-2.5 hidden">
+            <div class="relative inline-flex items-center gap-3 rounded-2xl bg-[#212121] p-2 pr-3 shadow-lg">
+              <img
+                id="imagePreviewThumb"
+                src=""
+                alt="Фото"
+                class="h-14 w-14 rounded-xl object-cover"
+              />
+              <div class="min-w-0">
+                <div id="imagePreviewName" class="max-w-[180px] truncate text-xs font-medium text-white">
+                  photo.jpg
+                </div>
+                <div class="text-[11px] text-neutral-400">Фото прикреплено</div>
+              </div>
+              <button
+                type="button"
+                onclick="clearAttachedImage()"
+                aria-label="Удалить фото"
+                class="flex h-7 w-7 items-center justify-center rounded-full bg-[#2e2e2e] text-white transition hover:bg-[#3a3a3a]"
+              >
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Капсула ввода: в обычном режиме справа синяя волна / стрелка; во время звонка справа микрофон и синий крестик как на фото -->
+          <div class="composer-box flex items-end gap-2 rounded-[28px] px-3 py-2">
+            <input
+              type="file"
+              id="imageFileInput"
+              accept="image/*"
+              class="hidden"
+              onchange="handleImageSelected(event)"
+            />
+
+            <!-- Значок + для прикрепления фото -->
+            <button
+              type="button"
+              onclick="document.getElementById('imageFileInput').click()"
+              title="Прикрепить фото"
+              aria-label="Прикрепить фото"
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-transparent text-neutral-300 transition hover:bg-[#2f2f2f] hover:text-white active:scale-95"
+            >
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+
+            <textarea
+              id="promptInput"
+              rows="1"
+              placeholder="Спросить Maf GPT"
+              oninput="updateActionButtonState()"
+              onkeydown="handleComposerKeydown(event)"
+              onpaste="handleComposerPaste(event)"
+              class="my-auto max-h-48 min-h-[24px] flex-1 resize-none bg-transparent py-1.5 text-[15px] leading-relaxed text-white placeholder-neutral-400 focus:outline-none focus:ring-0"
+            ></textarea>
+
+            <!-- Кнопки во время активного звонка (как на скриншоте: микрофон + синий крестик) -->
+            <div id="dockedCallControls" class="hidden shrink-0 items-center gap-2">
+              <button
+                type="button"
+                id="dockedMuteBtn"
+                onclick="toggleLiveMute()"
+                title="Выключить / включить микрофон"
+                aria-label="Микрофон"
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-[#2c2c2c] text-white transition hover:bg-[#3a3a3a] active:scale-95"
+              >
+                <svg id="dockedMicOnIcon" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                </svg>
+                <svg id="dockedMicOffIcon" class="hidden h-4 w-4 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="2" y1="2" x2="22" y2="22" />
+                  <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2" />
+                  <path d="M5 10v2a7 7 0 0 0 12 5" />
+                  <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" />
+                  <path d="M9 9v3a3 3 0 0 0 5.12 2.12" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                onclick="stopLiveCall()"
+                title="Закончить разговор"
+                aria-label="Закончить разговор"
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-[#2563eb] text-white transition hover:bg-[#1d4ed8] active:scale-95"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Умная кнопка в обычном режиме: если пусто — синяя кнопка живого звонка; если введён текст — белая стрелка вверх для отправки -->
+            <button
+              type="button"
+              id="sendBtn"
+              onclick="handlePrimaryActionClick()"
+              title="Голосовой разговор"
+              aria-label="Голосовой разговор"
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563eb] text-white transition-all duration-150 hover:bg-[#1d4ed8] active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              <!-- Иконка звуковых волн (режим звонка, когда поле пустое) -->
+              <svg id="iconVoiceWave" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <path d="M5 10v4" />
+                <path d="M9.5 7v10" />
+                <path d="M14.5 5v14" />
+                <path d="M19 9v6" />
+              </svg>
+              <!-- Иконка стрелки вверх (режим отправки текста, когда что-то введено) -->
+              <svg id="iconSendArrow" class="hidden h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 19V5" />
+                <path d="M5 12l7-7 7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Полноэкранный режим живого голосового звонка (с кнопкой сворачивания вниз в чат) -->
+  <div
+    id="liveCallOverlay"
+    class="fixed inset-0 z-50 hidden flex-col items-center justify-between bg-[#050505]/95 px-6 py-8 backdrop-blur-xl"
+  >
+    <div class="flex w-full max-w-3xl items-center justify-between">
+      <button
+        type="button"
+        onclick="setLiveCallCollapsed(true)"
+        title="Свернуть вниз и открыть чат"
+        class="flex items-center gap-1.5 rounded-full bg-[#1f1f1f] px-3.5 py-2 text-xs font-medium text-white transition hover:bg-[#2c2c2c]"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+        <span>В чат</span>
+      </button>
+
+      <div class="flex flex-col items-center text-center">
+        <span class="text-base font-semibold tracking-tight text-white">Maf GPT</span>
+        <span id="liveCallStatus" class="text-xs text-neutral-400">Подключение...</span>
+      </div>
+
+      <div class="w-16"></div>
+    </div>
+
+    <!-- Центральная анимированная сфера голоса -->
+    <div class="flex flex-col items-center justify-center gap-6">
+      <div
+        id="liveVoiceOrb"
+        class="sky-orb voice-orb-active h-40 w-40 rounded-full transition-transform duration-300 sm:h-48 sm:w-48"
+      ></div>
+      <p id="liveCallSubtitle" class="max-w-md text-center text-sm text-neutral-300 min-h-[20px]"></p>
+    </div>
+
+    <!-- Нижняя панель управления звонком: кнопка микрофона (вкл/выкл) и синий крестик (завершить звонок) -->
+    <div class="flex items-center gap-6">
+      <button
+        type="button"
+        id="liveMuteBtn"
+        onclick="toggleLiveMute()"
+        title="Выключить / включить микрофон"
+        aria-label="Микрофон"
+        class="flex h-14 w-14 items-center justify-center rounded-full bg-[#212121] text-white transition hover:bg-[#2f2f2f] active:scale-95"
+      >
+        <svg id="micOnIcon" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+          <line x1="12" y1="19" x2="12" y2="22" />
+        </svg>
+        <svg id="micOffIcon" class="hidden h-6 w-6 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="2" y1="2" x2="22" y2="22" />
+          <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2" />
+          <path d="M5 10v2a7 7 0 0 0 12 5" />
+          <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" />
+          <path d="M9 9v3a3 3 0 0 0 5.12 2.12" />
+          <line x1="12" y1="19" x2="12" y2="22" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        id="liveHangupBtn"
+        onclick="stopLiveCall()"
+        title="Закончить разговор"
+        aria-label="Закончить разговор"
+        class="flex h-14 w-14 items-center justify-center rounded-full bg-[#2563eb] text-white transition hover:bg-[#1d4ed8] active:scale-95"
+      >
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Модальное окно переименования чата -->
+  <div
+    id="renameModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-xs"
+  >
+    <div class="w-full max-w-sm rounded-2xl bg-[#1c1c1c] p-5 shadow-2xl">
+      <h3 class="mb-3 text-sm font-semibold text-white">Переименовать чат</h3>
+      <input
+        type="text"
+        id="renameChatInput"
+        onkeydown="if(event.key==='Enter') confirmRenameChat()"
+        class="w-full rounded-xl bg-[#121212] px-3.5 py-2.5 text-sm text-white focus:outline-none"
+      />
+      <div class="mt-4 flex justify-end gap-2">
+        <button
+          type="button"
+          onclick="closeRenameModal()"
+          class="rounded-xl bg-[#2a2a2a] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#363636]"
+        >
+          Отмена
+        </button>
+        <button
+          type="button"
+          onclick="confirmRenameChat()"
+          class="rounded-xl bg-[#2563eb] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#1d4ed8]"
+        >
+          Сохранить
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно предпросмотра HTML-кода (кнопка Play как на 2 фото) -->
+  <div
+    id="codePreviewModal"
+    class="fixed inset-0 z-50 hidden flex-col bg-black/90 p-3 backdrop-blur-xs sm:p-6"
+  >
+    <div class="mx-auto flex h-full w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-[#1a1a1a] shadow-2xl">
+      <div class="flex items-center justify-between bg-[#252525] px-4 py-3">
+        <span class="text-xs font-semibold text-white">Предпросмотр кода</span>
+        <button
+          type="button"
+          onclick="closeCodePreviewModal()"
+          class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#333333] text-white hover:bg-[#444444]"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <iframe
+        id="codePreviewFrame"
+        sandbox="allow-scripts"
+        class="h-full w-full flex-1 bg-white"
+      ></iframe>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Maf GPT — Состояние приложения и постоянное хранилище
+     */
+    const STORAGE_KEYS = {
+      CHATS: 'maf_gpt_chats_bw_v1',
+      ACTIVE_CHAT: 'maf_gpt_active_chat_bw_v1',
+    };
+
+    const state = {
+      chats: [],
+      activeChatId: null,
+      reasoningLevel: 'max',
+      attachedImage: null,
+      isGenerating: false,
+      abortController: null,
+      streamTimer: null,
+      greetingTimer: null,
+      imageProgressTimer: null,
+      imageProgressValue: 1,
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPersistedState();
+      ensureActiveChat();
+      renderSidebar();
+      renderMessages();
+      updateActionButtonState();
+      document.getElementById('promptInput')?.focus();
+    });
+
+    function loadPersistedState() {
+      try {
+        const savedChats = localStorage.getItem(STORAGE_KEYS.CHATS);
+        if (savedChats) {
+          const parsed = JSON.parse(savedChats);
+          if (Array.isArray(parsed)) state.chats = parsed;
+        }
+      } catch (_) {
+        state.chats = [];
+      }
+
+      state.activeChatId = localStorage.getItem(STORAGE_KEYS.ACTIVE_CHAT) || null;
+    }
+
+    function saveChats() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.CHATS, JSON.stringify(state.chats));
+        if (state.activeChatId) {
+          localStorage.setItem(STORAGE_KEYS.ACTIVE_CHAT, state.activeChatId);
+        }
+      } catch (_) {
+        showToast('Память заполнена — удалите старые диалоги');
+      }
+    }
+
+    function ensureActiveChat() {
+      if (!state.chats.length) {
+        createNewChat(false);
+        return;
+      }
+      const found = state.chats.find(c => c.id === state.activeChatId);
+      state.activeChatId = found ? found.id : state.chats[0].id;
+    }
+
+    function getActiveChat() {
+      return state.chats.find(c => c.id === state.activeChatId) || null;
+    }
+
+    function createNewChat(shouldRender = true) {
+      if (state.isGenerating) stopStreaming();
+      const id = 'chat_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+      const newChat = {
+        id,
+        title: 'Новый чат',
+        updatedAt: Date.now(),
+        messages: [],
+      };
+      state.chats.unshift(newChat);
+      state.activeChatId = id;
+      saveChats();
+
+      if (shouldRender) {
+        renderSidebar();
+        renderMessages();
+        toggleSidebar(false);
+        document.getElementById('promptInput')?.focus();
+      }
+    }
+
+    function selectChat(chatId) {
+      if (state.isGenerating) stopStreaming();
+      state.activeChatId = chatId;
+      saveChats();
+      renderSidebar();
+      renderMessages();
+      toggleSidebar(false);
+    }
+
+    function deleteChat(event, chatId) {
+      event.stopPropagation();
+      if (state.isGenerating && state.activeChatId === chatId) stopStreaming();
+      state.chats = state.chats.filter(c => c.id !== chatId);
+      if (!state.chats.length) {
+        createNewChat(false);
+      } else if (state.activeChatId === chatId) {
+        state.activeChatId = state.chats[0].id;
+      }
+      saveChats();
+      renderSidebar();
+      renderMessages();
+    }
+
+    function clearAllChats() {
+      if (state.isGenerating) stopStreaming();
+      state.chats = [];
+      createNewChat(false);
+      renderSidebar();
+      renderMessages();
+      showToast('История очищена');
+    }
+
+    let renamingChatId = null;
+
+    function openRenameModal(event, chatId) {
+      event.stopPropagation();
+      const chat = state.chats.find(c => c.id === chatId);
+      if (!chat) return;
+      renamingChatId = chatId;
+      const input = document.getElementById('renameChatInput');
+      input.value = chat.title || '';
+      const modal = document.getElementById('renameModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => input.focus(), 30);
+    }
+
+    function closeRenameModal() {
+      renamingChatId = null;
+      const modal = document.getElementById('renameModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function confirmRenameChat() {
+      if (!renamingChatId) return;
+      const newTitle = document.getElementById('renameChatInput').value.trim();
+      if (newTitle) {
+        const chat = state.chats.find(c => c.id === renamingChatId);
+        if (chat) {
+          chat.title = newTitle;
+          saveChats();
+          renderSidebar();
+        }
+      }
+      closeRenameModal();
+    }
+
+    function toggleSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (open) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function renderSidebar() {
+      const listEl = document.getElementById('chatHistoryList');
+      if (!listEl) return;
+
+      if (!state.chats.length) {
+        listEl.innerHTML = `<div class="px-3 py-6 text-center text-xs text-neutral-500">Нет диалогов</div>`;
+        return;
+      }
+
+      listEl.innerHTML = state.chats
+        .map(chat => {
+          const active = chat.id === state.activeChatId;
+          return `
+            <div
+              onclick="selectChat('${chat.id}')"
+              class="group flex cursor-pointer items-center justify-between gap-2 rounded-xl px-3 py-2 text-[13px] transition ${
+                active
+                  ? 'bg-[#212121] font-medium text-white'
+                  : 'text-neutral-300 hover:bg-[#181818] hover:text-white'
+              }"
+            >
+              <span class="truncate">${escapeHtml(chat.title || 'Новый чат')}</span>
+              <div class="flex shrink-0 items-center gap-1 opacity-0 transition group-hover:opacity-100">
+                <button
+                  type="button"
+                  onclick="openRenameModal(event, '${chat.id}')"
+                  title="Переименовать"
+                  class="flex h-6 w-6 items-center justify-center rounded-lg bg-transparent text-neutral-400 transition hover:bg-[#2f2f2f] hover:text-white"
+                >
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onclick="deleteChat(event, '${chat.id}')"
+                  title="Удалить"
+                  class="flex h-6 w-6 items-center justify-center rounded-lg bg-transparent text-neutral-400 transition hover:bg-[#2f2f2f] hover:text-white"
+                >
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    /**
+     * Работа с изображениями (загрузка, сжатие и скачивание в галерею)
+     */
+    function processImageFile(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        showToast('Выберите изображение');
+        return;
+      }
+      if (file.size > 15 * 1024 * 1024) {
+        showToast('Максимум 15 МБ');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const rawDataUrl = String(reader.result || '');
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1024;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const outMime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+          const compressedDataUrl = canvas.toDataURL(outMime, 0.88);
+          const base64 = compressedDataUrl.split(',')[1] || '';
+
+          state.attachedImage = {
+            name: file.name || `photo_${Date.now()}.jpg`,
+            mimeType: outMime,
+            base64,
+            dataUrl: compressedDataUrl,
+          };
+          document.getElementById('imagePreviewThumb').src = compressedDataUrl;
+          document.getElementById('imagePreviewName').textContent = state.attachedImage.name;
+          document.getElementById('imagePreviewContainer').classList.remove('hidden');
+          updateActionButtonState();
+        };
+        img.onerror = () => showToast('Не удалось открыть фото');
+        img.src = rawDataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleImageSelected(event) {
+      const file = event.target.files?.[0];
+      if (file) processImageFile(file);
+      event.target.value = '';
+    }
+
+    function handleComposerPaste(event) {
+      const items = event.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type && item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) {
+            event.preventDefault();
+            processImageFile(file);
+            break;
+          }
+        }
+      }
+    }
+
+    function clearAttachedImage() {
+      state.attachedImage = null;
+      const preview = document.getElementById('imagePreviewContainer');
+      if (preview) preview.classList.add('hidden');
+      const thumb = document.getElementById('imagePreviewThumb');
+      if (thumb) thumb.src = '';
+      updateActionButtonState();
+    }
+
+    function downloadGeneratedImage(msgIndex) {
+      const chat = getActiveChat();
+      const msg = chat?.messages?.[msgIndex];
+      const dataUrl = msg?.generatedImageUrl;
+      if (!dataUrl) {
+        showToast('Изображение недоступно');
+        return;
+      }
+
+      try {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        const ext = dataUrl.startsWith('data:image/jpeg') ? 'jpg' : 'png';
+        link.download = `MafGPT_${Date.now()}.${ext}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('Фото сохранено в галерею');
+      } catch (_) {
+        showToast('Не удалось скачать фото');
+      }
+    }
+
+    /**
+     * Отрисовка стартового экрана с плавной анимацией смены заголовка и ленты сообщений
+     */
+    const GREETING_PHRASES = [
+      'Чем помочь сегодня?',
+      'Можем начинать.',
+      'Какая идея у нас на очереди?',
+      'Готов к любым задачам.',
+      'Спросите о чём угодно.',
+      'Создадим что-то крутое?',
+    ];
+
+    function startGreetingAnimation() {
+      if (state.greetingTimer) {
+        clearInterval(state.greetingTimer);
+        state.greetingTimer = null;
+      }
+      const el = document.getElementById('animatedGreeting');
+      if (!el) return;
+
+      let phraseIndex = 0;
+      el.textContent = GREETING_PHRASES[0];
+      el.classList.remove('greeting-hidden');
+      el.classList.add('greeting-visible');
+
+      state.greetingTimer = setInterval(() => {
+        const target = document.getElementById('animatedGreeting');
+        if (!target) {
+          clearInterval(state.greetingTimer);
+          state.greetingTimer = null;
+          return;
+        }
+        target.classList.remove('greeting-visible');
+        target.classList.add('greeting-hidden');
+
+        setTimeout(() => {
+          const finalEl = document.getElementById('animatedGreeting');
+          if (!finalEl) return;
+          phraseIndex = (phraseIndex + 1) % GREETING_PHRASES.length;
+          finalEl.textContent = GREETING_PHRASES[phraseIndex];
+          finalEl.classList.remove('greeting-hidden');
+          finalEl.classList.add('greeting-visible');
+        }, 520);
+      }, 2800);
+    }
+
+    function handleComposerKeydown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        if (!state.isGenerating) {
+          sendMessage();
+        }
+      }
+    }
+
+    /**
+     * Переключение кнопки справа:
+     * - Во время активного звонка: если поле пустое -> кнопки микрофона и крестика; если введён текст -> стрелка отправки
+     * - Вне звонка: если поле пустое -> синяя кнопка звонка; если введён текст -> белая стрелка отправки
+     */
+    function updateActionButtonState() {
+      const input = document.getElementById('promptInput');
+      const btn = document.getElementById('sendBtn');
+      const dockedControls = document.getElementById('dockedCallControls');
+      const waveIcon = document.getElementById('iconVoiceWave');
+      const arrowIcon = document.getElementById('iconSendArrow');
+      if (!input || !btn || !waveIcon || !arrowIcon) return;
+
+      const hasContent = input.value.trim().length > 0 || Boolean(state.attachedImage);
+
+      if (liveState.active && liveState.collapsed) {
+        if (hasContent) {
+          dockedControls?.classList.add('hidden');
+          dockedControls?.classList.remove('flex');
+          btn.classList.remove('hidden');
+          waveIcon.classList.add('hidden');
+          arrowIcon.classList.remove('hidden');
+          btn.classList.remove('bg-[#2563eb]', 'hover:bg-[#1d4ed8]', 'text-white');
+          btn.classList.add('bg-white', 'hover:bg-neutral-200', 'text-black');
+          btn.title = 'Отправить сообщение';
+        } else {
+          btn.classList.add('hidden');
+          dockedControls?.classList.remove('hidden');
+          dockedControls?.classList.add('flex');
+        }
+        return;
+      }
+
+      dockedControls?.classList.add('hidden');
+      dockedControls?.classList.remove('flex');
+      btn.classList.remove('hidden');
+
+      if (hasContent) {
+        waveIcon.classList.add('hidden');
+        arrowIcon.classList.remove('hidden');
+        btn.classList.remove('bg-[#2563eb]', 'hover:bg-[#1d4ed8]', 'text-white');
+        btn.classList.add('bg-white', 'hover:bg-neutral-200', 'text-black');
+        btn.title = 'Отправить сообщение';
+        btn.setAttribute('aria-label', 'Отправить сообщение');
+      } else {
+        arrowIcon.classList.add('hidden');
+        waveIcon.classList.remove('hidden');
+        btn.classList.remove('bg-white', 'hover:bg-neutral-200', 'text-black');
+        btn.classList.add('bg-[#2563eb]', 'hover:bg-[#1d4ed8]', 'text-white');
+        btn.title = 'Голосовой звонок';
+        btn.setAttribute('aria-label', 'Голосовой звонок');
+      }
+    }
+
+    function handlePrimaryActionClick() {
+      const input = document.getElementById('promptInput');
+      const hasContent = (input && input.value.trim().length > 0) || Boolean(state.attachedImage);
+      if (hasContent) {
+        sendMessage();
+      } else {
+        startLiveCall();
+      }
+    }
+
+    async function sendMessage() {
+      if (state.isGenerating) return;
+      const input = document.getElementById('promptInput');
+      const rawText = input ? input.value.trim() : '';
+      const attached = state.attachedImage ? { ...state.attachedImage } : null;
+
+      if (!rawText && !attached) return;
+
+      const chat = getActiveChat();
+      if (!chat) return;
+
+      const isImageJob = isImageGenerationRequest(rawText, Boolean(attached));
+
+      const userMsg = {
+        role: 'user',
+        content: rawText,
+        imageDataUrl: attached ? attached.dataUrl : null,
+        imageBase64: attached ? attached.base64 : null,
+        imageMimeType: attached ? attached.mimeType : null,
+        timestamp: Date.now(),
+      };
+
+      chat.messages.push(userMsg);
+      if (chat.messages.length === 1 && rawText) {
+        chat.title = rawText.length > 36 ? rawText.slice(0, 36) + '...' : rawText;
+      }
+      chat.updatedAt = Date.now();
+
+      if (input) input.value = '';
+      clearAttachedImage();
+      updateActionButtonState();
+
+      const assistantMsg = {
+        role: 'assistant',
+        content: '',
+        generatedImageUrl: null,
+        isImageJob,
+        isStreaming: true,
+        timestamp: Date.now(),
+      };
+      chat.messages.push(assistantMsg);
+
+      state.isGenerating = true;
+      setGeneratingUI(true);
+      if (isImageJob) {
+        startImageProgressAnimation();
+      }
+
+      saveChats();
+      renderSidebar();
+      renderMessages();
+
+      try {
+        if (isImageJob) {
+          const imgRes = await fetchGeneratedImage(rawText || 'Создай красивое изображение', attached);
+          stopImageProgressAnimation();
+          assistantMsg.generatedImageUrl = imgRes.imageUrl;
+          assistantMsg.content = imgRes.answer;
+          assistantMsg.isStreaming = false;
+        } else {
+          const historyForApi = chat.messages.slice(0, -1);
+          let lastRenderTime = 0;
+
+          const textRes = await fetchTextResponseStream(historyForApi, state.reasoningLevel, (partialText) => {
+            assistantMsg.content = partialText;
+            const now = performance.now();
+            if (now - lastRenderTime > 32) {
+              lastRenderTime = now;
+              renderMessages();
+            }
+          });
+
+          if (textRes.detectedImagePrompt) {
+            assistantMsg.isImageJob = true;
+            renderMessages();
+            const fallbackImg = await fetchGeneratedImage(textRes.detectedImagePrompt, attached);
+            assistantMsg.generatedImageUrl = fallbackImg.imageUrl;
+            assistantMsg.content = fallbackImg.answer;
+            assistantMsg.isStreaming = false;
+          } else {
+            assistantMsg.content = textRes.answer;
+            assistantMsg.isStreaming = false;
+          }
+        }
+      } catch (err) {
+        stopImageProgressAnimation();
+        if (err?.name === 'AbortError') {
+          assistantMsg.content = assistantMsg.content || 'Генерация остановлена.';
+        } else {
+          assistantMsg.content = `Не удалось получить ответ (${escapePlainError(err?.message)}). Попробуйте ещё раз.`;
+        }
+        assistantMsg.isStreaming = false;
+      } finally {
+        state.isGenerating = false;
+        state.abortController = null;
+        setGeneratingUI(false);
+        chat.updatedAt = Date.now();
+        saveChats();
+        renderSidebar();
+        renderMessages();
+      }
+    }
+
+    function renderMessages() {
+      const inner = document.getElementById('messagesInner');
+      const chat = getActiveChat();
+      if (!inner || !chat) return;
+
+      if (!chat.messages.length) {
+        inner.innerHTML = `
+          <div class="flex flex-1 flex-col items-center justify-center px-3 pt-24 pb-8 text-center sm:pt-44 sm:pb-10">
+            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#141416] shadow-lg">
+              <svg class="h-7 w-7" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="mafCenterGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#60a5fa" />
+                    <stop offset="55%" stop-color="#2563eb" />
+                    <stop offset="100%" stop-color="#ffffff" />
+                  </linearGradient>
+                </defs>
+                <path d="M6.5 23.5V9.5L16 17.5L25.5 9.5V23.5" stroke="url(#mafCenterGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="16" cy="7.5" r="2.1" fill="#60a5fa" />
+              </svg>
+            </div>
+            <h1 id="animatedGreeting" class="greeting-fade greeting-visible text-[22px] font-medium tracking-tight text-white sm:text-[28px]">
+              Чем помочь сегодня?
+            </h1>
+          </div>
+        `;
+        startGreetingAnimation();
+        return;
+      }
+
+      if (state.greetingTimer) {
+        clearInterval(state.greetingTimer);
+        state.greetingTimer = null;
+      }
+
+      inner.innerHTML = chat.messages.map((msg, idx) => buildMessageHTML(msg, idx)).join('');
+      scrollToBottom();
+    }
+
+    function buildGeneratedImageCard(dataUrl, index) {
+      if (!dataUrl) return '';
+      return `
+        <div class="mb-3 inline-block max-w-full overflow-hidden rounded-2xl bg-[#171717] p-2 shadow-xl">
+          <img
+            src="${dataUrl}"
+            alt="Изображение"
+            class="max-h-96 w-auto max-w-full rounded-xl object-contain"
+          />
+        </div>
+      `;
+    }
+
+    /**
+     * Анимированная точечная сетка создания изображения с процентами (как на 3 фото)
+     */
+    function buildImageGenerationSkeleton(percent) {
+      return `
+        <div class="my-1 w-full max-w-[320px]">
+          <div class="mb-3 text-[15px] font-normal text-neutral-200">Создание изображения</div>
+          <div class="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#050505]">
+            <canvas
+              id="imageDotWaveCanvas"
+              class="h-full w-full block"
+            ></canvas>
+            <div
+              id="imageGenPercentBadge"
+              class="absolute bottom-3 right-3 rounded-full bg-[#1a1a1a]/95 px-3 py-1 text-xs font-medium text-[#3b82f6] shadow-lg"
+            >
+              ${percent} %
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    let dotWaveRafId = null;
+
+    function startImageProgressAnimation() {
+      stopImageProgressAnimation();
+      state.imageProgressValue = 3;
+
+      const animateCanvasDots = () => {
+        const canvas = document.getElementById('imageDotWaveCanvas');
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          const w = Math.max(200, Math.floor(rect.width || 300));
+          const h = Math.max(200, Math.floor(rect.height || 300));
+          if (canvas.width !== w || canvas.height !== h) {
+            canvas.width = w;
+            canvas.height = h;
+          }
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, w, h);
+
+            const cols = 22;
+            const rows = 20;
+            const stepX = w / cols;
+            const stepY = h / rows;
+            const t = performance.now() * 0.0032;
+
+            for (let r = 0; r < rows; r++) {
+              for (let c = 0; c < cols; c++) {
+                const wave = Math.sin(c * 0.38 - t) * Math.cos(r * 0.34 - t * 0.8);
+                const norm = (wave + 1) * 0.5;
+                const radius = 0.9 + norm * 1.45;
+                const alpha = 0.15 + norm * 0.85;
+
+                ctx.beginPath();
+                ctx.arc(c * stepX + stepX * 0.5, r * stepY + stepY * 0.5, radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(59, 130, 246, ${alpha.toFixed(3)})`;
+                ctx.fill();
+              }
+            }
+          }
+        }
+        dotWaveRafId = requestAnimationFrame(animateCanvasDots);
+      };
+
+      dotWaveRafId = requestAnimationFrame(animateCanvasDots);
+
+      state.imageProgressTimer = setInterval(() => {
+        if (state.imageProgressValue < 99) {
+          const step = state.imageProgressValue < 45 ? 4 : state.imageProgressValue < 80 ? 2 : 1;
+          state.imageProgressValue = Math.min(99, state.imageProgressValue + step);
+          const badge = document.getElementById('imageGenPercentBadge');
+          if (badge) {
+            badge.textContent = `${state.imageProgressValue} %`;
+          }
+        }
+      }, 260);
+    }
+
+    function stopImageProgressAnimation() {
+      if (state.imageProgressTimer) {
+        clearInterval(state.imageProgressTimer);
+        state.imageProgressTimer = null;
+      }
+      if (dotWaveRafId) {
+        cancelAnimationFrame(dotWaveRafId);
+        dotWaveRafId = null;
+      }
+    }
+
+    function editUserMessage(index) {
+      const chat = getActiveChat();
+      const msg = chat?.messages?.[index];
+      const input = document.getElementById('promptInput');
+      if (!msg || !input) return;
+      input.value = msg.content || '';
+      updateActionButtonState();
+      input.focus();
+    }
+
+    function toggleMessageReaction(index, type) {
+      const chat = getActiveChat();
+      const msg = chat?.messages?.[index];
+      if (!msg) return;
+      msg.reaction = msg.reaction === type ? null : type;
+      saveChats();
+      renderMessages();
+    }
+
+    function shareOrDownloadMessage(index) {
+      const chat = getActiveChat();
+      const msg = chat?.messages?.[index];
+      if (!msg) return;
+      if (msg.generatedImageUrl) {
+        downloadGeneratedImage(index);
+        return;
+      }
+      if (navigator.share && msg.content) {
+        navigator.share({ title: 'Maf GPT', text: msg.content }).catch(() => {});
+      } else {
+        copyRawText(msg.content || '');
+      }
+    }
+
+    function buildMessageHTML(msg, index) {
+      const isUser = msg.role === 'user';
+      const escapedPlain = escapeAttr(msg.content || '');
+
+      if (isUser) {
+        const imgHtml = msg.imageDataUrl
+          ? `<div class="mb-2.5 overflow-hidden rounded-xl bg-appBg">
+               <img src="${msg.imageDataUrl}" alt="Фото" class="max-h-64 w-auto max-w-full object-contain" />
+             </div>`
+          : '';
+
+        return `
+          <div id="msg-${index}" class="msg-appear flex flex-col items-end gap-1.5">
+            <div class="max-w-[85%] rounded-3xl bg-[#1e1e1e] px-4 py-3 text-[15px] text-white sm:max-w-[75%]">
+              ${imgHtml}
+              ${msg.content ? `<div class="whitespace-pre-wrap break-words leading-relaxed">${escapeHtml(msg.content)}</div>` : ''}
+            </div>
+            <!-- Кнопки под сообщением пользователя как на 1 фото: Копировать и Редактировать -->
+            <div class="flex items-center gap-1 pr-1">
+              <button
+                type="button"
+                onclick="copyRawText(decodeAttr('${escapedPlain}'))"
+                title="Копировать"
+                aria-label="Копировать"
+                class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-300 transition hover:bg-[#1c1c1c] hover:text-white active:scale-95"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2.5" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onclick="editUserMessage(${index})"
+                title="Редактировать"
+                aria-label="Редактировать"
+                class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-300 transition hover:bg-[#1c1c1c] hover:text-white active:scale-95"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      const isWaitingFirstChunk = msg.isStreaming && !msg.content && !msg.generatedImageUrl;
+      const generatedImgHtml = buildGeneratedImageCard(msg.generatedImageUrl, index);
+
+      let bodyContent = '';
+      if (msg.isStreaming && msg.isImageJob && !msg.generatedImageUrl) {
+        bodyContent = buildImageGenerationSkeleton();
+      } else if (isWaitingFirstChunk) {
+        bodyContent = `<div class="py-1.5 text-sm text-neutral-400"><span>Думает...</span></div>`;
+      } else {
+        bodyContent = `${generatedImgHtml}${renderRichMarkdown(msg.content || '', Boolean(msg.isStreaming))}`;
+      }
+
+      const liked = msg.reaction === 'like';
+      const disliked = msg.reaction === 'dislike';
+
+      return `
+        <div id="msg-${index}" class="msg-appear flex w-full min-w-0 max-w-full flex-col items-start overflow-x-hidden">
+          <div class="w-full min-w-0 max-w-full overflow-x-hidden">
+            <div class="prose-maf min-w-0 max-w-full overflow-x-hidden text-[15px] ${msg.isStreaming && !isWaitingFirstChunk && !msg.isImageJob ? 'streaming-cursor' : ''}">
+              ${bodyContent}
+            </div>
+            ${
+              !msg.isStreaming && (msg.content || msg.generatedImageUrl)
+                ? `<!-- Панель из 4 иконок под ответом / фото как на 4 фото: Копировать, Лайк, Дизлайк, Поделиться/Скачать -->
+                   <div class="mt-2.5 flex items-center gap-2">
+                     <button
+                       type="button"
+                       onclick="copyRawText(decodeAttr('${escapedPlain}'))"
+                       title="Копировать"
+                       aria-label="Копировать"
+                       class="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-neutral-300 transition hover:bg-[#1c1c1c] hover:text-white active:scale-95"
+                     >
+                       <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                         <rect x="9" y="9" width="13" height="13" rx="2.5" />
+                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                       </svg>
+                     </button>
+                     <button
+                       type="button"
+                       onclick="toggleMessageReaction(${index}, 'like')"
+                       title="Хороший ответ"
+                       aria-label="Хороший ответ"
+                       class="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent transition hover:bg-[#1c1c1c] active:scale-95 ${liked ? 'text-white' : 'text-neutral-300 hover:text-white'}"
+                     >
+                       <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                         <path d="M7 10v12" />
+                         <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
+                       </svg>
+                     </button>
+                     <button
+                       type="button"
+                       onclick="toggleMessageReaction(${index}, 'dislike')"
+                       title="Плохой ответ"
+                       aria-label="Плохой ответ"
+                       class="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent transition hover:bg-[#1c1c1c] active:scale-95 ${disliked ? 'text-white' : 'text-neutral-300 hover:text-white'}"
+                     >
+                       <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="${disliked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                         <path d="M17 14V2" />
+                         <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z" />
+                       </svg>
+                     </button>
+                     <button
+                       type="button"
+                       onclick="shareOrDownloadMessage(${index})"
+                       title="${msg.generatedImageUrl ? 'Сохранить в галерею' : 'Поделиться'}"
+                       aria-label="${msg.generatedImageUrl ? 'Сохранить в галерею' : 'Поделиться'}"
+                       class="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-neutral-300 transition hover:bg-[#1c1c1c] hover:text-white active:scale-95"
+                     >
+                       <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                         <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                         <polyline points="16 6 12 2 8 6" />
+                         <line x1="12" y1="2" x2="12" y2="15" />
+                       </svg>
+                     </button>
+                   </div>`
+                : ''
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Определение запроса на генерацию/редактирование фото и запроса на написание кода
+     */
+    function isImageGenerationRequest(text, hasAttachedImage) {
+      if (!text) return false;
+      const lower = text.toLowerCase().trim();
+
+      if (hasAttachedImage) {
+        return /(отредактируй|измени|убери фон|сделай из этого|перерисуй|преврати|улучши фото|добавь на фото)/i.test(lower);
+      }
+
+      // Любой запрос со словами "сделай фото...", "создай фото...", "нарисуй...", "сгенерируй картинку/изображение..."
+      if (
+        /(сделай|создай|нарисуй|сгенерируй|изобрази|покажи|draw|generate|create)\s+(мне\s+|пожалуйста\s+|как\s+)?(красивое\s+|крутое\s+|реалистичное\s+|милое\s+|смешное\s+)?(фото|фотку|картинк|изображен|арт|рисунок|логотип|аватар|обои|иллюстрац|портрет|image|picture|photo)/i.test(
+          lower
+        )
+      ) {
+        return true;
+      }
+
+      if (/^(нарисуй|сгенерируй фото|создай фото|сделай фото|draw\s+|generate\s+(an?\s+)?image)/i.test(lower)) {
+        return true;
+      }
+
+      return false;
+    }
+
+    function isCodeGenerationRequest(text) {
+      if (!text) return false;
+      return /(напиши код|сделай код|создай код|сгенерируй код|код на |скрипт|программу|сайт на |html|python|javascript|c\+\+|lua|roblox скрипт)/i.test(text);
+    }
+
+    /**
+     * Строгая очистка ответа — гарантированно блокирует любые JSON-промпты (dalle.text2im, action_input и т.д.)
+     */
+    function sanitizeModelOutput(rawText) {
+      if (!rawText) return '';
+      let cleaned = String(rawText);
+
+      // Удаляем блоки рассуждений в тегах
+      cleaned = cleaned.replace(/<thought>[\s\S]*?<\/thought>/gi, '');
+      cleaned = cleaned.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '');
+
+      // Удаляем JSON-объекты вызова генерации изображений вроде {"action": "dalle.text2im", "action_input": ...}
+      cleaned = cleaned.replace(/\(?\s*\{\s*"action"\s*:\s*"[^"]*dalle[^"]*"[\s\S]*?\}\s*\)?/gi, '');
+      cleaned = cleaned.replace(/\(?\s*\{\s*"action_input"\s*:[\s\S]*?\}\s*\)?/gi, '');
+
+      // Удаляем текстовые промпты
+      cleaned = cleaned.replace(/```(prompt|image[_-]?prompt|midjourney|dalle|json)[\s\S]*?```/gi, (match) => {
+        if (/dalle|text2im|action_input|aspect_ratio/i.test(match)) return '';
+        return match;
+      });
+      cleaned = cleaned.replace(/^(Промпт|Prompt|Image prompt)\s*:.*$/gim, '');
+
+      return cleaned.trim();
+    }
+
+    /**
+     * Статичная карточка создания изображения без анимаций и процентов
+     */
+    function buildImageGenerationSkeleton() {
+      return `
+        <div class="my-1 w-full max-w-[320px]">
+          <div class="mb-2.5 text-[15px] font-normal text-neutral-200">Создание изображения</div>
+          <div class="static-image-placeholder flex aspect-square w-full flex-col items-center justify-center rounded-2xl p-5 text-center">
+            <div class="text-sm font-medium text-neutral-300">Создание изображения</div>
+            <div class="mt-1 text-xs text-neutral-500">Подождите, фото формируется</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function startImageProgressAnimation() {
+      stopImageProgressAnimation();
+    }
+
+    function stopImageProgressAnimation() {
+      if (state.imageProgressTimer) {
+        clearInterval(state.imageProgressTimer);
+        state.imageProgressTimer = null;
+      }
+    }
+
+    async function fetchGeneratedImage(promptText, attachedImage) {
+      state.abortController = new AbortController();
+      const apiKey = '';
+
+      const parts = [{ text: promptText }];
+      if (attachedImage && attachedImage.base64 && attachedImage.mimeType) {
+        parts.push({
+          inlineData: {
+            mimeType: attachedImage.mimeType,
+            data: attachedImage.base64,
+          },
+        });
+      }
+
+      const payload = {
+        contents: [{ role: 'user', parts }],
+        generationConfig: {
+          responseModalities: ['IMAGE'],
+        },
+      };
+
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+      const res = await fetchWithRetry(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: state.abortController.signal,
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error?.message || `Ошибка генерации (${res.status})`);
+      }
+
+      const data = await res.json();
+      const resParts = data?.candidates?.[0]?.content?.parts || [];
+      const imgPart = resParts.find(p => p.inlineData);
+
+      if (!imgPart?.inlineData?.data) {
+        throw new Error('Не удалось сгенерировать изображение. Попробуйте другое описание.');
+      }
+
+      const mime = imgPart.inlineData.mimeType || 'image/png';
+      const imageUrl = `data:${mime};base64,${imgPart.inlineData.data}`;
+
+      return {
+        imageUrl,
+        answer:
+          'Я создал фото по вашему запросу:\n' +
+          '- **Готовый результат:** Изображение сгенерировано в высоком качестве и добавлено выше.\n' +
+          '- **Сохранение:** Нажмите кнопку **«Скачать»** под картинкой, чтобы сохранить её в галерею.',
+      };
+    }
+
+    async function fetchWithRetry(url, options, maxRetries = 4) {
+      let delay = 1000;
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        const res = await fetch(url, options);
+        if (res.ok) return res;
+        if ((res.status === 429 || res.status >= 500) && attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2;
+          continue;
+        }
+        return res;
+      }
+    }
+
+    /**
+     * Извлекает промпт, если модель попыталась вывести JSON формата dalle.text2im
+     */
+    function extractHiddenDallePrompt(rawText) {
+      if (!rawText) return null;
+      if (!/(dalle\.text2im|action_input)/i.test(rawText)) return null;
+      const promptMatch = rawText.match(/"prompt"\s*:\s*\\?"([^"\\]+(?:\\.[^"\\]+)*)\\?"/i);
+      if (promptMatch && promptMatch[1]) {
+        return promptMatch[1].replace(/\\"/g, '"');
+      }
+      return 'Красивая иллюстрация по запросу пользователя';
+    }
+
+    async function fetchTextResponse(historyMessages, reasoningLevel) {
+      return fetchTextResponseStream(historyMessages, reasoningLevel, null);
+    }
+
+    async function fetchTextResponseStream(historyMessages, reasoningLevel, onChunk) {
+      state.abortController = new AbortController();
+      const apiKey = '';
+
+      let systemInstructionText =
+        'Ты Maf GPT — умный персональный ИИ-ассистент. ' +
+        'Отвечай на русском языке максимально быстро, чётко, структурированно и по делу. ' +
+        'ФОРМАТ ОТВЕТОВ: начинай с короткой вводной фразы (например: «Я подготовил ответ...», «Я создал код по вашему запросу:» и т.д.), а основные детали оформляй аккуратным списком с жирными заголовками пунктов (`- **Заголовок пункта:** подробное пояснение`). ' +
+        'КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО: никогда не выводи JSON с action, dalle.text2im, action_input или текстовые промпты для генерации картинок. Никогда не выводи внутренние рассуждения или теги <thought>. ' +
+        'Если пользователь просит код — начинай с фразы «Я создал код по вашему запросу:», затем давай полный рабочий код в блоке ```язык и список ключевых особенностей реализации.';
+      if (reasoningLevel === 'max') {
+        systemInstructionText +=
+          '\n\nПроводи точный логический анализ без лишних задержек и сразу выдавай чистый финальный результат.';
+      }
+
+      const contents = historyMessages.map(m => {
+        const parts = [];
+        if (m.content) {
+          parts.push({ text: m.content });
+        }
+        if (m.role === 'user' && m.imageBase64 && m.imageMimeType) {
+          parts.push({
+            inlineData: {
+              mimeType: m.imageMimeType,
+              data: m.imageBase64,
+            },
+          });
+        }
+        if (!parts.length) {
+          parts.push({ text: 'Опиши и проанализируй это изображение.' });
+        }
+        return {
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts,
+        };
+      });
+
+      const payload = {
+        contents,
+        systemInstruction: {
+          parts: [{ text: systemInstructionText }],
+        },
+        generationConfig: {
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
+        },
+      };
+
+      const streamUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:streamGenerateContent?alt=sse&key=${apiKey}`;
+      const res = await fetch(streamUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: state.abortController.signal,
+      });
+
+      if (!res.ok || !res.body) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error?.message || `Ошибка сервера (${res.status})`);
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let sseBuffer = '';
+      let rawAnswer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        sseBuffer += decoder.decode(value, { stream: true });
+
+        const lines = sseBuffer.split(/\r?\n/);
+        sseBuffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data:')) continue;
+          const jsonStr = trimmed.slice(5).trim();
+          if (!jsonStr || jsonStr === '[DONE]') continue;
+
+          try {
+            const chunkObj = JSON.parse(jsonStr);
+            const parts = chunkObj?.candidates?.[0]?.content?.parts || [];
+            for (const part of parts) {
+              if (!part.thought && part.text) {
+                rawAnswer += part.text;
+              }
+            }
+            if (onChunk && rawAnswer) {
+              const hiddenCheck = extractHiddenDallePrompt(rawAnswer);
+              if (!hiddenCheck) {
+                onChunk(sanitizeModelOutput(rawAnswer));
+              }
+            }
+          } catch (_) {}
+        }
+      }
+
+      const hiddenPrompt = extractHiddenDallePrompt(rawAnswer);
+      if (hiddenPrompt) {
+        return { detectedImagePrompt: hiddenPrompt, answer: '' };
+      }
+
+      rawAnswer = sanitizeModelOutput(rawAnswer);
+      if (!rawAnswer) {
+        rawAnswer = 'Не удалось сформировать ответ. Попробуйте переформулировать запрос.';
+      }
+
+      return { answer: rawAnswer };
+    }
+
+    /**
+     * Живой голосовой разговор в реальном времени (непрерывный диалог с автодетекцией речи и голосом парня Puck как у ChatGPT)
+     */
+    const liveState = {
+      active: false,
+      collapsed: false,
+      muted: false,
+      isSpeaking: false,
+      isProcessing: false,
+      audioContext: null,
+      mediaStream: null,
+      analyser: null,
+      rafId: null,
+      mediaRecorder: null,
+      audioChunks: [],
+      speechStarted: false,
+      silenceStart: 0,
+      speechStartTime: 0,
+      currentAudioEl: null,
+      abortController: null,
+      voiceHistory: [],
+    };
+
+    /**
+     * Сворачивает звонок вниз над полем ввода (как на скриншоте) или разворачивает обратно на весь экран
+     */
+    function setLiveCallCollapsed(collapsed) {
+      liveState.collapsed = Boolean(collapsed);
+      const overlay = document.getElementById('liveCallOverlay');
+      const dockedBar = document.getElementById('dockedCallBar');
+      const promptInput = document.getElementById('promptInput');
+
+      if (!liveState.active) {
+        overlay?.classList.add('hidden');
+        overlay?.classList.remove('flex');
+        dockedBar?.classList.add('hidden');
+        dockedBar?.classList.remove('flex');
+        if (promptInput) promptInput.placeholder = 'Спросить Maf GPT';
+        updateActionButtonState();
+        return;
+      }
+
+      if (liveState.collapsed) {
+        overlay?.classList.add('hidden');
+        overlay?.classList.remove('flex');
+        dockedBar?.classList.remove('hidden');
+        dockedBar?.classList.add('flex');
+        if (promptInput) promptInput.placeholder = 'Введите сообщение';
+        scrollToBottom();
+      } else {
+        dockedBar?.classList.add('hidden');
+        dockedBar?.classList.remove('flex');
+        overlay?.classList.remove('hidden');
+        overlay?.classList.add('flex');
+        if (promptInput) promptInput.placeholder = 'Спросить Maf GPT';
+      }
+      updateActionButtonState();
+    }
+
+    /**
+     * Форматирование Markdown и блоков кода с подсветкой синтаксиса
+     */
+    function normalizeCodeFenceText(text) {
+      let normalized = String(text || '');
+      // Нормализуем возможные экранированные или разорванные тройные обратные кавычки
+      normalized = normalized.replace(/\\`\\`\\`/g, '```');
+
+      // Если модель выдала открытый блок ``` без закрывающих кавычек
+      const fenceMatches = normalized.match(/```/g);
+      if (fenceMatches && fenceMatches.length % 2 === 1) {
+        normalized = normalized + '\n```';
+      }
+
+      // Если нет тройных кавычек, но ответ содержит явный целый HTML/CSS/JS документ или кусок разметки с закрывающими тегами
+      if (
+        !/```/.test(normalized) &&
+        (/<!doctype\s+html/i.test(normalized) ||
+          (/<html[\s>]/i.test(normalized) && /<\/html>/i.test(normalized)) ||
+          (/<script[\s>]/i.test(normalized) && /<\/script>/i.test(normalized)))
+      ) {
+        const htmlMatch = normalized.match(/(<!doctype\s+html[\s\S]*<\/html>|<html[\s\S]*<\/html>)/i);
+        if (htmlMatch && htmlMatch[1]) {
+          normalized = normalized.replace(htmlMatch[1], `\n\`\`\`html\n${htmlMatch[1].trim()}\n\`\`\`\n`);
+        }
+      }
+
+      return normalized;
+    }
+
+    function renderRichMarkdown(text, isStreaming = false) {
+      if (!text) return '';
+      const codeBlocks = [];
+      let processed = normalizeCodeFenceText(text).replace(/```([a-zA-Z0-9_+-]*)\r?\n([\s\S]*?)```/g, (_, lang, code) => {
+        const idx = codeBlocks.length;
+        const cleanLang = (lang || 'code').trim().toUpperCase();
+        codeBlocks.push({ lang: cleanLang, code: code.replace(/\r?\n$/, '') });
+        return `\n@@CODEBLOCK_${idx}@@\n`;
+      });
+
+      if (isStreaming && /```/.test(processed)) {
+        processed = processed.replace(/```([a-zA-Z0-9_+-]*)\r?\n([\s\S]*)$/, (_, lang, code) => {
+          const idx = codeBlocks.length;
+          const cleanLang = (lang || 'code').trim().toUpperCase();
+          codeBlocks.push({ lang: cleanLang, code });
+          return `\n@@CODEBLOCK_${idx}@@\n`;
+        });
+      }
+
+      const lines = processed.split(/\r?\n/);
+      let html = '';
+      let inUl = false;
+      let inOl = false;
+      let paraBuffer = [];
+
+      const flushPara = () => {
+        if (paraBuffer.length) {
+          const joined = paraBuffer.join('<br/>');
+          html += `<p>${formatInline(joined)}</p>`;
+          paraBuffer = [];
+        }
+      };
+
+      const closeLists = () => {
+        if (inUl) { html += '</ul>'; inUl = false; }
+        if (inOl) { html += '</ol>'; inOl = false; }
+      };
+
+      for (const rawLine of lines) {
+        const line = rawLine.trimEnd();
+        const cbMatch = line.trim().match(/^@@CODEBLOCK_(\d+)@@$/);
+        if (cbMatch) {
+          flushPara();
+          closeLists();
+          html += line.trim();
+          continue;
         }
 
-        function redirectToCheckout(edition, price) {
-            const paymentUrl = "https://yoomoney.ru"; // Замените на вашу ссылку оплаты
-            window.location.href = paymentUrl;
+        if (!line.trim()) {
+          flushPara();
+          closeLists();
+          continue;
         }
-    </script>
 
+        if (line.startsWith('### ')) {
+          flushPara(); closeLists();
+          html += `<h3>${formatInline(line.slice(4))}</h3>`;
+          continue;
+        }
+        if (line.startsWith('## ')) {
+          flushPara(); closeLists();
+          html += `<h2>${formatInline(line.slice(3))}</h2>`;
+          continue;
+        }
+        if (line.startsWith('# ')) {
+          flushPara(); closeLists();
+          html += `<h1>${formatInline(line.slice(2))}</h1>`;
+          continue;
+        }
+        if (line.startsWith('> ')) {
+          flushPara(); closeLists();
+          html += `<blockquote>${formatInline(line.slice(2))}</blockquote>`;
+          continue;
+        }
+
+        const ulMatch = line.match(/^[-*]\s+(.*)$/);
+        if (ulMatch) {
+          flushPara();
+          if (inOl) { html += '</ol>'; inOl = false; }
+          if (!inUl) { html += '<ul>'; inUl = true; }
+          html += `<li>${formatInline(ulMatch[1])}</li>`;
+          continue;
+        }
+
+        const olMatch = line.match(/^\d+\.\s+(.*)$/);
+        if (olMatch) {
+          flushPara();
+          if (inUl) { html += '</ul>'; inUl = false; }
+          if (!inOl) { html += '<ol>'; inOl = true; }
+          html += `<li>${formatInline(olMatch[1])}</li>`;
+          continue;
+        }
+
+        closeLists();
+        paraBuffer.push(line);
+      }
+
+      flushPara();
+      closeLists();
+
+      codeBlocks.forEach((block, idx) => {
+        const highlighted = highlightCode(block.code);
+        const encodedCode = escapeAttr(block.code);
+        const blockId = `code-block-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 5)}`;
+        const blockHtml = `
+          <div class="code-wrapper">
+            <div class="code-header">
+              <div class="flex items-center gap-2 text-white">
+                <svg class="h-4 w-4 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+                <span class="uppercase tracking-wide text-sm font-medium">${escapeHtml(block.lang)}</span>
+              </div>
+              <!-- Три аккуратные иконки в правом верхнем углу как на 2 фото: свернуть/развернуть, копировать, предпросмотр -->
+              <div class="flex items-center gap-3.5 text-neutral-200">
+                <button
+                  type="button"
+                  onclick="toggleCodeCollapse('${blockId}')"
+                  title="Свернуть / развернуть"
+                  aria-label="Свернуть или развернуть"
+                  class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-200 transition hover:bg-[#3d3d3d] hover:text-white active:scale-95"
+                >
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12h16" />
+                    <path d="M12 4v5" />
+                    <path d="M9 6l3 3 3-3" />
+                    <path d="M12 20v-5" />
+                    <path d="M9 18l3-3 3 3" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onclick="copyRawText(decodeAttr('${encodedCode}'))"
+                  title="Копировать код"
+                  aria-label="Копировать код"
+                  class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-200 transition hover:bg-[#3d3d3d] hover:text-white active:scale-95"
+                >
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2.5" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onclick="runCodePreview(decodeAttr('${encodedCode}'))"
+                  title="Предпросмотр"
+                  aria-label="Предпросмотр"
+                  class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-200 transition hover:bg-[#3d3d3d] hover:text-white active:scale-95"
+                >
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="6 4 20 12 6 20 6 4" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <pre id="${blockId}" class="code-body"><code>${highlighted}</code></pre>
+          </div>
+        `;
+        html = html.replace(`@@CODEBLOCK_${idx}@@`, blockHtml);
+      });
+
+      return html;
+    }
+
+    function toggleCodeCollapse(blockId) {
+      const el = document.getElementById(blockId);
+      if (el) {
+        el.classList.toggle('code-collapsed');
+      }
+    }
+
+    function runCodePreview(code) {
+      const modal = document.getElementById('codePreviewModal');
+      const frame = document.getElementById('codePreviewFrame');
+      if (!modal || !frame) return;
+      const trimmed = String(code || '').trim();
+      const isHtml = /<html|<body|<div|<script|<style|<!doctype/i.test(trimmed);
+      const isCss = !isHtml && /\{[\s\S]*:[\s\S]*\}/.test(trimmed) && !/\b(function|const|let|var|def|import|class)\b/.test(trimmed);
+
+      if (isHtml) {
+        frame.srcdoc = trimmed;
+      } else if (isCss) {
+        frame.srcdoc = `<!DOCTYPE html><html><head><style>${trimmed}</style></head><body style="background:#141414;color:#fff;font-family:Inter,sans-serif;padding:24px;"><h2>Предпросмотр стилей</h2><p class="demo-text">Пример текста для проверки CSS-правил.</p><button class="btn" style="padding:10px 18px;border-radius:8px;background:#2563eb;color:#fff;border:none;">Кнопка</button></body></html>`;
+      } else {
+        frame.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8" /><style>body{background:#111;color:#f5f5f5;font-family:'JetBrains Mono',monospace;padding:18px;margin:0;}#out{white-space:pre-wrap;background:#1b1b1b;padding:14px;border-radius:12px;border:1px solid #2e2e2e;min-height:80px;}</style></head><body><div style="font-family:Inter,sans-serif;font-size:13px;color:#a3a3a3;margin-bottom:10px;">Результат выполнения / код:</div><div id="out"></div><script>(function(){const out=document.getElementById('out');const log=(...a)=>out.textContent+=a.map(x=>typeof x==='object'?JSON.stringify(x,null,2):String(x)).join(' ')+'\\n';console.log=log;console.error=log;try{const fn=new Function(${JSON.stringify(trimmed)});const res=fn();if(res!==undefined)log('Результат:',res);if(!out.textContent)out.textContent=${JSON.stringify(trimmed)};}catch(e){out.textContent=${JSON.stringify(trimmed)};}})();<\/script></body></html>`;
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function formatInline(text) {
+      let escaped = escapeHtml(text);
+      escaped = escaped.replace(/`([^`]+)`/g, '<code class="rounded bg-[#262626] px-1.5 py-0.5 font-mono text-[13px] text-neutral-100">$1</code>');
+      escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold text-white">$1</strong>');
+      escaped = escaped.replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, '$1<em class="italic text-neutral-200">$2</em>');
+      return escaped;
+    }
+
+    function highlightCode(code) {
+      const raw = String(code ?? '');
+      // Однопроходный токенизатор: исключает поломку тегов подсветки внутри строк и атрибутов
+      const tokenRegex = /(&lt;!--[\s\S]*?--&gt;|\/\*[\s\S]*?\*\/|\/\/[^\n]*|#[^\n]*)|(&quot;(?:\\.|[^&]|&(?!quot;))*?&quot;|&#39;(?:\\.|[^&]|&(?!#39;))*?&#39;|`[^`]*`)|(&lt;\/?[a-zA-Z0-9-]+)|(\b\d+(?:\.\d+)?(?:px|rem|em|%|vh|vw|s|ms)?\b)|\b(const|let|var|function|return|if|else|for|while|class|import|export|from|async|await|try|catch|def|print|public|private|void|int|float|true|false|null|undefined|body|header|footer|section|div|style|script|html|head|meta|title)\b/g;
+
+      const escaped = escapeHtml(raw);
+      return escaped.replace(tokenRegex, (match, cmt, str, tag, num, kw) => {
+        if (cmt) return `<span class="tok-cmt">${cmt}</span>`;
+        if (str) return `<span class="tok-str">${str}</span>`;
+        if (tag) return `<span class="tok-tag">${tag}</span>`;
+        if (num) return `<span class="tok-num">${num}</span>`;
+        if (kw) return `<span class="tok-kw">${kw}</span>`;
+        return match;
+      });
+    }
+
+    function updateLiveCallUI(statusText, subtitleText) {
+      const statusEl = document.getElementById('liveCallStatus');
+      const dockedStatusEl = document.getElementById('dockedCallStatus');
+      const subEl = document.getElementById('liveCallSubtitle');
+      if (statusEl && statusText !== undefined) statusEl.textContent = statusText;
+      if (dockedStatusEl && statusText !== undefined) dockedStatusEl.textContent = statusText;
+      if (subEl && subtitleText !== undefined) subEl.textContent = subtitleText;
+    }
+
+    function interruptCurrentSpeech() {
+      if (liveState.currentAudioEl) {
+        try {
+          liveState.currentAudioEl.onended = null;
+          liveState.currentAudioEl.onerror = null;
+          liveState.currentAudioEl.pause();
+          liveState.currentAudioEl.src = '';
+        } catch (_) {}
+        liveState.currentAudioEl = null;
+      }
+      if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch (_) {}
+      }
+      if (liveState.abortController) {
+        try {
+          liveState.abortController.abort();
+        } catch (_) {}
+        liveState.abortController = null;
+      }
+      liveState.isSpeaking = false;
+      liveState.isProcessing = false;
+      document.getElementById('liveVoiceOrb')?.classList.remove('voice-orb-speaking');
+      document.getElementById('dockedVoiceOrb')?.classList.remove('voice-orb-speaking');
+    }
+
+    function updateMuteButtonUI() {
+      const btn = document.getElementById('liveMuteBtn');
+      const micOn = document.getElementById('micOnIcon');
+      const micOff = document.getElementById('micOffIcon');
+      const dBtn = document.getElementById('dockedMuteBtn');
+      const dMicOn = document.getElementById('dockedMicOnIcon');
+      const dMicOff = document.getElementById('dockedMicOffIcon');
+
+      if (liveState.muted) {
+        micOn?.classList.add('hidden');
+        micOff?.classList.remove('hidden');
+        btn?.classList.remove('bg-[#212121]');
+        btn?.classList.add('bg-red-500/20');
+
+        dMicOn?.classList.add('hidden');
+        dMicOff?.classList.remove('hidden');
+        dBtn?.classList.remove('bg-[#2c2c2c]');
+        dBtn?.classList.add('bg-red-500/25');
+
+        updateLiveCallUI('Микрофон выключен');
+      } else {
+        micOff?.classList.add('hidden');
+        micOn?.classList.remove('hidden');
+        btn?.classList.remove('bg-red-500/20');
+        btn?.classList.add('bg-[#212121]');
+
+        dMicOff?.classList.add('hidden');
+        dMicOn?.classList.remove('hidden');
+        dBtn?.classList.remove('bg-red-500/25');
+        dBtn?.classList.add('bg-[#2c2c2c]');
+
+        if (liveState.active && !liveState.isSpeaking && !liveState.isProcessing) {
+          updateLiveCallUI('Говорите...');
+        }
+      }
+    }
+
+    function toggleLiveMute() {
+      if (!liveState.active) return;
+      liveState.muted = !liveState.muted;
+
+      if (liveState.mediaStream) {
+        liveState.mediaStream.getAudioTracks().forEach(track => {
+          track.enabled = !liveState.muted;
+        });
+      }
+
+      if (liveState.muted) {
+        liveState.speechStarted = false;
+        if (liveState.mediaRecorder && liveState.mediaRecorder.state === 'recording') {
+          try { liveState.mediaRecorder.stop(); } catch (_) {}
+        }
+      }
+
+      updateMuteButtonUI();
+    }
+
+    async function startLiveCall() {
+      if (liveState.active) return;
+      if (state.isGenerating) stopStreaming();
+
+      liveState.active = true;
+      liveState.collapsed = false;
+      liveState.muted = false;
+      liveState.isSpeaking = false;
+      liveState.isProcessing = false;
+      liveState.speechStarted = false;
+      liveState.voiceHistory = [];
+      setLiveCallCollapsed(false);
+      updateMuteButtonUI();
+      updateLiveCallUI('Подключение...', '');
+
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error('Браузер не поддерживает доступ к микрофону');
+        }
+
+        liveState.mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            channelCount: 1,
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        });
+
+        if (!liveState.active) return;
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        liveState.audioContext = new AudioCtx();
+        if (liveState.audioContext.state === 'suspended') {
+          await liveState.audioContext.resume();
+        }
+
+        const source = liveState.audioContext.createMediaStreamSource(liveState.mediaStream);
+        const analyser = liveState.audioContext.createAnalyser();
+        analyser.fftSize = 1024;
+        analyser.smoothingTimeConstant = 0.25;
+        source.connect(analyser);
+        liveState.analyser = analyser;
+
+        updateLiveCallUI('Говорите...', '');
+        startVoiceActivityLoop();
+      } catch (err) {
+        showToast(err?.message || 'Нет доступа к микрофону');
+        stopLiveCall();
+      }
+    }
+
+    function beginSegmentRecording() {
+      if (!liveState.active || !liveState.mediaStream || liveState.muted) return;
+      if (liveState.mediaRecorder && liveState.mediaRecorder.state === 'recording') return;
+
+      liveState.audioChunks = [];
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : '';
+
+      const recorder = mimeType
+        ? new MediaRecorder(liveState.mediaStream, { mimeType })
+        : new MediaRecorder(liveState.mediaStream);
+
+      recorder.ondataavailable = e => {
+        if (e.data && e.data.size > 0) {
+          liveState.audioChunks.push(e.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        liveState.mediaRecorder = null;
+        if (!liveState.active || liveState.muted) return;
+        const duration = Date.now() - liveState.speechStartTime;
+        if (duration < 320 || !liveState.audioChunks.length) {
+          liveState.isProcessing = false;
+          if (liveState.active && !liveState.isSpeaking) {
+            updateLiveCallUI('Говорите...');
+          }
+          return;
+        }
+        const audioBlob = new Blob(liveState.audioChunks, { type: recorder.mimeType || 'audio/webm' });
+        liveState.audioChunks = [];
+        await processVoiceTurn(audioBlob);
+      };
+
+      liveState.mediaRecorder = recorder;
+      try {
+        recorder.start(60);
+      } catch (_) {
+        liveState.mediaRecorder = null;
+        liveState.speechStarted = false;
+      }
+    }
+
+    function startVoiceActivityLoop() {
+      const dataArray = new Uint8Array(liveState.analyser.frequencyBinCount);
+      const BASE_THRESHOLD = 16;
+      const BARGE_IN_THRESHOLD = 46;
+      const SILENCE_MS = 220;
+
+      const tick = () => {
+        if (!liveState.active || !liveState.analyser) return;
+
+        if (liveState.audioContext && liveState.audioContext.state === 'suspended') {
+          liveState.audioContext.resume().catch(() => {});
+        }
+
+        liveState.analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 2; i < 64; i++) {
+          sum += dataArray[i];
+        }
+        const avgVolume = sum / 62;
+
+        // Анимация сферы от громкости голоса
+        const orb = document.getElementById('liveVoiceOrb');
+        const dockedOrb = document.getElementById('dockedVoiceOrb');
+        if (!liveState.isSpeaking) {
+          const scale = liveState.muted ? 1 : 1 + Math.min(0.16, (avgVolume / 120) * 0.16);
+          if (orb) orb.style.transform = `scale(${scale.toFixed(3)})`;
+          if (dockedOrb) dockedOrb.style.transform = `scale(${scale.toFixed(3)})`;
+        }
+
+        if (!liveState.muted) {
+          const threshold = liveState.isSpeaking ? BARGE_IN_THRESHOLD : BASE_THRESHOLD;
+          if (avgVolume > threshold) {
+            if (liveState.isSpeaking) {
+              interruptCurrentSpeech();
+            }
+            if (!liveState.isProcessing && !liveState.speechStarted) {
+              liveState.speechStarted = true;
+              liveState.speechStartTime = Date.now();
+              liveState.silenceStart = 0;
+              updateLiveCallUI('Слушаю...');
+              beginSegmentRecording();
+            } else if (liveState.speechStarted) {
+              liveState.silenceStart = 0;
+            }
+          } else if (liveState.speechStarted) {
+            if (!liveState.silenceStart) {
+              liveState.silenceStart = Date.now();
+            } else if (Date.now() - liveState.silenceStart >= SILENCE_MS) {
+              liveState.speechStarted = false;
+              liveState.silenceStart = 0;
+              if (liveState.mediaRecorder && liveState.mediaRecorder.state === 'recording') {
+                try {
+                  liveState.mediaRecorder.stop();
+                } catch (_) {
+                  liveState.mediaRecorder = null;
+                }
+              }
+            }
+          }
+        }
+
+        liveState.rafId = requestAnimationFrame(tick);
+      };
+
+      liveState.rafId = requestAnimationFrame(tick);
+    }
+
+    async function speakVoiceReply(replyText, saveToChat = true) {
+      if (!liveState.active || !replyText) return;
+
+      if (liveState.currentAudioEl) {
+        try {
+          liveState.currentAudioEl.onended = null;
+          liveState.currentAudioEl.onerror = null;
+          liveState.currentAudioEl.pause();
+        } catch (_) {}
+        liveState.currentAudioEl = null;
+      }
+
+      liveState.isSpeaking = true;
+      updateLiveCallUI('Отвечает...', replyText);
+
+      const orb = document.getElementById('liveVoiceOrb');
+      const dockedOrb = document.getElementById('dockedVoiceOrb');
+      orb?.classList.add('voice-orb-speaking');
+      dockedOrb?.classList.add('voice-orb-speaking');
+
+      try {
+        const apiKey = '';
+        const ttsController = new AbortController();
+        liveState.abortController = ttsController;
+
+        const ttsRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: ttsController.signal,
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: `Прочитай естественно, энергично и в быстром живом разговорном темпе на русском языке: ${replyText}`,
+                    },
+                  ],
+                },
+              ],
+              generationConfig: {
+                responseModalities: ['AUDIO'],
+                speechConfig: {
+                  voiceConfig: {
+                    prebuiltVoiceConfig: {
+                      voiceName: 'Puck',
+                    },
+                  },
+                },
+              },
+            }),
+          }
+        );
+
+        if (!ttsRes.ok || !liveState.active) {
+          throw new Error('TTS недоступен');
+        }
+
+        const ttsData = await ttsRes.json();
+        const audioPart = (ttsData?.candidates?.[0]?.content?.parts || []).find(p => p.inlineData?.data);
+        if (!audioPart?.inlineData?.data || !liveState.active) {
+          throw new Error('Пустой аудиоответ');
+        }
+
+        const pcmBytes = base64ToUint8Array(audioPart.inlineData.data);
+        const pcm16 = new Int16Array(pcmBytes.buffer, pcmBytes.byteOffset, Math.floor(pcmBytes.byteLength / 2));
+        const wavBlob = pcmToWavBlob(pcm16, 24000);
+        const audioUrl = URL.createObjectURL(wavBlob);
+
+        const audioEl = new Audio(audioUrl);
+        audioEl.playbackRate = 1.18;
+        if ('preservesPitch' in audioEl) audioEl.preservesPitch = true;
+        liveState.currentAudioEl = audioEl;
+
+        const finishPlayback = () => {
+          URL.revokeObjectURL(audioUrl);
+          liveState.currentAudioEl = null;
+          liveState.isSpeaking = false;
+          liveState.isProcessing = false;
+          liveState.speechStarted = false;
+          orb?.classList.remove('voice-orb-speaking');
+          dockedOrb?.classList.remove('voice-orb-speaking');
+          if (liveState.active) {
+            updateLiveCallUI(liveState.muted ? 'Микрофон выключен' : 'Говорите...');
+          }
+        };
+
+        audioEl.onended = finishPlayback;
+        audioEl.onerror = finishPlayback;
+
+        await audioEl.play();
+        if (saveToChat) {
+          appendVoiceTurnToChat(saveToChat.userText || '', replyText);
+        }
+      } catch (err) {
+        liveState.isProcessing = false;
+        liveState.speechStarted = false;
+        if (err?.name === 'AbortError' || !liveState.active) return;
+
+        // Резервный мужской синтез речи браузера, если сетевой TTS недоступен
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(replyText);
+          utter.lang = 'ru-RU';
+          const voices = window.speechSynthesis.getVoices();
+          const maleRuVoice = voices.find(v => /ru/i.test(v.lang) && /(dmitry|pavel|yuri|maxim|male|google русский)/i.test(v.name));
+          if (maleRuVoice) utter.voice = maleRuVoice;
+          utter.rate = 1.15;
+          utter.pitch = 0.95;
+          liveState.isSpeaking = true;
+          const orb = document.getElementById('liveVoiceOrb');
+          const dockedOrb = document.getElementById('dockedVoiceOrb');
+          orb?.classList.add('voice-orb-speaking');
+          dockedOrb?.classList.add('voice-orb-speaking');
+          utter.onend = () => {
+            liveState.isSpeaking = false;
+            liveState.isProcessing = false;
+            liveState.speechStarted = false;
+            orb?.classList.remove('voice-orb-speaking');
+            dockedOrb?.classList.remove('voice-orb-speaking');
+            if (liveState.active) {
+              updateLiveCallUI(liveState.muted ? 'Микрофон выключен' : 'Говорите...');
+            }
+          };
+          utter.onerror = () => {
+            liveState.isSpeaking = false;
+            liveState.isProcessing = false;
+          };
+          window.speechSynthesis.speak(utter);
+          if (saveToChat) appendVoiceTurnToChat(saveToChat.userText || '', replyText);
+        } else {
+          liveState.isSpeaking = false;
+          updateLiveCallUI(liveState.muted ? 'Микрофон выключен' : 'Говорите...');
+        }
+      }
+    }
+
+    async function processVoiceTurn(audioBlob) {
+      if (!liveState.active) return;
+      liveState.isProcessing = true;
+      liveState.abortController = new AbortController();
+      updateLiveCallUI('Думает...');
+
+      try {
+        const base64Audio = await blobToBase64Raw(audioBlob);
+        if (!base64Audio || !liveState.active) return;
+
+        const apiKey = '';
+        const cleanMime = (audioBlob.type || 'audio/webm').split(';')[0];
+
+        // Анализируем СТРОГО ТОЛЬКО текущую аудиозапись без старой истории, чтобы прошлые просьбы о фото/коде не повторялись
+        const recentContextSummary = liveState.voiceHistory
+          .slice(-4)
+          .map(m => `${m.role === 'user' ? 'Пользователь' : 'Maf GPT'}: ${m.parts?.[0]?.text || ''}`)
+          .join('\n');
+
+        const contents = [
+          {
+            role: 'user',
+            parts: [
+              {
+                inlineData: {
+                  mimeType: cleanMime,
+                  data: base64Audio,
+                },
+              },
+              {
+                text:
+                  'Прослушай ТОЛЬКО прикреплённую сейчас аудиозапись пользователя. Не повторяй прошлые команды из контекста!\n' +
+                  (recentContextSummary ? `Краткий контекст предыдущего разговора (только для понимания темы, НЕ как новая команда):\n${recentContextSummary}\n\n` : '') +
+                  'Ответь строго в формате JSON с полями:\n' +
+                  '1) "type":\n' +
+                  '   - "image" — ТОЛЬКО если пользователь ПРЯМО СЕЙЧАС в этой аудиозаписи вслух просит нарисовать/сгенерировать/создать новое фото или картинку;\n' +
+                  '   - "code" — ТОЛЬКО если пользователь ПРЯМО СЕЙЧАС в этой аудиозаписи вслух просит написать/создать код или скрипт;\n' +
+                  '   - "chat" — во всех остальных случаях (обычный вопрос, благодарность, уточнение, диалог);\n' +
+                  '   - "silence" — если в аудио только шум, тишина, вздох или неразборчивые звуки.\n' +
+                  '2) "prompt": точная расшифровка того, что сказал пользователь именно в этой аудиозаписи на русском языке.\n' +
+                  '3) "voiceReply": краткий, живой голосовой ответ на русском языке без markdown-символов (1-2 предложения). Для "image" строго: "Я создаю фото по вашему запросу, ожидайте!". Для "code" строго: "Я создаю код по вашему запросу, ожидайте!".',
+              },
+            ],
+          },
+        ];
+
+        const chatRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: liveState.abortController.signal,
+            body: JSON.stringify({
+              contents,
+              generationConfig: {
+                responseMimeType: 'application/json',
+              },
+            }),
+          }
+        );
+
+        if (!chatRes.ok || !liveState.active) {
+          throw new Error('Ошибка связи');
+        }
+
+        const chatData = await chatRes.json();
+        const rawJsonText = (chatData?.candidates?.[0]?.content?.parts || [])
+          .filter(p => !p.thought && p.text)
+          .map(p => p.text)
+          .join('')
+          .trim();
+
+        let parsed = { type: 'chat', prompt: '', voiceReply: '' };
+        try {
+          parsed = JSON.parse(rawJsonText);
+        } catch (_) {
+          parsed = { type: 'chat', prompt: '', voiceReply: sanitizeModelOutput(rawJsonText) };
+        }
+
+        const spokenPrompt = String(parsed.prompt || '').trim();
+        if (!parsed.type || parsed.type === 'silence' || spokenPrompt.length < 2) {
+          liveState.isProcessing = false;
+          if (liveState.active && !liveState.muted) {
+            updateLiveCallUI('Говорите...');
+          }
+          return;
+        }
+
+        // Дополнительная проверка: "image" разрешаем только если в текущей фразе реально есть просьба создать картинку
+        const explicitlyAskedImage = isImageGenerationRequest(spokenPrompt, false);
+        if (parsed.type === 'image' && !explicitlyAskedImage) {
+          parsed.type = 'chat';
+        }
+
+        // Если голосом попросили фото — сворачиваем звонок вниз как на фото, говорим статус и генерируем картинку в чат!
+        if (parsed.type === 'image') {
+          setLiveCallCollapsed(true);
+          const chat = getActiveChat();
+          const imgPrompt = spokenPrompt;
+          liveState.voiceHistory.push({ role: 'user', parts: [{ text: imgPrompt }] });
+          liveState.voiceHistory.push({ role: 'model', parts: [{ text: 'Я создал фото по вашему запросу.' }] });
+
+          if (chat) {
+            chat.messages.push({ role: 'user', content: imgPrompt, timestamp: Date.now() });
+            const assistantMsg = {
+              role: 'assistant',
+              content: '',
+              generatedImageUrl: null,
+              isImageJob: true,
+              isStreaming: true,
+              timestamp: Date.now(),
+            };
+            chat.messages.push(assistantMsg);
+            startImageProgressAnimation();
+            saveChats();
+            renderSidebar();
+            renderMessages();
+
+            speakVoiceReply('Я создаю фото по вашему запросу, ожидайте!', false);
+
+            try {
+              const imgResult = await fetchGeneratedImage(imgPrompt, null);
+              stopImageProgressAnimation();
+              assistantMsg.generatedImageUrl = imgResult.imageUrl;
+              assistantMsg.content = imgResult.answer;
+              assistantMsg.isStreaming = false;
+              saveChats();
+              renderMessages();
+              await speakVoiceReply('Я создал фото по вашему запросу, посмотрите в чате!', false);
+            } catch (e) {
+              stopImageProgressAnimation();
+              assistantMsg.content = 'Не удалось создать изображение. Попробуйте ещё раз.';
+              assistantMsg.isStreaming = false;
+              saveChats();
+              renderMessages();
+            }
+          }
+          liveState.isProcessing = false;
+          return;
+        }
+
+        // Дополнительная проверка для кода
+        const explicitlyAskedCode = /(напиши|сделай|создай|сгенерируй).*(код|скрипт|программ|сайт|игру)|код на /i.test(spokenPrompt);
+        if (parsed.type === 'code' && !explicitlyAskedCode) {
+          parsed.type = 'chat';
+        }
+
+        // Если голосом попросили код — сворачиваем звонок вниз как на фото, создаём код в чат и сообщаем голосом!
+        if (parsed.type === 'code') {
+          setLiveCallCollapsed(true);
+          const chat = getActiveChat();
+          const codePrompt = spokenPrompt;
+          liveState.voiceHistory.push({ role: 'user', parts: [{ text: codePrompt }] });
+          liveState.voiceHistory.push({ role: 'model', parts: [{ text: 'Я создал код по вашему запросу.' }] });
+
+          if (chat) {
+            chat.messages.push({ role: 'user', content: codePrompt, timestamp: Date.now() });
+            const assistantMsg = {
+              role: 'assistant',
+              content: 'Я создаю код по вашему запросу, ожидайте!',
+              isStreaming: true,
+              timestamp: Date.now(),
+            };
+            chat.messages.push(assistantMsg);
+            saveChats();
+            renderSidebar();
+            renderMessages();
+
+            speakVoiceReply('Я создаю код по вашему запросу, ожидайте!', false);
+
+            try {
+              const codePayload = await fetchTextResponse(chat.messages.slice(0, -1), state.reasoningLevel);
+              assistantMsg.content = codePayload.answer;
+              assistantMsg.isStreaming = false;
+              saveChats();
+              renderMessages();
+              await speakVoiceReply('Я создал код по вашему запросу, он уже в чате!', false);
+            } catch (e) {
+              assistantMsg.content = 'Не удалось создать код. Попробуйте ещё раз.';
+              assistantMsg.isStreaming = false;
+              saveChats();
+              renderMessages();
+            }
+          }
+          liveState.isProcessing = false;
+          return;
+        }
+
+        const replyText = sanitizeModelOutput(parsed.voiceReply || '')
+          .replace(/[*#`>_~]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        if (!replyText) {
+          liveState.isProcessing = false;
+          if (liveState.active && !liveState.muted) {
+            updateLiveCallUI('Говорите...');
+          }
+          return;
+        }
+
+        liveState.voiceHistory.push({ role: 'user', parts: [{ text: spokenPrompt }] });
+        liveState.voiceHistory.push({ role: 'model', parts: [{ text: replyText }] });
+
+        await speakVoiceReply(replyText, { userText: spokenPrompt });
+      } catch (err) {
+        liveState.isProcessing = false;
+        liveState.isSpeaking = false;
+        if (err?.name !== 'AbortError' && liveState.active) {
+          updateLiveCallUI(liveState.muted ? 'Микрофон выключен' : 'Говорите...');
+        }
+      }
+    }
+
+    function appendVoiceTurnToChat(userText, modelText) {
+      const chat = getActiveChat();
+      if (!chat) return;
+
+      if (userText) {
+        chat.messages.push({
+          role: 'user',
+          content: userText,
+          timestamp: Date.now(),
+        });
+      }
+
+      if (modelText) {
+        chat.messages.push({
+          role: 'assistant',
+          content: modelText,
+          timestamp: Date.now(),
+        });
+      }
+
+      chat.updatedAt = Date.now();
+      saveChats();
+      renderSidebar();
+      renderMessages();
+    }
+
+    function stopLiveCall() {
+      const wasActive = liveState.active;
+      liveState.active = false;
+      liveState.collapsed = false;
+      liveState.muted = false;
+      liveState.speechStarted = false;
+
+      interruptCurrentSpeech();
+
+      if (liveState.rafId) {
+        cancelAnimationFrame(liveState.rafId);
+        liveState.rafId = null;
+      }
+
+      setLiveCallCollapsed(false);
+
+      if (liveState.mediaRecorder && liveState.mediaRecorder.state === 'recording') {
+        try { liveState.mediaRecorder.stop(); } catch (_) {}
+      }
+      liveState.mediaRecorder = null;
+
+      if (liveState.mediaStream) {
+        liveState.mediaStream.getTracks().forEach(track => {
+          try { track.stop(); } catch (_) {}
+        });
+        liveState.mediaStream = null;
+      }
+
+      if (liveState.audioContext) {
+        try { liveState.audioContext.close(); } catch (_) {}
+        liveState.audioContext = null;
+      }
+      liveState.analyser = null;
+
+      if (wasActive) {
+        showToast('Разговор завершён');
+      }
+    }
+
+    function scrollToBottom() {
+      const container = document.getElementById('messagesScroll');
+      if (!container) return;
+      requestAnimationFrame(() => {
+        container.scrollTop = container.scrollHeight;
+      });
+    }
+
+    function setGeneratingUI(isGenerating) {
+      const stopBtn = document.getElementById('stopGeneratingBtn');
+      const sendBtn = document.getElementById('sendBtn');
+      if (stopBtn) {
+        if (isGenerating) {
+          stopBtn.classList.remove('hidden');
+          stopBtn.classList.add('flex');
+        } else {
+          stopBtn.classList.add('hidden');
+          stopBtn.classList.remove('flex');
+        }
+      }
+      if (sendBtn) {
+        sendBtn.disabled = Boolean(isGenerating);
+      }
+    }
+
+    function stopStreaming() {
+      if (state.abortController) {
+        try {
+          state.abortController.abort();
+        } catch (_) {}
+        state.abortController = null;
+      }
+      stopImageProgressAnimation();
+      state.isGenerating = false;
+      setGeneratingUI(false);
+
+      const chat = getActiveChat();
+      const lastMsg = chat?.messages?.[chat.messages.length - 1];
+      if (lastMsg && lastMsg.role === 'assistant' && lastMsg.isStreaming) {
+        lastMsg.isStreaming = false;
+        if (!lastMsg.content && !lastMsg.generatedImageUrl) {
+          lastMsg.content = 'Генерация остановлена.';
+        }
+        saveChats();
+        renderMessages();
+      }
+    }
+
+    function closeCodePreviewModal() {
+      const modal = document.getElementById('codePreviewModal');
+      const frame = document.getElementById('codePreviewFrame');
+      if (frame) frame.srcdoc = '';
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function base64ToUint8Array(base64) {
+      const binary = atob(base64);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return bytes;
+    }
+
+    function pcmToWavBlob(pcm16Array, sampleRate) {
+      const numChannels = 1;
+      const bitsPerSample = 16;
+      const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+      const blockAlign = (numChannels * bitsPerSample) / 8;
+      const dataSize = pcm16Array.byteLength;
+      const buffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(buffer);
+
+      const writeStr = (offset, str) => {
+        for (let i = 0; i < str.length; i++) {
+          view.setUint8(offset + i, str.charCodeAt(i));
+        }
+      };
+
+      writeStr(0, 'RIFF');
+      view.setUint32(4, 36 + dataSize, true);
+      writeStr(8, 'WAVE');
+      writeStr(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitsPerSample, true);
+      writeStr(36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      new Uint8Array(buffer, 44).set(new Uint8Array(pcm16Array.buffer, pcm16Array.byteOffset, dataSize));
+      return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    function blobToBase64Raw(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const res = String(reader.result || '');
+          const idx = res.indexOf(',');
+          resolve(idx >= 0 ? res.slice(idx + 1) : res);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    /**
+     * Буфер обмена и уведомления
+     */
+    function copyRawText(text) {
+      if (!text) return;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(
+          () => showToast('Скопировано'),
+          () => fallbackExecCopy(text)
+        );
+      } else {
+        fallbackExecCopy(text);
+      }
+    }
+
+    function fallbackExecCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('Скопировано');
+      } catch (_) {
+        showToast('Не удалось скопировать');
+      }
+      document.body.removeChild(ta);
+    }
+
+    let toastTimeout = null;
+    function showToast(message) {
+      const el = document.getElementById('toastBanner');
+      if (!el) return;
+      el.textContent = message;
+      el.classList.remove('opacity-0');
+      el.classList.add('opacity-100');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        el.classList.remove('opacity-100');
+        el.classList.add('opacity-0');
+      }, 2200);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeAttr(str) {
+      return encodeURIComponent(String(str ?? ''));
+    }
+
+    function decodeAttr(encoded) {
+      try {
+        return decodeURIComponent(encoded || '');
+      } catch (_) {
+        return '';
+      }
+    }
+
+    function escapePlainError(msg) {
+      return String(msg || 'ошибка сети').replace(/[`*]/g, '');
+    }
+  </script>
 </body>
 </html>
