@@ -440,9 +440,7 @@
     let activeModalSnippetId = null;
 
     const MODELS_PRIORITY = [
-      "gemini-3.8-flash",
-      "gemini-3-flash-preview",
-      "gemini-2.5-flash"
+      "gemini-3.8-flash"
     ];
 
     const GREETINGS = [
@@ -479,7 +477,6 @@
       currentAudio: null
     };
 
-    // --- ПАМЯТЬ КОДА ---
     function saveCodeMemory() {
       localStorage.setItem("mafgpt_code_memory_v1", JSON.stringify(state.codeMemory.slice(0, 30)));
       renderCodeMemoryList();
@@ -591,7 +588,6 @@
       return `\n\nСохранённый в памяти код пользователя (помни и учитывай его при ответах и правках):\n${recentSnippets}`;
     }
 
-    // --- СОХРАНЕНИЕ И АКТИВАЦИЯ API KEY ---
     function hideActivationScreenImmediate() {
       const screen = document.getElementById("activationScreen");
       if (!screen) return;
@@ -689,7 +685,6 @@
       throw new Error(lastError);
     }
 
-    // --- ЧАТЫ ---
     function saveChats() {
       localStorage.setItem("mafgpt_chats_v8", JSON.stringify(state.chats));
       renderHistoryList();
@@ -983,7 +978,6 @@
         .replace(/"/g, "&quot;");
     }
 
-    // --- ГОЛОСОВОЙ РАЗГОВОР + ЭНЕРГИЧНЫЙ БЫСТРЫЙ МУЖСКОЙ ГОЛОС ---
     function pickEnergeticMaleVoice() {
       if (!("speechSynthesis" in window)) return null;
       const voices = window.speechSynthesis.getVoices() || [];
