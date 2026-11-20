@@ -185,7 +185,7 @@
 </head>
 <body class="flex flex-col md:flex-row bg-black text-white select-none">
 
-  <!-- ЭКРАН БЫСТРОЙ АКТИВАЦИИ (с вшитым ключом) -->
+  <!-- ЭКРАН ВВОДА API KEY ПРИ КАЖДОМ ВХОДЕ -->
   <div id="activationScreen" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 screen-transition screen-visible">
     <div class="w-full max-w-sm bg-[#141414] border border-[#2b2b2b] rounded-3xl p-7 text-center shadow-2xl">
       <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/30">
@@ -195,12 +195,23 @@
         </svg>
       </div>
       <h1 class="text-2xl font-bold tracking-tight mb-2">Maf GPT</h1>
-      <p class="text-sm text-neutral-400 mb-6 leading-relaxed">
-        Ключ вшит. Нажмите «Активировать», чтобы войти и разблокировать звук.
+      <p class="text-sm text-neutral-400 mb-5 leading-relaxed">
+        Введите ваш API Key для запуска сессии. Ключ хранится только в текущей сессии и сбрасывается при перезаходе.
       </p>
+
+      <input
+        id="sessionApiKeyInput"
+        type="password"
+        autocomplete="off"
+        placeholder="Вставьте API Key..."
+        onkeydown="if(event.key==='Enter') activateMafGpt()"
+        class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none mb-4 select-text"
+      />
+
       <button onclick="activateMafGpt()" class="w-full py-3.5 px-6 rounded-2xl bg-white text-black font-semibold text-base hover:bg-neutral-200 cursor-pointer">
         Активировать
       </button>
+      <p id="keyErrorMsg" class="text-xs text-red-400 mt-3 min-h-[16px]"></p>
     </div>
   </div>
 
@@ -224,10 +235,14 @@
       </button>
     </div>
 
-    <div class="p-3">
+    <div class="p-3 space-y-2">
       <button onclick="createNewChat()" class="w-full py-2.5 px-3.5 rounded-xl bg-[#1b1b1b] hover:bg-[#262626] text-white text-sm font-medium flex items-center gap-2.5 cursor-pointer">
         <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
         Новый чат
+      </button>
+      <button onclick="openKeyModal()" class="w-full py-2 px-3.5 rounded-xl bg-[#141414] hover:bg-[#202020] text-neutral-300 text-xs font-medium flex items-center gap-2 cursor-pointer">
+        <svg class="w-3.5 h-3.5 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        Сменить API Key
       </button>
     </div>
 
@@ -389,7 +404,8 @@
   </div>
 
   <script>
-    const EMBEDDED_API_KEY = "AQ.Ab8RN6LdQzxxebsJquL5WuIpSLR1TFH4c91tW1o63T19mAJ9wg";
+    // Ключ хранится только в оперативной памяти вкладки и очищается при каждом новом входе/обновлении
+    let sessionApiKey = "";
 
     const MODELS_PRIORITY = [
       "gemini-3.8-flash",
@@ -407,7 +423,7 @@
     ];
 
     let state = {
-      chats: JSON.parse(localStorage.getItem("mafgpt_chats_v4") || "[]"),
+      chats: JSON.parse(localStorage.getItem("mafgpt_chats_v5") || "[]"),
       currentChatId: null,
       attachedImageBase64: null,
       attachedImageMime: null,
@@ -429,7 +445,32 @@
       silenceStart: 0
     };
 
+    function openKeyModal() {
+      const errEl = document.getElementById("keyErrorMsg");
+      const inputEl = document.getElementById("sessionApiKeyInput");
+      if (errEl) errEl.textContent = "";
+      if (inputEl) inputEl.value = "";
+      const screen = document.getElementById("activationScreen");
+      screen.style.display = "flex";
+      requestAnimationFrame(() => {
+        screen.classList.remove("screen-hidden");
+        screen.classList.add("screen-visible");
+      });
+    }
+
     function activateMafGpt() {
+      const inputEl = document.getElementById("sessionApiKeyInput");
+      const errEl = document.getElementById("keyErrorMsg");
+      const entered = (inputEl?.value || "").trim();
+
+      if (!entered) {
+        if (errEl) errEl.textContent = "Введите ваш API Key.";
+        return;
+      }
+
+      sessionApiKey = entered;
+      if (errEl) errEl.textContent = "";
+
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (AudioCtx && !voiceState.audioCtx) {
@@ -446,9 +487,14 @@
     }
 
     async function callGeminiAPI(payload) {
+      if (!sessionApiKey) {
+        openKeyModal();
+        throw new Error("API Key не введён для текущей сессии.");
+      }
+
       let lastError = "Неизвестная ошибка";
       for (const model of MODELS_PRIORITY) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(EMBEDDED_API_KEY)}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(sessionApiKey)}`;
         try {
           const res = await fetch(url, {
             method: "POST",
@@ -468,7 +514,7 @@
     }
 
     function saveChats() {
-      localStorage.setItem("mafgpt_chats_v4", JSON.stringify(state.chats));
+      localStorage.setItem("mafgpt_chats_v5", JSON.stringify(state.chats));
       renderHistoryList();
     }
 
@@ -581,6 +627,11 @@
 
     async function sendTextMessage() {
       if (state.isGenerating) return;
+      if (!sessionApiKey) {
+        openKeyModal();
+        return;
+      }
+
       const input = document.getElementById("promptInput");
       const text = input.value.trim();
       const imgBase64 = state.attachedImageBase64;
@@ -631,7 +682,7 @@
         chat.messages.pop();
         chat.messages.push({
           role: "model",
-          text: `Не удалось получить ответ (${err.message}). Проверьте, что ключ в Google AI Studio не заблокирован.`
+          text: `Не удалось получить ответ (${err.message}).`
         });
       } finally {
         state.isGenerating = false;
@@ -750,8 +801,12 @@
         .replace(/"/g, "&quot;");
     }
 
-    // --- ГОЛОСОВОЙ РАЗГОВОР ---
     async function startVoiceCall() {
+      if (!sessionApiKey) {
+        openKeyModal();
+        return;
+      }
+
       const overlay = document.getElementById("liveCallOverlay");
       overlay.classList.remove("hidden");
       overlay.classList.add("flex");
