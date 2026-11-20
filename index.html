@@ -5,117 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Maf GPT</title>
 
-  <!-- Настройки полноэкранного режима приложения (PWA) при добавлении на экран «Домой» на iPhone и Android -->
-  <meta name="application-name" content="Maf GPT" />
-  <meta name="apple-mobile-web-app-title" content="Maf GPT" />
+  <!-- Полноэкранный режим приложения (PWA) при добавлении на главный экран телефона -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Maf GPT" />
   <meta name="theme-color" content="#000000" />
-  <meta name="msapplication-navbutton-color" content="#000000" />
-  <link id="appleTouchIconLink" rel="apple-touch-icon" sizes="180x180" href="" />
-  <link id="pwaManifestLink" rel="manifest" href="" />
 
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            appBg: '#000000',
-            sideBg: '#0a0a0a',
-            cardBg: '#121212',
-            cardHover: '#1c1c1c',
-            userBubble: '#1a1a1a',
-          },
-        },
-      },
-    };
-  </script>
-  <style>
-    html, body {
-      max-width: 100%;
-      height: 100%;
-      overflow-x: hidden;
-      background: #000000;
-      color: #ffffff;
-      margin: 0;
-      padding: 0;
-      overscroll-behavior-y: none;
-      -webkit-tap-highlight-color: transparent;
-    }
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
+  <style>
     *, *::before, *::after {
       box-sizing: border-box;
       min-width: 0;
     }
 
-    /* Учёт вырезов экрана (чёлки и нижней полосы жестов) в полноэкранном режиме приложения */
-    .safe-top {
-      padding-top: max(0.5rem, env(safe-area-inset-top));
-    }
-    .safe-bottom {
-      padding-bottom: max(1.1rem, calc(env(safe-area-inset-bottom) + 0.65rem));
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100dvh;
+      background-color: #000000;
+      color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* Поле ввода в стиле современного ChatGPT с тонкой серой обводкой */
+    .safe-top {
+      padding-top: max(0.6rem, env(safe-area-inset-top));
+    }
+    .safe-bottom {
+      padding-bottom: max(1rem, calc(env(safe-area-inset-bottom) + 0.55rem));
+    }
+
+    button {
+      border: none !important;
+      outline: none !important;
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.22s ease, color 0.22s ease, opacity 0.22s ease;
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+
     .composer-box {
       background: #212121;
       border: 1px solid #383838;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.65);
-      transition: background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      transition: background-color 0.22s ease, border-color 0.22s ease;
     }
-
     .composer-box:focus-within {
       background: #242424;
       border-color: #525252;
-      box-shadow: 0 10px 34px rgba(0, 0, 0, 0.8);
     }
 
-    /* Все кнопки без обводки и с плавным откликом */
-    button {
-      border: none !important;
-      outline: none !important;
-      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.22s ease, color 0.22s ease, opacity 0.22s ease, box-shadow 0.22s ease;
-    }
-
-    /* Плавные анимации переходов между окнами, звонком и чатом */
-    .screen-transition {
-      transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-      will-change: opacity, transform;
-    }
-    .screen-hidden {
-      opacity: 0 !important;
-      transform: scale(0.95) translateY(14px) !important;
-      pointer-events: none !important;
-    }
-    .screen-visible {
-      opacity: 1 !important;
-      transform: scale(1) translateY(0) !important;
-      pointer-events: auto !important;
-    }
-
-    .docked-transition {
-      transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .docked-hidden {
-      opacity: 0;
-      transform: translateY(14px) scale(0.92);
-    }
-    .docked-visible {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-
-    /* Анимация живой голосовой сферы во время звонка */
+    /* Сфера голосового режима */
     @keyframes voice-orb-pulse {
       0%, 100% {
         transform: scale(1);
@@ -123,23 +70,19 @@
       }
       50% {
         transform: scale(1.07);
-        box-shadow: 0 0 60px rgba(59, 130, 246, 0.75), inset 0 0 36px rgba(255, 255, 255, 0.4);
+        box-shadow: 0 0 62px rgba(59, 130, 246, 0.78), inset 0 0 36px rgba(255, 255, 255, 0.42);
       }
     }
-
     .voice-orb-active {
       animation: voice-orb-pulse 2s ease-in-out infinite;
     }
-
     .voice-orb-speaking {
-      animation: voice-orb-pulse 0.8s ease-in-out infinite;
+      animation: voice-orb-pulse 0.75s ease-in-out infinite;
     }
 
-    /* Текстура голубого неба с облаками внутри сферы */
     .sky-orb {
-      background:
-        radial-gradient(circle at 35% 28%, #93c5fd 0%, #3b82f6 42%, #1d4ed8 72%),
-        linear-gradient(180deg, #2563eb 0%, #60a5fa 60%, #eff6ff 100%);
+      background: radial-gradient(circle at 35% 28%, #93c5fd 0%, #3b82f6 42%, #1d4ed8 72%),
+                  linear-gradient(180deg, #2563eb 0%, #60a5fa 60%, #eff6ff 100%);
       position: relative;
       overflow: hidden;
     }
@@ -151,9 +94,24 @@
       pointer-events: none;
     }
 
-    /* Плавная анимация смены стартового заголовка */
+    /* Плавные переходы экранов и оверлеев */
+    .fade-screen {
+      transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .fade-hidden {
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
+    }
+    .fade-visible {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    /* Плавная смена приветствия */
     .greeting-fade {
-      transition: opacity 0.55s ease, transform 0.55s ease;
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
     .greeting-hidden {
       opacity: 0;
@@ -164,2538 +122,1049 @@
       transform: translateY(0);
     }
 
-    /* Плавное появление сообщений */
+    /* Сообщения */
     @keyframes msg-slide-up {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .msg-appear {
-      animation: msg-slide-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation: msg-slide-up 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
-    /* Чистая типографика ответов */
-    .prose-maf p {
-      margin-bottom: 0.85rem;
-      line-height: 1.72;
-      color: #f5f5f5;
-    }
-    .prose-maf p:last-child {
-      margin-bottom: 0;
-    }
-    .prose-maf h1, .prose-maf h2, .prose-maf h3 {
-      color: #ffffff;
-      font-weight: 600;
-      margin-top: 1.25rem;
-      margin-bottom: 0.55rem;
-      line-height: 1.35;
-    }
-    .prose-maf h1 { font-size: 1.28rem; }
-    .prose-maf h2 { font-size: 1.12rem; }
-    .prose-maf h3 { font-size: 1.02rem; color: #e5e5e5; }
-
-    .prose-maf ul, .prose-maf ol {
-      margin: 0.55rem 0 0.95rem 1.35rem;
-      line-height: 1.7;
-      color: #f5f5f5;
-    }
+    .prose-maf p { margin-bottom: 0.85rem; line-height: 1.7; color: #f5f5f5; }
+    .prose-maf p:last-child { margin-bottom: 0; }
+    .prose-maf h1, .prose-maf h2, .prose-maf h3 { color: #ffffff; font-weight: 600; margin-top: 1.2rem; margin-bottom: 0.5rem; }
+    .prose-maf ul, .prose-maf ol { margin: 0.5rem 0 0.9rem 1.35rem; line-height: 1.65; color: #f5f5f5; }
     .prose-maf ul { list-style-type: disc; }
     .prose-maf ol { list-style-type: decimal; }
-    .prose-maf li { margin-bottom: 0.3rem; }
-
-    /* Блоки кода в стиле 2-го фото */
-    .code-wrapper {
-      margin: 0.95rem 0;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #2f2f2f;
-      max-width: 100%;
-      width: 100%;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    .prose-maf code:not(pre code) {
+      background: #262626;
+      padding: 0.15rem 0.4rem;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85em;
+      color: #93c5fd;
     }
 
+    .code-wrapper {
+      margin: 0.9rem 0;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #1c1c1c;
+      border: 1px solid #2e2e2e;
+    }
     .code-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.85rem 1.15rem;
-      background: #2f2f2f;
-      font-size: 0.88rem;
-      font-weight: 500;
-      color: #f5f5f5;
-      font-family: 'Inter', sans-serif;
+      padding: 0.65rem 1rem;
+      background: #252525;
+      font-size: 0.82rem;
+      color: #d4d4d4;
     }
-
     .code-body {
       margin: 0;
-      padding: 0.25rem 1.25rem 1.25rem 1.25rem;
+      padding: 1rem;
       overflow-x: auto;
-      max-width: 100%;
-      max-height: 460px;
-      overflow-y: auto;
+      max-height: 420px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.84rem;
-      line-height: 1.65;
+      font-size: 0.82rem;
+      line-height: 1.6;
       color: #f5f5f5;
-      tab-size: 2;
-      transition: max-height 0.25s ease;
-    }
-
-    .code-body.code-collapsed {
-      max-height: 160px;
-      overflow-y: hidden;
-    }
-
-    .tok-kw { color: #60a5fa; font-weight: 500; }
-    .tok-tag { color: #60a5fa; }
-    .tok-attr { color: #e5e7eb; }
-    .tok-str { color: #86efac; }
-    .tok-num { color: #fbbf24; }
-    .tok-cmt { color: #8e8e93; font-style: italic; }
-
-    /* Статичная карточка создания изображения без каких-либо анимаций */
-    .static-image-placeholder {
-      background-color: #141414;
-      border: 1px solid #262626;
     }
 
     textarea#promptInput {
       field-sizing: content;
-      max-height: 200px;
+      max-height: 180px;
       min-height: 26px;
       caret-color: #ffffff;
     }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #333333; border-radius: 999px; }
   </style>
 </head>
-<body class="bg-appBg text-white antialiased selection:bg-white/25 selection:text-white">
-  <div class="flex h-dvh w-full max-w-full overflow-hidden">
-    <!-- Затемнение для мобильного меню -->
-    <div
-      id="sidebarBackdrop"
-      onclick="toggleSidebar(false)"
-      class="fixed inset-0 z-30 hidden bg-black/80 backdrop-blur-xs transition-opacity duration-200 md:hidden"
-    ></div>
+<body class="flex flex-col md:flex-row bg-black text-white select-none">
 
-    <!-- Боковая панель: на ПК статичная, на мобильном телефоне — выдвижное меню по кнопке с 3 палочками -->
-    <aside
-      id="sidebar"
-      class="safe-top safe-bottom fixed inset-y-0 left-0 z-40 flex w-[280px] max-w-[82vw] shrink-0 -translate-x-full flex-col bg-[#0d0d0d] shadow-2xl transition-transform duration-200 ease-out md:static md:w-64 md:max-w-none md:translate-x-0 md:shadow-none"
-    >
-      <!-- Верх боковой панели: Новый чат и кнопка закрытия на телефоне -->
-      <div class="flex items-center justify-between gap-2 px-3 pt-4 pb-2 md:pt-3.5">
-        <button
-          id="newChatBtn"
-          type="button"
-          onclick="createNewChat()"
-          class="flex flex-1 items-center gap-2.5 rounded-xl bg-[#1a1a1a] px-3.5 py-2.5 text-sm font-medium text-white hover:bg-[#262626] active:scale-[0.98]"
-        >
-          <svg class="h-4 w-4 shrink-0 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-          </svg>
-          <span>Новый чат</span>
-        </button>
+  <!-- ЭКРАН АКТИВАЦИИ (кнопка «Активировать» с уже вшитым API-ключом) -->
+  <div id="activationScreen" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 fade-screen fade-visible">
+    <div class="w-full max-w-sm bg-[#141414] border border-[#2a2a2a] rounded-3xl p-7 text-center shadow-2xl">
+      <!-- Фирменный логотип Maf GPT -->
+      <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/30">
+        <svg class="w-9 h-9 text-white" viewBox="0 0 32 32" fill="none">
+          <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="16" cy="7" r="2.2" fill="#93c5fd"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight mb-2">Maf GPT</h1>
+      <p class="text-sm text-neutral-400 mb-6 leading-relaxed">
+        API-ключ уже встроен в систему. Нажмите кнопку ниже, чтобы активировать ИИ и голосовой движок.
+      </p>
 
-        <button
-          type="button"
-          onclick="toggleSidebar(false)"
-          title="Закрыть меню"
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1a1a1a] text-neutral-300 hover:bg-[#262626] hover:text-white active:scale-95 md:hidden"
-          aria-label="Закрыть меню"
-        >
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
+      <div class="bg-[#1c1c1c] border border-[#2c2c2c] rounded-xl px-3.5 py-2.5 mb-5 flex items-center justify-between text-xs text-neutral-400 font-mono">
+        <span class="truncate">AQ.Ab8RN6LdQzxxebs...mAJ9wg</span>
+        <span class="text-emerald-400 font-sans font-medium ml-2 shrink-0">● Вшит</span>
       </div>
 
-      <!-- Список истории диалогов -->
-      <div class="mt-2 flex-1 overflow-y-auto px-2.5 pb-4">
-        <div class="px-2.5 py-2 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
-          История разговоров
+      <button id="activateBtn" onclick="activateMafGpt()" class="w-full py-3.5 px-6 rounded-2xl bg-white text-black font-semibold text-base hover:bg-neutral-200 shadow-lg cursor-pointer">
+        Активировать
+      </button>
+      <p id="activationStatus" class="text-xs text-neutral-500 mt-3 min-h-[16px]"></p>
+    </div>
+  </div>
+
+  <!-- ЗАТЕМНЕНИЕ ДЛЯ МОБИЛЬНОГО МЕНЮ -->
+  <div id="mobileBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/70 z-30 hidden md:hidden backdrop-blur-xs"></div>
+
+  <!-- БОКОВАЯ ПАНЕЛЬ (На ПК всегда скраю, на телефоне открывается по 3 полоскам) -->
+  <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 bg-[#0d0d0d] border-r border-[#1f1f1f] flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-out safe-top safe-bottom">
+    <div class="px-4 py-3 flex items-center justify-between border-b border-[#1c1c1c]">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-md shadow-blue-600/25">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 32 32" fill="none">
+            <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="16" cy="7" r="2.3" fill="#93c5fd"/>
+          </svg>
         </div>
-        <div id="chatHistoryList" class="flex flex-col gap-1"></div>
+        <span class="font-semibold text-base tracking-tight">Maf GPT</span>
       </div>
+      <!-- Кнопка закрыть (крестик на телефоне) -->
+      <button onclick="toggleMobileSidebar(false)" class="md:hidden w-8 h-8 rounded-lg bg-[#1c1c1c] text-neutral-300 flex items-center justify-center hover:bg-[#2a2a2a]" aria-label="Закрыть меню">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
 
-      <!-- Низ боковой панели -->
-      <div class="flex flex-col gap-1 p-2.5">
-        <button
-          type="button"
-          onclick="clearAllChats()"
-          class="flex w-full items-center gap-2.5 rounded-xl bg-transparent px-3 py-2 text-xs text-neutral-400 hover:bg-[#1a1a1a] hover:text-white"
-        >
-          <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+    <div class="p-3">
+      <button onclick="createNewChat()" class="w-full py-2.5 px-3.5 rounded-xl bg-[#1b1b1b] hover:bg-[#262626] text-white text-sm font-medium flex items-center gap-2.5 cursor-pointer">
+        <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+        Новый чат
+      </button>
+    </div>
+
+    <div class="px-4 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+      История разговоров
+    </div>
+    <div id="chatHistoryList" class="flex-1 overflow-y-auto px-2.5 space-y-1"></div>
+
+    <div class="p-3 border-t border-[#1c1c1c] flex items-center justify-between text-xs text-neutral-500">
+      <span class="flex items-center gap-1.5 text-emerald-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Активен
+      </span>
+      <button onclick="clearAllHistory()" class="text-neutral-400 hover:text-white px-2 py-1 rounded-lg hover:bg-[#1c1c1c] cursor-pointer">
+        Очистить
+      </button>
+    </div>
+  </aside>
+
+  <!-- ОСНОВНАЯ ОБЛАСТЬ ЧАТА -->
+  <main class="flex-1 flex flex-col h-full relative bg-black">
+
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <header class="safe-top px-4 pb-2.5 flex items-center justify-between border-b border-[#161616] bg-black/90 backdrop-blur-md z-20">
+      <div class="flex items-center gap-2.5">
+        <!-- 3 полоски на мобильном телефоне -->
+        <button onclick="toggleMobileSidebar(true)" class="md:hidden w-9 h-9 rounded-xl bg-[#161616] hover:bg-[#222222] flex items-center justify-center text-white cursor-pointer" aria-label="Меню">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M4 7h16M4 12h16M4 17h16"/>
           </svg>
-          <span>Очистить историю</span>
         </button>
-      </div>
-    </aside>
 
-    <!-- Основная рабочая область -->
-    <main class="relative flex min-w-0 flex-1 flex-col overflow-x-hidden bg-appBg">
-      <!-- Шапка -->
-      <header class="safe-top flex min-h-14 shrink-0 items-center justify-between px-3 sm:px-6">
+        <!-- Фирменный значок Maf GPT скраю -->
         <div class="flex items-center gap-2">
-          <button
-            type="button"
-            onclick="toggleSidebar(true)"
-            title="История разговоров"
-            class="flex h-10 w-10 items-center justify-center rounded-xl bg-transparent text-white hover:bg-[#1a1a1a] active:scale-95 md:hidden"
-            aria-label="Открыть меню"
-          >
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round">
-              <path d="M4 6h16M4 12h16M4 18h16" />
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-sm shadow-blue-600/30">
+            <svg class="w-4 h-4 text-white" viewBox="0 0 32 32" fill="none">
+              <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="16" cy="7" r="2.3" fill="#93c5fd"/>
             </svg>
-          </button>
-
-          <!-- Фирменный значок Maf GPT скраю -->
-          <div class="flex select-none items-center gap-2.5">
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#161618] shadow-md">
-              <svg class="h-5 w-5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="mafLogoGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#60a5fa" />
-                    <stop offset="55%" stop-color="#2563eb" />
-                    <stop offset="100%" stop-color="#ffffff" />
-                  </linearGradient>
-                </defs>
-                <path d="M6.5 23.5V9.5L16 17.5L25.5 9.5V23.5" stroke="url(#mafLogoGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
-                <circle cx="16" cy="7.5" r="2.1" fill="#60a5fa" />
-              </svg>
-            </div>
-            <span class="text-base font-semibold tracking-tight text-white">Maf GPT</span>
           </div>
-        </div>
-
-        <div class="flex items-center gap-1.5">
-          <!-- Быстрая кнопка нового чата на мобильном телефоне -->
-          <button
-            type="button"
-            onclick="createNewChat()"
-            title="Новый чат"
-            aria-label="Новый чат"
-            class="flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-neutral-300 hover:bg-[#1a1a1a] hover:text-white active:scale-95 md:hidden"
-          >
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 20h9" />
-              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            id="stopGeneratingBtn"
-            onclick="stopStreaming()"
-            class="hidden items-center gap-1.5 rounded-full bg-[#212121] px-3.5 py-1.5 text-xs font-medium text-white hover:bg-[#2f2f2f]"
-          >
-            <span class="h-2 w-2 rounded-xs bg-white"></span>
-            <span>Остановить</span>
-          </button>
-        </div>
-      </header>
-
-      <!-- Лента сообщений -->
-      <div id="messagesScroll" class="flex-1 overflow-y-auto overflow-x-hidden px-3 py-6 sm:px-6">
-        <div id="messagesInner" class="mx-auto flex w-full max-w-[820px] min-w-0 flex-col gap-6 overflow-x-hidden pb-4">
-          <!-- Контент чата -->
+          <span class="font-semibold text-base tracking-tight">Maf GPT</span>
         </div>
       </div>
 
-      <!-- Всплывающее уведомление -->
-      <div
-        id="toastBanner"
-        class="pointer-events-none fixed bottom-28 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#262626] px-4 py-2 text-xs font-medium text-white opacity-0 shadow-xl transition-all duration-200"
-      >
-        Готово
-      </div>
-
-      <!-- Компактная голосовая сфера прямо над полем ввода (когда звонок свёрнут вниз) -->
-      <div
-        id="dockedCallBar"
-        class="docked-transition docked-hidden mx-auto hidden w-full max-w-[820px] shrink-0 flex-col items-center justify-center overflow-x-hidden bg-appBg px-3 pt-2 pb-1"
-      >
-        <button
-          type="button"
-          onclick="setLiveCallCollapsed(false)"
-          title="Развернуть звонок"
-          class="group relative flex flex-col items-center gap-1.5 bg-transparent"
-        >
-          <div
-            id="dockedVoiceOrb"
-            class="sky-orb voice-orb-active h-20 w-20 rounded-full shadow-2xl transition-transform duration-200 group-hover:scale-105"
-          ></div>
-          <span id="dockedCallStatus" class="text-[11px] font-medium text-neutral-400">Говорите...</span>
+      <div class="flex items-center gap-2">
+        <button onclick="createNewChat()" class="md:hidden w-9 h-9 rounded-xl bg-[#161616] hover:bg-[#222222] flex items-center justify-center text-neutral-200 cursor-pointer" title="Новый чат">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
         </button>
       </div>
+    </header>
 
-      <!-- Область ввода -->
-      <div class="safe-bottom shrink-0 overflow-x-hidden bg-appBg px-3 pt-1 sm:px-6 sm:pb-7">
-        <div class="mx-auto w-full max-w-[820px] min-w-0">
-          <!-- Превью прикреплённого фото -->
-          <div id="imagePreviewContainer" class="mb-2.5 hidden">
-            <div class="relative inline-flex items-center gap-3 rounded-2xl bg-[#212121] p-2 pr-3 shadow-lg">
-              <img
-                id="imagePreviewThumb"
-                src=""
-                alt="Фото"
-                class="h-14 w-14 rounded-xl object-cover"
-              />
-              <div class="min-w-0">
-                <div id="imagePreviewName" class="max-w-[180px] truncate text-xs font-medium text-white">
-                  photo.jpg
-                </div>
-                <div class="text-[11px] text-neutral-400">Фото прикреплено</div>
-              </div>
-              <button
-                type="button"
-                onclick="clearAttachedImage()"
-                aria-label="Удалить фото"
-                class="flex h-7 w-7 items-center justify-center rounded-full bg-[#2e2e2e] text-white hover:bg-[#3a3a3a]"
-              >
-                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Капсула ввода -->
-          <div class="composer-box flex items-end gap-2 rounded-[28px] px-3 py-2">
-            <input
-              type="file"
-              id="imageFileInput"
-              accept="image/*"
-              class="hidden"
-              onchange="handleImageSelected(event)"
-            />
-
-            <!-- Значок + для прикрепления фото -->
-            <button
-              type="button"
-              onclick="document.getElementById('imageFileInput').click()"
-              title="Прикрепить фото"
-              aria-label="Прикрепить фото"
-              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-transparent text-neutral-300 hover:bg-[#2f2f2f] hover:text-white active:scale-95"
-            >
-              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-            </button>
-
-            <textarea
-              id="promptInput"
-              rows="1"
-              placeholder="Спросить Maf GPT"
-              oninput="updateActionButtonState()"
-              onkeydown="handleComposerKeydown(event)"
-              onpaste="handleComposerPaste(event)"
-              class="my-auto max-h-48 min-h-[24px] flex-1 resize-none bg-transparent py-1.5 text-[15px] leading-relaxed text-white placeholder-neutral-400 focus:outline-none focus:ring-0"
-            ></textarea>
-
-            <!-- Кнопки во время активного звонка -->
-            <div id="dockedCallControls" class="hidden shrink-0 items-center gap-2">
-              <button
-                type="button"
-                id="dockedMuteBtn"
-                onclick="toggleLiveMute()"
-                title="Выключить / включить микрофон"
-                aria-label="Микрофон"
-                class="flex h-9 w-9 items-center justify-center rounded-full bg-[#2c2c2c] text-white hover:bg-[#3a3a3a] active:scale-95"
-              >
-                <svg id="dockedMicOnIcon" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                  <line x1="12" y1="19" x2="12" y2="22" />
-                </svg>
-                <svg id="dockedMicOffIcon" class="hidden h-4 w-4 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="2" y1="2" x2="22" y2="22" />
-                  <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2" />
-                  <path d="M5 10v2a7 7 0 0 0 12 5" />
-                  <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" />
-                  <path d="M9 9v3a3 3 0 0 0 5.12 2.12" />
-                  <line x1="12" y1="19" x2="12" y2="22" />
-                </svg>
-              </button>
-
-              <button
-                type="button"
-                onclick="stopLiveCall()"
-                title="Закончить разговор"
-                aria-label="Закончить разговор"
-                class="flex h-9 w-9 items-center justify-center rounded-full bg-[#2563eb] text-white hover:bg-[#1d4ed8] active:scale-95"
-              >
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <!-- Умная кнопка в обычном режиме: если пусто — синяя кнопка живого звонка; если введён текст — белая стрелка вверх для отправки -->
-            <button
-              type="button"
-              id="sendBtn"
-              onclick="handlePrimaryActionClick()"
-              title="Голосовой разговор"
-              aria-label="Голосовой разговор"
-              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2563eb] text-white hover:bg-[#1d4ed8] active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
-            >
-              <!-- Иконка звуковых волн -->
-              <svg id="iconVoiceWave" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-                <path d="M5 10v4" />
-                <path d="M9.5 7v10" />
-                <path d="M14.5 5v14" />
-                <path d="M19 9v6" />
-              </svg>
-              <!-- Иконка стрелки вверх -->
-              <svg id="iconSendArrow" class="hidden h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 19V5" />
-                <path d="M5 12l7-7 7 7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <!-- Полноэкранный режим живого голосового звонка с плавной анимацией -->
-  <div
-    id="liveCallOverlay"
-    class="screen-transition screen-hidden fixed inset-0 z-50 hidden flex-col items-center justify-between bg-[#050505]/95 px-6 py-8 backdrop-blur-xl"
-  >
-    <div class="flex w-full max-w-3xl items-center justify-between">
-      <button
-        type="button"
-        onclick="setLiveCallCollapsed(true)"
-        title="Свернуть вниз и открыть чат"
-        class="flex items-center gap-1.5 rounded-full bg-[#1f1f1f] px-3.5 py-2 text-xs font-medium text-white hover:bg-[#2c2c2c] active:scale-95"
-      >
-        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 9l6 6 6-6" />
-        </svg>
-        <span>В чат</span>
-      </button>
-
-      <div class="flex flex-col items-center text-center">
-        <span class="text-base font-semibold tracking-tight text-white">Maf GPT</span>
-        <span id="liveCallStatus" class="text-xs text-neutral-400">Подключение...</span>
-      </div>
-
-      <div class="w-16"></div>
-    </div>
-
-    <!-- Центральная анимированная сфера голоса + индикатор звука -->
-    <div class="flex flex-col items-center justify-center gap-5">
-      <div
-        id="liveVoiceOrb"
-        class="sky-orb voice-orb-active h-40 w-40 rounded-full transition-transform duration-150 sm:h-48 sm:w-48"
-      ></div>
-      <div class="h-1.5 w-28 overflow-hidden rounded-full bg-[#1d1d1f]">
-        <div id="micLevelFill" class="h-full w-0 rounded-full bg-[#3b82f6] transition-all duration-75"></div>
-      </div>
-      <p id="liveCallSubtitle" class="min-h-[20px] max-w-md text-center text-sm text-neutral-300"></p>
-    </div>
-
-    <!-- Нижняя панель управления звонком -->
-    <div class="flex items-center gap-6">
-      <button
-        type="button"
-        id="liveMuteBtn"
-        onclick="toggleLiveMute()"
-        title="Выключить / включить микрофон"
-        aria-label="Микрофон"
-        class="flex h-14 w-14 items-center justify-center rounded-full bg-[#212121] text-white hover:bg-[#2f2f2f] active:scale-95"
-      >
-        <svg id="micOnIcon" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-          <line x1="12" y1="19" x2="12" y2="22" />
-        </svg>
-        <svg id="micOffIcon" class="hidden h-6 w-6 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="2" y1="2" x2="22" y2="22" />
-          <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2" />
-          <path d="M5 10v2a7 7 0 0 0 12 5" />
-          <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" />
-          <path d="M9 9v3a3 3 0 0 0 5.12 2.12" />
-          <line x1="12" y1="19" x2="12" y2="22" />
-        </svg>
-      </button>
-
-      <button
-        type="button"
-        id="liveHangupBtn"
-        onclick="stopLiveCall()"
-        title="Закончить разговор"
-        aria-label="Закончить разговор"
-        class="flex h-14 w-14 items-center justify-center rounded-full bg-[#2563eb] text-white hover:bg-[#1d4ed8] active:scale-95"
-      >
-        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- Модальное окно переименования чата -->
-  <div
-    id="renameModal"
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-xs"
-  >
-    <div class="w-full max-w-sm rounded-2xl bg-[#1c1c1c] p-5 shadow-2xl">
-      <h3 class="mb-3 text-sm font-semibold text-white">Переименовать чат</h3>
-      <input
-        type="text"
-        id="renameChatInput"
-        onkeydown="if(event.key==='Enter') confirmRenameChat()"
-        class="w-full rounded-xl bg-[#121212] px-3.5 py-2.5 text-sm text-white focus:outline-none"
-      />
-      <div class="mt-4 flex justify-end gap-2">
-        <button
-          type="button"
-          onclick="closeRenameModal()"
-          class="rounded-xl bg-[#2a2a2a] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#363636]"
-        >
-          Отмена
-        </button>
-        <button
-          type="button"
-          onclick="confirmRenameChat()"
-          class="rounded-xl bg-[#2563eb] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#1d4ed8]"
-        >
-          Сохранить
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Модальное окно живого предпросмотра HTML-кода -->
-  <div
-    id="codePreviewModal"
-    class="fixed inset-0 z-50 hidden flex-col bg-black/90 p-3 backdrop-blur-xs sm:p-6"
-  >
-    <div class="mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[#18181a] shadow-2xl">
-      <div class="flex items-center justify-between bg-[#212121] px-4 py-3">
-        <span class="text-xs font-semibold text-white">Предпросмотр кода</span>
-        <button
-          type="button"
-          onclick="closeCodePreviewModal()"
-          class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2f2f2f] text-white hover:bg-[#3e3e3e]"
-          aria-label="Закрыть предпросмотр"
-        >
-          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12" />
+    <!-- ЛЕНТА СООБЩЕНИЙ -->
+    <div id="messagesContainer" class="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-5">
+      <!-- Стартовый экран с живой сменой фраз -->
+      <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center text-center px-4 pb-12">
+        <div class="w-14 h-14 mb-5 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/25">
+          <svg class="w-8 h-8 text-white" viewBox="0 0 32 32" fill="none">
+            <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="16" cy="7" r="2.2" fill="#93c5fd"/>
           </svg>
-        </button>
+        </div>
+        <h2 id="dynamicGreeting" class="text-2xl md:text-3xl font-semibold tracking-tight text-white greeting-fade greeting-visible">
+          Можем начинать.
+        </h2>
+        <p class="text-sm text-neutral-500 mt-2 max-w-md">
+          Задайте любой вопрос текстом, прикрепите фото или нажмите синюю кнопку справа для живого голосового разговора.
+        </p>
       </div>
-      <iframe
-        id="codePreviewFrame"
-        sandbox="allow-scripts allow-forms allow-modals"
-        class="h-full w-full flex-1 bg-white"
-      ></iframe>
+    </div>
+
+    <!-- СВЁРНУТАЯ ПАНЕЛЬ ЗВОНКА НАД ПОЛЕМ ВВОДА (когда нажали «В чат») -->
+    <div id="dockedCallBar" class="hidden px-4 pb-2">
+      <div class="max-w-3xl mx-auto bg-[#161a24] border border-blue-500/30 rounded-2xl px-4 py-2.5 flex items-center justify-between shadow-lg">
+        <div onclick="expandVoiceCall()" class="flex items-center gap-3 cursor-pointer flex-1">
+          <div class="w-9 h-9 rounded-full sky-orb voice-orb-active shrink-0"></div>
+          <div class="min-w-0">
+            <div class="text-xs font-semibold text-blue-300">Голосовой разговор • Maf GPT</div>
+            <div id="dockedStatusText" class="text-xs text-neutral-300 truncate">Слушаю вас...</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="expandVoiceCall()" class="px-3 py-1.5 rounded-xl bg-blue-600/20 text-blue-300 text-xs font-medium hover:bg-blue-600/30 cursor-pointer">
+            Развернуть
+          </button>
+          <button onclick="endVoiceCall()" class="w-8 h-8 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/30 cursor-pointer" title="Завершить">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ПАНЕЛЬ ВВОДА -->
+    <div class="safe-bottom px-4 pt-1 bg-black">
+      <div class="max-w-3xl mx-auto">
+        <!-- Превью прикреплённого фото -->
+        <div id="imagePreviewBar" class="hidden mb-2 px-3 py-2 rounded-2xl bg-[#181818] border border-[#2c2c2c] flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <img id="imagePreviewThumb" src="" alt="Фото" class="w-10 h-10 rounded-lg object-cover" />
+            <span class="text-xs text-neutral-300">Изображение прикреплено</span>
+          </div>
+          <button onclick="removeAttachedImage()" class="w-7 h-7 rounded-lg bg-[#262626] text-neutral-300 flex items-center justify-center hover:text-white cursor-pointer">×</button>
+        </div>
+
+        <div class="composer-box rounded-[26px] px-3.5 py-2 flex items-end gap-2">
+          <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)" />
+          <button onclick="document.getElementById('imageInput').click()" class="w-9 h-9 rounded-full text-neutral-400 hover:text-white hover:bg-[#2f2f2f] flex items-center justify-center shrink-0 cursor-pointer" title="Прикрепить фото">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+
+          <textarea
+            id="promptInput"
+            rows="1"
+            placeholder="Спросить Maf GPT..."
+            class="flex-1 bg-transparent text-white placeholder-neutral-500 text-[15px] leading-relaxed resize-none focus:outline-none py-1.5 select-text"
+            oninput="updateActionButton()"
+            onkeydown="handleInputKeydown(event)"
+          ></textarea>
+
+          <!-- Кнопка: Голосовой разговор (если поле пустое) или Отправить (если есть текст) -->
+          <button id="primaryActionBtn" onclick="handlePrimaryAction()" class="w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-600/30 cursor-pointer" title="Голосовой разговор">
+            <svg id="voiceIcon" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="M12 3v18M8 7v10M16 7v10M4 10v4M20 10v4"/>
+            </svg>
+            <svg id="sendIcon" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 19V5M5 12l7-7 7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ПОЛНОЭКРАННЫЙ ГОЛОСОВОЙ РАЗГОВОР -->
+  <div id="liveCallOverlay" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl hidden flex-col justify-between p-6 safe-top safe-bottom fade-screen fade-hidden">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 32 32" fill="none">
+            <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="16" cy="7" r="2.3" fill="#93c5fd"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-semibold text-sm">Maf GPT Live</div>
+          <div class="text-[11px] text-blue-400">Голосовой режим</div>
+        </div>
+      </div>
+
+      <!-- Кнопка «В чат» -->
+      <button onclick="dockVoiceCall()" class="px-4 py-2 rounded-full bg-[#1c1c1c] hover:bg-[#2a2a2a] text-sm font-medium text-white flex items-center gap-2 cursor-pointer">
+        <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        В чат
+      </button>
+    </div>
+
+    <!-- Центральная сфера -->
+    <div class="flex flex-col items-center justify-center my-auto text-center px-4">
+      <div id="liveOrb" class="w-44 h-44 md:w-52 md:h-52 rounded-full sky-orb voice-orb-active mb-8 transition-transform duration-150"></div>
+      <div id="liveStatusTitle" class="text-xl font-semibold text-white mb-2">Говорите...</div>
+      <div id="liveTranscriptText" class="text-sm text-neutral-400 max-w-md min-h-[42px] leading-relaxed">
+        Я слушаю вас. Задайте любой вопрос голосом.
+      </div>
+      <!-- Полоска уровня микрофона -->
+      <div class="w-48 h-1.5 bg-[#1f1f1f] rounded-full overflow-hidden mt-5">
+        <div id="micLevelBar" class="h-full bg-blue-500 transition-all duration-75" style="width: 4%;"></div>
+      </div>
+    </div>
+
+    <!-- Нижние кнопки звонка -->
+    <div class="flex items-center justify-center gap-5 pb-4">
+      <button id="muteBtn" onclick="toggleMute()" class="w-14 h-14 rounded-full bg-[#1f1f1f] hover:bg-[#2c2c2c] text-white flex items-center justify-center cursor-pointer" title="Микрофон">
+        <svg id="micOnIcon" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+        <svg id="micOffIcon" class="w-6 h-6 text-red-400 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23M12 19v4M8 23h8"/></svg>
+      </button>
+
+      <button onclick="endVoiceCall()" class="w-16 h-16 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-600/30 cursor-pointer" title="Завершить разговор">
+        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
     </div>
   </div>
 
   <script>
-    /**
-     * Maf GPT — Состояние приложения и постоянное хранилище
-     */
-    const STORAGE_KEYS = {
-      CHATS: 'maf_gpt_chats_bw_v1',
-      ACTIVE_CHAT: 'maf_gpt_active_chat_bw_v1',
-      CUSTOM_KEY: 'maf_gpt_custom_api_key_v1',
-    };
+    // ВШИТЫЙ API-КЛЮЧ GOOGLE AI STUDIO
+    const EMBEDDED_API_KEY = "AQ.Ab8RN6LdQzxxebsJquL5WuIpSLR1TFH4c91tW1o63T19mAJ9wg";
 
-    const state = {
-      chats: [],
-      activeChatId: null,
+    const MODELS_PRIORITY = [
+      "gemini-2.5-flash",
+      "gemini-3-flash-preview",
+      "gemini-2.0-flash"
+    ];
+
+    const GREETINGS = [
+      "Можем начинать.",
+      "Чем помочь сегодня?",
+      "Какая идея у нас на очереди?",
+      "Готов к любым задачам.",
+      "Спросите о чём угодно.",
+      "Создадим что-то крутое?"
+    ];
+
+    let state = {
+      chats: JSON.parse(localStorage.getItem("mafgpt_chats_v3") || "[]"),
+      currentChatId: null,
+      attachedImageBase64: null,
+      attachedImageMime: null,
       isGenerating: false,
-      abortController: null,
-      attachedImage: null,
-      greetingTimer: null,
-      renamingChatId: null,
+      greetingIndex: 0
     };
 
-    const codeStore = {};
-    let codeBlockCounter = 0;
-    const EMBEDDED_API_KEY = '';
+    let voiceState = {
+      active: false,
+      docked: false,
+      muted: false,
+      isSpeaking: false,
+      isProcessing: false,
+      audioCtx: null,
+      mediaStream: null,
+      processor: null,
+      pcmChunks: [],
+      speechStarted: false,
+      silenceStart: 0
+    };
 
-    function getEffectiveApiKey() {
+    // --- АКТИВАЦИЯ ПРИЛОЖЕНИЯ ---
+    function activateMafGpt() {
+      const btn = document.getElementById("activateBtn");
+      const status = document.getElementById("activationStatus");
+      btn.disabled = true;
+      btn.textContent = "Активация...";
+      status.textContent = "Подключение к Maf GPT и разблокировка звука...";
+
       try {
-        const saved = localStorage.getItem(STORAGE_KEYS.CUSTOM_KEY);
-        if (saved && saved.trim()) return saved.trim();
-      } catch (_) {}
-      return EMBEDDED_API_KEY.trim();
-    }
-
-    async function saveCustomApiKeyFromInline(inputId) {
-      const el = document.getElementById(inputId);
-      const val = el ? el.value.trim() : '';
-      if (!val) {
-        showToast('Вставьте API-ключ из Google AI Studio');
-        return;
-      }
-      try {
-        localStorage.setItem(STORAGE_KEYS.CUSTOM_KEY, val);
-      } catch (_) {}
-      showToast('Ключ сохранён, повторяю запрос...');
-
-      const chat = getActiveChat();
-      if (chat && chat.messages.length >= 2) {
-        const lastModel = chat.messages[chat.messages.length - 1];
-        const lastUser = chat.messages[chat.messages.length - 2];
-        if (lastModel && lastModel.role === 'model' && lastModel.isKeyError && lastUser && lastUser.role === 'user') {
-          chat.messages.splice(chat.messages.length - 2, 2);
-          saveChats();
-          renderChatMessages();
-          await sendMessage(lastUser.text || '');
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass && !voiceState.audioCtx) {
+          voiceState.audioCtx = new AudioContextClass();
+          if (voiceState.audioCtx.state === "suspended") {
+            voiceState.audioCtx.resume();
+          }
         }
-      }
-    }
-
-    function buildGeminiHeaders(apiKey) {
-      const headers = { 'Content-Type': 'application/json' };
-      if (apiKey) {
-        headers['x-goog-api-key'] = apiKey;
-      }
-      return headers;
-    }
-
-    /**
-     * Единый запрос к Gemini API с поддержкой ключей AIza... и AQ....
-     */
-    async function geminiApiRequest(modelPath, bodyObj, signal) {
-      const apiKey = getEffectiveApiKey();
-      const endpoints = [
-        {
-          url: `https://generativelanguage.googleapis.com/v1beta/models/${modelPath}?key=${encodeURIComponent(apiKey)}`,
-          headers: { 'Content-Type': 'application/json' },
-        },
-        {
-          url: `https://generativelanguage.googleapis.com/v1beta/models/${modelPath}`,
-          headers: buildGeminiHeaders(apiKey),
-        },
-        {
-          url: `https://aiplatform.googleapis.com/v1beta1/publishers/google/models/${modelPath}`,
-          headers: buildGeminiHeaders(apiKey),
-        },
-      ];
-
-      let lastRes = null;
-      let lastData = {};
-
-      for (const ep of endpoints) {
-        const res = await fetch(ep.url, {
-          method: 'POST',
-          headers: ep.headers,
-          signal,
-          body: JSON.stringify(bodyObj),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (res.ok) {
-          return { res, data };
+        if ("speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
         }
-        lastRes = res;
-        lastData = data;
-        const errMsg = data?.error?.message || '';
-        if (!/api key|not valid|permission|unauthenticated|unsupported|400|401|403/i.test(errMsg + ' ' + res.status)) {
-          break;
-        }
-      }
+      } catch (e) {}
 
-      return { res: lastRes, data: lastData };
+      localStorage.setItem("mafgpt_activated", "1");
+
+      setTimeout(() => {
+        const screen = document.getElementById("activationScreen");
+        screen.classList.remove("fade-visible");
+        screen.classList.add("fade-hidden");
+        setTimeout(() => {
+          screen.style.display = "none";
+        }, 320);
+      }, 280);
     }
 
-    function loadChats() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEYS.CHATS);
-        const parsed = raw ? JSON.parse(raw) : [];
-        state.chats = Array.isArray(parsed) ? parsed : [];
-      } catch (_) {
-        state.chats = [];
-      }
-      state.activeChatId = localStorage.getItem(STORAGE_KEYS.ACTIVE_CHAT) || null;
-    }
+    // --- УНИВЕРСАЛЬНЫЙ ЗАПРОС К GEMINI API ---
+    async function callGeminiAPI(payload, customModelList = MODELS_PRIORITY) {
+      let lastError = "Неизвестная ошибка";
 
-    function saveChats() {
-      try {
-        localStorage.setItem(STORAGE_KEYS.CHATS, JSON.stringify(state.chats));
-        if (state.activeChatId) {
-          localStorage.setItem(STORAGE_KEYS.ACTIVE_CHAT, state.activeChatId);
-        } else {
-          localStorage.removeItem(STORAGE_KEYS.ACTIVE_CHAT);
-        }
-      } catch (_) {
-        if (state.chats.length > 1) {
-          state.chats = state.chats.slice(0, 8);
+      for (const model of customModelList) {
+        // Пробуем оба стандартных маршрута Google AI Studio (v1beta и v1)
+        const endpoints = [
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(EMBEDDED_API_KEY)}`,
+          `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${encodeURIComponent(EMBEDDED_API_KEY)}`
+        ];
+
+        for (const url of endpoints) {
           try {
-            localStorage.setItem(STORAGE_KEYS.CHATS, JSON.stringify(state.chats));
-          } catch (_) {}
+            const res = await fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if (res.ok && data?.candidates?.[0]?.content?.parts) {
+              return data.candidates[0].content.parts.map(p => p.text || "").join("");
+            } else {
+              lastError = data?.error?.message || `HTTP ${res.status}`;
+            }
+          } catch (err) {
+            lastError = err.message || "Ошибка сети";
+          }
         }
       }
+
+      throw new Error(lastError);
     }
 
-    function getActiveChat() {
-      return state.chats.find((c) => c.id === state.activeChatId) || null;
+    // --- ЧАТЫ И ИСТОРИЯ ---
+    function saveChats() {
+      localStorage.setItem("mafgpt_chats_v3", JSON.stringify(state.chats));
+      renderHistoryList();
     }
 
-    function ensureActiveChat() {
-      let chat = getActiveChat();
+    function getCurrentChat() {
+      let chat = state.chats.find(c => c.id === state.currentChatId);
       if (!chat) {
         chat = {
-          id: 'chat_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-          title: 'Новый чат',
-          messages: [],
-          updatedAt: Date.now(),
+          id: "chat_" + Date.now(),
+          title: "Новый разговор",
+          messages: []
         };
         state.chats.unshift(chat);
-        state.activeChatId = chat.id;
+        state.currentChatId = chat.id;
         saveChats();
-        renderSidebarHistory();
       }
       return chat;
     }
 
     function createNewChat() {
-      if (state.isGenerating) stopStreaming();
-      state.activeChatId = null;
+      state.currentChatId = "chat_" + Date.now();
+      state.chats.unshift({
+        id: state.currentChatId,
+        title: "Новый разговор",
+        messages: []
+      });
       saveChats();
-      renderSidebarHistory();
-      renderChatMessages();
-      toggleSidebar(false);
-      const input = document.getElementById('promptInput');
-      if (input) input.focus();
+      renderMessages();
+      toggleMobileSidebar(false);
     }
 
-    function selectChat(chatId) {
-      if (state.isGenerating) stopStreaming();
-      state.activeChatId = chatId;
-      saveChats();
-      renderSidebarHistory();
-      renderChatMessages();
-      toggleSidebar(false);
+    function selectChat(id) {
+      state.currentChatId = id;
+      renderMessages();
+      renderHistoryList();
+      toggleMobileSidebar(false);
     }
 
-    function deleteChat(event, chatId) {
-      event.stopPropagation();
-      state.chats = state.chats.filter((c) => c.id !== chatId);
-      if (state.activeChatId === chatId) {
-        state.activeChatId = state.chats.length ? state.chats[0].id : null;
-      }
-      saveChats();
-      renderSidebarHistory();
-      renderChatMessages();
-    }
-
-    function clearAllChats() {
+    function clearAllHistory() {
       state.chats = [];
-      state.activeChatId = null;
+      state.currentChatId = null;
       saveChats();
-      renderSidebarHistory();
-      renderChatMessages();
-      showToast('История очищена');
+      renderMessages();
     }
 
-    function openRenameModal(event, chatId) {
-      event.stopPropagation();
-      const chat = state.chats.find((c) => c.id === chatId);
-      if (!chat) return;
-      state.renamingChatId = chatId;
-      const modal = document.getElementById('renameModal');
-      const input = document.getElementById('renameChatInput');
-      if (input) input.value = chat.title;
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        setTimeout(() => {
-          if (input) {
-            input.focus();
-            input.select();
-          }
-        }, 40);
-      }
-    }
-
-    function closeRenameModal() {
-      state.renamingChatId = null;
-      const modal = document.getElementById('renameModal');
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
-    }
-
-    function confirmRenameChat() {
-      const input = document.getElementById('renameChatInput');
-      const newTitle = (input ? input.value : '').trim();
-      if (newTitle && state.renamingChatId) {
-        const chat = state.chats.find((c) => c.id === state.renamingChatId);
-        if (chat) {
-          chat.title = newTitle;
-          saveChats();
-          renderSidebarHistory();
-        }
-      }
-      closeRenameModal();
-    }
-
-    function toggleSidebar(forceOpen) {
-      const sidebar = document.getElementById('sidebar');
-      const backdrop = document.getElementById('sidebarBackdrop');
-      if (!sidebar || !backdrop) return;
-      const isCurrentlyClosed = sidebar.classList.contains('-translate-x-full');
-      const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : isCurrentlyClosed;
-      if (shouldOpen) {
-        sidebar.classList.remove('-translate-x-full');
-        backdrop.classList.remove('hidden');
-      } else {
-        sidebar.classList.add('-translate-x-full');
-        backdrop.classList.add('hidden');
-      }
-    }
-
-    function showToast(text) {
-      const el = document.getElementById('toastBanner');
-      if (!el) return;
-      el.textContent = text;
-      el.classList.remove('opacity-0');
-      el.classList.add('opacity-100');
-      clearTimeout(el._timer);
-      el._timer = setTimeout(() => {
-        el.classList.remove('opacity-100');
-        el.classList.add('opacity-0');
-      }, 2000);
-    }
-
-    function escapeHtml(str) {
-      return String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    function renderSidebarHistory() {
-      const list = document.getElementById('chatHistoryList');
-      if (!list) return;
+    function renderHistoryList() {
+      const list = document.getElementById("chatHistoryList");
       if (!state.chats.length) {
-        list.innerHTML = `<div class="px-3 py-4 text-xs text-neutral-600">Пока нет сохранённых диалогов</div>`;
+        list.innerHTML = `<div class="text-xs text-neutral-600 px-3 py-4 text-center">Пока нет сохранённых диалогов</div>`;
         return;
       }
 
-      list.innerHTML = state.chats
-        .map((chat) => {
-          const active = chat.id === state.activeChatId;
-          return `
-            <div
-              onclick="selectChat('${chat.id}')"
-              class="group flex cursor-pointer items-center justify-between gap-2 rounded-xl px-3 py-2 text-xs transition ${
-                active ? 'bg-[#1f1f1f] text-white font-medium' : 'text-neutral-400 hover:bg-[#161616] hover:text-white'
-              }"
-            >
-              <span class="truncate">${escapeHtml(chat.title || 'Новый чат')}</span>
-              <div class="flex shrink-0 items-center gap-0.5 opacity-0 transition group-hover:opacity-100">
-                <button
-                  type="button"
-                  onclick="openRenameModal(event, '${chat.id}')"
-                  title="Переименовать"
-                  class="flex h-6 w-6 items-center justify-center rounded-md text-neutral-400 hover:bg-[#2a2a2a] hover:text-white"
-                >
-                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 20h9" />
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  onclick="deleteChat(event, '${chat.id}')"
-                  title="Удалить"
-                  class="flex h-6 w-6 items-center justify-center rounded-md text-neutral-400 hover:bg-[#2a2a2a] hover:text-white"
-                >
-                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          `;
-        })
-        .join('');
-    }
-
-    function startGreetingAnimation() {
-      if (state.greetingTimer) {
-        clearInterval(state.greetingTimer);
-        state.greetingTimer = null;
-      }
-      const phrases = [
-        'Чем помочь сегодня?',
-        'Можем начинать.',
-        'Какая идея у нас на очереди?',
-        'Готов к любым задачам.',
-        'Спросите о чём угодно.',
-        'Создадим что-то крутое?',
-      ];
-      let idx = 0;
-      state.greetingTimer = setInterval(() => {
-        const el = document.getElementById('welcomeGreeting');
-        if (!el) {
-          clearInterval(state.greetingTimer);
-          state.greetingTimer = null;
-          return;
-        }
-        el.classList.remove('greeting-visible');
-        el.classList.add('greeting-hidden');
-        setTimeout(() => {
-          const target = document.getElementById('welcomeGreeting');
-          if (!target) return;
-          idx = (idx + 1) % phrases.length;
-          target.textContent = phrases[idx];
-          target.classList.remove('greeting-hidden');
-          target.classList.add('greeting-visible');
-        }, 420);
-      }, 3600);
-    }
-
-    function renderChatMessages() {
-      const container = document.getElementById('messagesInner');
-      if (!container) return;
-
-      const chat = getActiveChat();
-      if (!chat || !chat.messages.length) {
-        container.innerHTML = `
-          <div class="flex min-h-[62vh] flex-col items-center justify-center px-4 text-center">
-            <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#141416] shadow-xl">
-              <svg class="h-8 w-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="mafHeroGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#60a5fa" />
-                    <stop offset="55%" stop-color="#2563eb" />
-                    <stop offset="100%" stop-color="#ffffff" />
-                  </linearGradient>
-                </defs>
-                <path d="M6.5 23.5V9.5L16 17.5L25.5 9.5V23.5" stroke="url(#mafHeroGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
-                <circle cx="16" cy="7.5" r="2.1" fill="#60a5fa" />
-              </svg>
-            </div>
-            <h1 id="welcomeGreeting" class="greeting-fade greeting-visible text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-              Чем помочь сегодня?
-            </h1>
-          </div>
-        `;
-        startGreetingAnimation();
-        return;
-      }
-
-      if (state.greetingTimer) {
-        clearInterval(state.greetingTimer);
-        state.greetingTimer = null;
-      }
-
-      container.innerHTML = chat.messages
-        .map((msg, index) => buildMessageHTML(msg, index))
-        .join('');
-
-      scrollToBottom();
-    }
-
-    function buildMessageHTML(msg, index) {
-      if (msg.role === 'user') {
-        const imgHtml = msg.imageDataUrl
-          ? `<img src="${msg.imageDataUrl}" alt="Фото" class="mb-2 max-h-64 rounded-2xl object-contain" />`
-          : '';
-        const textHtml = msg.text
-          ? `<div class="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-white">${escapeHtml(msg.text)}</div>`
-          : '';
-
+      list.innerHTML = state.chats.map(chat => {
+        const active = chat.id === state.currentChatId;
         return `
-          <div class="msg-appear flex flex-col items-end">
-            <div class="max-w-[85%] rounded-3xl bg-[#1f1f1f] px-4 py-3 sm:max-w-[75%]">
-              ${imgHtml}
-              ${textHtml}
-            </div>
-            <div class="mt-1.5 flex items-center gap-1 pr-1">
-              <button
-                type="button"
-                onclick="copyMessageText(${index})"
-                title="Копировать"
-                class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-400 hover:bg-[#1a1a1a] hover:text-white"
-              >
-                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-                  <rect x="9" y="9" width="13" height="13" rx="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onclick="editUserMessage(${index})"
-                title="Редактировать"
-                class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-400 hover:bg-[#1a1a1a] hover:text-white"
-              >
-                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <button onclick="selectChat('${chat.id}')" class="w-full text-left px-3 py-2.5 rounded-xl text-sm truncate cursor-pointer ${active ? "bg-[#222222] text-white font-medium" : "text-neutral-400 hover:bg-[#171717] hover:text-neutral-200"}">
+            ${escapeHtml(chat.title)}
+          </button>
         `;
-      }
-
-      if (msg.isImagePending) {
-        return `
-          <div class="msg-appear flex flex-col items-start">
-            <div class="mb-2 text-sm font-medium text-neutral-300">Создание изображения</div>
-            <div class="static-image-placeholder flex h-72 w-72 max-w-full items-center justify-center rounded-2xl">
-              <span class="text-xs text-neutral-500">Пожалуйста, подождите...</span>
-            </div>
-          </div>
-        `;
-      }
-
-      const generatedImgHtml = msg.generatedImageUrl
-        ? `
-          <div class="mb-3 overflow-hidden rounded-2xl bg-[#121212]">
-            <img src="${msg.generatedImageUrl}" alt="Сгенерированное фото" class="max-h-[460px] w-auto max-w-full rounded-2xl object-contain" />
-          </div>
-        `
-        : '';
-
-      const renderedBody = msg.text
-        ? `<div class="prose-maf w-full max-w-full break-words text-[15px]">${renderRichMarkdown(msg.text)}</div>`
-        : msg.isStreaming
-        ? `<div class="text-[15px] font-medium text-neutral-400">Думаю над ответом...</div>`
-        : '';
-
-      const keyRecoveryHtml = msg.isKeyError
-        ? `
-          <div class="mt-3 flex w-full max-w-md flex-col gap-2.5 rounded-2xl bg-[#161618] p-4">
-            <div class="text-xs leading-relaxed text-neutral-300">
-              Старый ключ недействителен или был отозван. Создайте бесплатный ключ вида <span class="font-mono text-white">AIzaSy...</span> в <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="underline text-blue-400">Google AI Studio</a>, вставьте его ниже и нажмите <span class="font-medium text-white">Сохранить</span>:
-            </div>
-            <div class="flex items-center gap-2">
-              <input
-                id="inlineKeyInput_${index}"
-                type="password"
-                placeholder="AIzaSy..."
-                onkeydown="if(event.key==='Enter') saveCustomApiKeyFromInline('inlineKeyInput_${index}')"
-                class="flex-1 rounded-xl bg-[#0d0d0e] px-3 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none"
-              />
-              <button
-                type="button"
-                onclick="saveCustomApiKeyFromInline('inlineKeyInput_${index}')"
-                class="shrink-0 rounded-xl bg-[#2563eb] px-3.5 py-2 text-xs font-medium text-white hover:bg-[#1d4ed8]"
-              >
-                Сохранить
-              </button>
-            </div>
-          </div>
-        `
-        : '';
-
-      const feedback = msg.feedback || null;
-      const actionBarHtml = !msg.isStreaming
-        ? `
-          <div class="mt-2 flex items-center gap-1">
-            <button
-              type="button"
-              onclick="copyMessageText(${index})"
-              title="Копировать"
-              class="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-neutral-400 hover:bg-[#1a1a1a] hover:text-white"
-            >
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-                <rect x="9" y="9" width="13" height="13" rx="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onclick="toggleMessageFeedback(${index}, 'like')"
-              title="Нравится"
-              class="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent hover:bg-[#1a1a1a] ${
-                feedback === 'like' ? 'text-white' : 'text-neutral-400 hover:text-white'
-              }"
-            >
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="${feedback === 'like' ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.9">
-                <path d="M7 10v12" />
-                <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onclick="toggleMessageFeedback(${index}, 'dislike')"
-              title="Не нравится"
-              class="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent hover:bg-[#1a1a1a] ${
-                feedback === 'dislike' ? 'text-white' : 'text-neutral-400 hover:text-white'
-              }"
-            >
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="${feedback === 'dislike' ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.9">
-                <path d="M17 14V2" />
-                <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onclick="shareOrDownloadMessage(${index})"
-              title="${msg.generatedImageUrl ? 'Скачать в галерею' : 'Поделиться'}"
-              class="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-neutral-400 hover:bg-[#1a1a1a] hover:text-white"
-            >
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                <polyline points="16 6 12 2 8 6" />
-                <line x1="12" y1="2" x2="12" y2="15" />
-              </svg>
-            </button>
-          </div>
-        `
-        : '';
-
-      return `
-        <div class="msg-appear flex w-full max-w-full flex-col items-start">
-          ${generatedImgHtml}
-          ${renderedBody}
-          ${keyRecoveryHtml}
-          ${actionBarHtml}
-        </div>
-      `;
+      }).join("");
     }
 
-    function scrollToBottom() {
-      const scroller = document.getElementById('messagesScroll');
-      if (scroller) {
-        scroller.scrollTop = scroller.scrollHeight;
-      }
-    }
-
-    function copyTextToClipboard(text) {
-      if (!text) return;
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        document.execCommand('copy');
-        showToast('Скопировано');
-      } catch (_) {}
-      document.body.removeChild(ta);
-    }
-
-    function copyMessageText(index) {
-      const chat = getActiveChat();
-      if (!chat || !chat.messages[index]) return;
-      copyTextToClipboard(chat.messages[index].text || '');
-    }
-
-    function editUserMessage(index) {
-      const chat = getActiveChat();
-      if (!chat || !chat.messages[index]) return;
-      const input = document.getElementById('promptInput');
-      if (input) {
-        input.value = chat.messages[index].text || '';
-        updateActionButtonState();
-        input.focus();
-      }
-    }
-
-    function toggleMessageFeedback(index, type) {
-      const chat = getActiveChat();
-      if (!chat || !chat.messages[index]) return;
-      chat.messages[index].feedback = chat.messages[index].feedback === type ? null : type;
-      saveChats();
-      renderChatMessages();
-    }
-
-    function shareOrDownloadMessage(index) {
-      const chat = getActiveChat();
-      if (!chat || !chat.messages[index]) return;
-      const msg = chat.messages[index];
-      if (msg.generatedImageUrl) {
-        const a = document.createElement('a');
-        a.href = msg.generatedImageUrl;
-        a.download = 'maf-gpt-image-' + Date.now() + '.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('Фото сохранено');
-        return;
-      }
-      if (navigator.share && msg.text) {
-        navigator.share({ title: 'Maf GPT', text: msg.text }).catch(() => {});
+    function toggleMobileSidebar(open) {
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("mobileBackdrop");
+      if (open) {
+        sidebar.classList.remove("-translate-x-full");
+        backdrop.classList.remove("hidden");
       } else {
-        copyTextToClipboard(msg.text || '');
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
       }
     }
 
-    /**
-     * Однопроходный безопасный токенизатор кода
-     */
-    function highlightCode(rawCode, lang) {
-      const code = String(rawCode || '');
-      const l = (lang || '').toLowerCase();
-      if (l === 'html' || l === 'xml' || l === 'svg') {
-        return code.replace(
-          /(<!--[\s\S]*?-->)|(<\/?)([a-zA-Z0-9-]+)([^>]*?)(\/?>)|("[^"]*"|'[^']*')/g,
-          (m, cmt, openBracket, tagName, attrs, closeBracket, str) => {
-            if (cmt) return `<span class="tok-cmt">${escapeHtml(cmt)}</span>`;
-            if (str) return `<span class="tok-str">${escapeHtml(str)}</span>`;
-            if (tagName) {
-              const highlightedAttrs = (attrs || '').replace(
-                /([a-zA-Z0-9:-]+)(=)("[^"]*"|'[^']*')/g,
-                (_, aName, eq, aVal) =>
-                  `<span class="tok-attr">${escapeHtml(aName)}</span>${escapeHtml(eq)}<span class="tok-str">${escapeHtml(aVal)}</span>`
-              );
-              return `${escapeHtml(openBracket)}<span class="tok-tag">${escapeHtml(tagName)}</span>${highlightedAttrs}${escapeHtml(closeBracket)}`;
-            }
-            return escapeHtml(m);
-          }
-        );
-      }
+    // --- ОТПРАВКА СООБЩЕНИЙ ---
+    function updateActionButton() {
+      const input = document.getElementById("promptInput");
+      const voiceIcon = document.getElementById("voiceIcon");
+      const sendIcon = document.getElementById("sendIcon");
+      const hasContent = input.value.trim().length > 0 || Boolean(state.attachedImageBase64);
 
-      return code.replace(
-        /(\/\/[^\n]*|\/\*[\s\S]*?\*\/|#[^\n]*)|("[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|`[^`\\]*(?:\\.[^`\\]*)*`)|\b(const|let|var|function|return|if|else|for|while|class|import|from|export|default|async|await|try|catch|new|def|print|elif|None|True|False|int|float|str|bool|public|private|void|static)\b|\b(\d+(?:\.\d+)?)\b/g,
-        (m, cmt, str, kw, num) => {
-          if (cmt) return `<span class="tok-cmt">${escapeHtml(cmt)}</span>`;
-          if (str) return `<span class="tok-str">${escapeHtml(str)}</span>`;
-          if (kw) return `<span class="tok-kw">${escapeHtml(kw)}</span>`;
-          if (num) return `<span class="tok-num">${escapeHtml(num)}</span>`;
-          return escapeHtml(m);
-        }
-      );
-    }
-
-    function copyCodeById(codeId) {
-      const code = codeStore[codeId];
-      if (code !== undefined) copyTextToClipboard(code);
-    }
-
-    function toggleCodeCollapse(codeId) {
-      const pre = document.getElementById('pre_' + codeId);
-      if (pre) pre.classList.toggle('code-collapsed');
-    }
-
-    function previewCodeById(codeId) {
-      const code = codeStore[codeId];
-      if (code === undefined) return;
-      const modal = document.getElementById('codePreviewModal');
-      const frame = document.getElementById('codePreviewFrame');
-      if (!modal || !frame) return;
-      const isHtml = /<!DOCTYPE|<html|<body|<div|<script|<style/i.test(code);
-      frame.srcdoc = isHtml
-        ? code
-        : `<!DOCTYPE html><html><body style="background:#111;color:#eee;font-family:monospace;padding:16px;"><pre>${escapeHtml(code)}</pre></body></html>`;
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeCodePreviewModal() {
-      const modal = document.getElementById('codePreviewModal');
-      const frame = document.getElementById('codePreviewFrame');
-      if (frame) frame.srcdoc = '';
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+      if (hasContent) {
+        voiceIcon.classList.add("hidden");
+        sendIcon.classList.remove("hidden");
+      } else {
+        voiceIcon.classList.remove("hidden");
+        sendIcon.classList.add("hidden");
       }
     }
 
-    function formatInlineMarkdown(text) {
-      let s = escapeHtml(text);
-      s = s.replace(/`([^`]+)`/g, '<code class="rounded bg-[#262626] px-1.5 py-0.5 font-mono text-[13px] text-neutral-200">$1</code>');
-      s = s.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold text-white">$1</strong>');
-      s = s.replace(/\*([^*]+)\*/g, '<em class="italic text-neutral-200">$1</em>');
-      return s;
+    function handlePrimaryAction() {
+      const input = document.getElementById("promptInput");
+      const hasContent = input.value.trim().length > 0 || Boolean(state.attachedImageBase64);
+      if (hasContent) {
+        sendTextMessage();
+      } else {
+        startVoiceCall();
+      }
     }
 
-    function renderRichMarkdown(rawText) {
-      const cleaned = sanitizeModelOutput(rawText);
-      const parts = cleaned.split(/(```[\s\S]*?```)/g);
-      return parts
-        .map((part) => {
-          if (part.startsWith('```') && part.endsWith('```')) {
-            const inner = part.slice(3, -3);
-            const firstNewline = inner.indexOf('\n');
-            let lang = 'CODE';
-            let codeContent = inner;
-            if (firstNewline !== -1) {
-              const possibleLang = inner.slice(0, firstNewline).trim();
-              if (possibleLang && possibleLang.length <= 20 && !possibleLang.includes(' ')) {
-                lang = possibleLang.toUpperCase();
-                codeContent = inner.slice(firstNewline + 1);
-              }
-            }
-            const codeId = 'cb_' + ++codeBlockCounter;
-            codeStore[codeId] = codeContent;
-
-            return `
-              <div class="code-wrapper">
-                <div class="code-header">
-                  <div class="flex items-center gap-2">
-                    <svg class="h-4 w-4 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="16 18 22 12 16 6" />
-                      <polyline points="8 6 2 12 8 18" />
-                    </svg>
-                    <span>${escapeHtml(lang)}</span>
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onclick="toggleCodeCollapse('${codeId}')"
-                      title="Свернуть / развернуть"
-                      class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-300 hover:bg-[#3f3f3f] hover:text-white"
-                    >
-                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="4 14 10 14 10 20" />
-                        <polyline points="20 10 14 10 14 4" />
-                        <line x1="14" y1="10" x2="21" y2="3" />
-                        <line x1="3" y1="21" x2="10" y2="14" />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      onclick="copyCodeById('${codeId}')"
-                      title="Копировать код"
-                      class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-300 hover:bg-[#3f3f3f] hover:text-white"
-                    >
-                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-                        <rect x="9" y="9" width="13" height="13" rx="2" />
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      onclick="previewCodeById('${codeId}')"
-                      title="Предпросмотр"
-                      class="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-neutral-300 hover:bg-[#3f3f3f] hover:text-white"
-                    >
-                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="5 3 19 12 5 21 5 3" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <pre id="pre_${codeId}" class="code-body"><code>${highlightCode(codeContent, lang)}</code></pre>
-              </div>
-            `;
-          }
-
-          const lines = part.split('\n');
-          let html = '';
-          let inUl = false;
-          let inOl = false;
-
-          const closeLists = () => {
-            if (inUl) { html += '</ul>'; inUl = false; }
-            if (inOl) { html += '</ol>'; inOl = false; }
-          };
-
-          for (const rawLine of lines) {
-            const line = rawLine.trim();
-            if (!line) {
-              closeLists();
-              continue;
-            }
-            if (line.startsWith('### ')) {
-              closeLists();
-              html += `<h3>${formatInlineMarkdown(line.slice(4))}</h3>`;
-            } else if (line.startsWith('## ')) {
-              closeLists();
-              html += `<h2>${formatInlineMarkdown(line.slice(3))}</h2>`;
-            } else if (line.startsWith('# ')) {
-              closeLists();
-              html += `<h1>${formatInlineMarkdown(line.slice(2))}</h1>`;
-            } else if (/^[-*•]\s+/.test(line)) {
-              if (inOl) { html += '</ol>'; inOl = false; }
-              if (!inUl) { html += '<ul>'; inUl = true; }
-              html += `<li>${formatInlineMarkdown(line.replace(/^[-*•]\s+/, ''))}</li>`;
-            } else if (/^\d+\.\s+/.test(line)) {
-              if (inUl) { html += '</ul>'; inUl = false; }
-              if (!inOl) { html += '<ol>'; inOl = true; }
-              html += `<li>${formatInlineMarkdown(line.replace(/^\d+\.\s+/, ''))}</li>`;
-            } else {
-              closeLists();
-              html += `<p>${formatInlineMarkdown(line)}</p>`;
-            }
-          }
-          closeLists();
-          return html;
-        })
-        .join('');
+    function handleInputKeydown(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendTextMessage();
+      }
     }
 
-    function sanitizeModelOutput(text) {
-      let s = String(text || '');
-      s = s.replace(/<thought>[\s\S]*?<\/thought>/gi, '');
-      s = s.replace(/\{\s*"action"\s*:\s*"dalle\.text2im"[\s\S]*?\}/gi, '');
-      return s.trim();
-    }
-
-    /**
-     * Работа с прикреплёнными изображениями
-     */
-    function handleImageSelected(event) {
-      const file = event.target.files && event.target.files[0];
+    function handleImageUpload(e) {
+      const file = e.target.files?.[0];
       if (!file) return;
-      compressImageFile(file);
-      event.target.value = '';
-    }
-
-    function handleComposerPaste(event) {
-      const items = event.clipboardData && event.clipboardData.items;
-      if (!items) return;
-      for (const item of items) {
-        if (item.type && item.type.startsWith('image/')) {
-          const file = item.getAsFile();
-          if (file) {
-            event.preventDefault();
-            compressImageFile(file);
-            break;
-          }
-        }
-      }
-    }
-
-    function compressImageFile(file) {
       const reader = new FileReader();
       reader.onload = () => {
-        const img = new Image();
-        img.onload = () => {
-          const maxSide = 1024;
-          let w = img.width;
-          let h = img.height;
-          if (w > maxSide || h > maxSide) {
-            if (w > h) {
-              h = Math.round((h * maxSide) / w);
-              w = maxSide;
-            } else {
-              w = Math.round((w * maxSide) / h);
-              h = maxSide;
-            }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.84);
-          const base64 = dataUrl.split(',')[1];
-          state.attachedImage = {
-            name: file.name || 'image.jpg',
-            mimeType: 'image/jpeg',
-            base64,
-            dataUrl,
-          };
-          const previewCont = document.getElementById('imagePreviewContainer');
-          const thumb = document.getElementById('imagePreviewThumb');
-          const nameEl = document.getElementById('imagePreviewName');
-          if (thumb) thumb.src = dataUrl;
-          if (nameEl) nameEl.textContent = state.attachedImage.name;
-          if (previewCont) previewCont.classList.remove('hidden');
-          updateActionButtonState();
-        };
-        img.src = reader.result;
+        const result = reader.result;
+        state.attachedImageBase64 = result.split(",")[1];
+        state.attachedImageMime = file.type || "image/jpeg";
+        document.getElementById("imagePreviewThumb").src = result;
+        document.getElementById("imagePreviewBar").classList.remove("hidden");
+        updateActionButton();
       };
       reader.readAsDataURL(file);
     }
 
-    function clearAttachedImage() {
-      state.attachedImage = null;
-      const previewCont = document.getElementById('imagePreviewContainer');
-      if (previewCont) previewCont.classList.add('hidden');
-      updateActionButtonState();
+    function removeAttachedImage() {
+      state.attachedImageBase64 = null;
+      state.attachedImageMime = null;
+      document.getElementById("imageInput").value = "";
+      document.getElementById("imagePreviewBar").classList.add("hidden");
+      updateActionButton();
     }
 
-    /**
-     * Управление кнопкой отправки / голосового звонка
-     */
-    function updateActionButtonState() {
-      const input = document.getElementById('promptInput');
-      const sendBtn = document.getElementById('sendBtn');
-      const iconVoice = document.getElementById('iconVoiceWave');
-      const iconArrow = document.getElementById('iconSendArrow');
-      if (!input || !sendBtn) return;
-
-      const hasContent = input.value.trim().length > 0 || Boolean(state.attachedImage);
-      if (hasContent) {
-        sendBtn.classList.remove('bg-[#2563eb]', 'hover:bg-[#1d4ed8]', 'text-white');
-        sendBtn.classList.add('bg-white', 'hover:bg-neutral-200', 'text-black');
-        sendBtn.title = 'Отправить сообщение';
-        if (iconVoice) iconVoice.classList.add('hidden');
-        if (iconArrow) iconArrow.classList.remove('hidden');
-      } else {
-        sendBtn.classList.remove('bg-white', 'hover:bg-neutral-200', 'text-black');
-        sendBtn.classList.add('bg-[#2563eb]', 'hover:bg-[#1d4ed8]', 'text-white');
-        sendBtn.title = 'Голосовой разговор';
-        if (iconArrow) iconArrow.classList.add('hidden');
-        if (iconVoice) iconVoice.classList.remove('hidden');
-      }
-    }
-
-    function handleComposerKeydown(event) {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        const input = document.getElementById('promptInput');
-        if ((input && input.value.trim()) || state.attachedImage) {
-          sendMessage();
-        }
-      }
-    }
-
-    function handlePrimaryActionClick() {
-      const input = document.getElementById('promptInput');
-      const hasContent = (input && input.value.trim().length > 0) || Boolean(state.attachedImage);
-      if (hasContent) {
-        sendMessage();
-      } else {
-        startLiveCall();
-      }
-    }
-
-    function setGeneratingUI(active) {
-      state.isGenerating = active;
-      const stopBtn = document.getElementById('stopGeneratingBtn');
-      if (stopBtn) {
-        if (active) {
-          stopBtn.classList.remove('hidden');
-          stopBtn.classList.add('flex');
-        } else {
-          stopBtn.classList.add('hidden');
-          stopBtn.classList.remove('flex');
-        }
-      }
-    }
-
-    function stopStreaming() {
-      if (state.abortController) {
-        try {
-          state.abortController.abort();
-        } catch (_) {}
-        state.abortController = null;
-      }
-      setGeneratingUI(false);
-      const chat = getActiveChat();
-      if (chat && chat.messages.length) {
-        const last = chat.messages[chat.messages.length - 1];
-        if (last.role === 'model') {
-          last.isStreaming = false;
-          last.isImagePending = false;
-        }
-        saveChats();
-        renderChatMessages();
-      }
-    }
-
-    function isImageGenerationRequest(text) {
-      const t = String(text || '').toLowerCase().trim();
-      if (!t) return false;
-      return /(нарисуй|сгенерируй\s+(фото|картинк|изображен|арт|рисунок)|создай\s+(фото|картинк|изображен|арт|рисунок)|сделай\s+(фото|картинк|изображен|арт|рисунок)|покажи\s+(фото|картинк)|draw\s+|generate\s+(an?\s+)?image)/i.test(t);
-    }
-
-    function isCodeRequest(text) {
-      const t = String(text || '').toLowerCase();
-      return /(напиши\s+код|сделай\s+код|создай\s+код|html|css|javascript|python|скрипт|сайт|страниц|игр[уы]|калькулятор)/i.test(t);
-    }
-
-    /**
-     * Отправка сообщения и получение ответа от Gemini API
-     */
-    async function sendMessage(overrideText = null) {
+    async function sendTextMessage(overrideText = null, fromVoice = false) {
       if (state.isGenerating) return;
-      const input = document.getElementById('promptInput');
-      const text = overrideText !== null ? String(overrideText).trim() : (input ? input.value.trim() : '');
-      const attached = state.attachedImage;
+      const input = document.getElementById("promptInput");
+      const text = (overrideText !== null ? overrideText : input.value).trim();
+      const imgBase64 = state.attachedImageBase64;
+      const imgMime = state.attachedImageMime;
 
-      if (!text && !attached) return;
+      if (!text && !imgBase64) return;
 
-      const chat = ensureActiveChat();
-      if (chat.messages.length === 0) {
-        chat.title = (text || 'Фото').slice(0, 38);
+      const chat = getCurrentChat();
+      if (chat.messages.length === 0 && text) {
+        chat.title = text.slice(0, 36);
       }
 
       chat.messages.push({
-        role: 'user',
-        text,
-        imageDataUrl: attached ? attached.dataUrl : null,
-        imageBase64: attached ? attached.base64 : null,
-        imageMimeType: attached ? attached.mimeType : null,
+        role: "user",
+        text: text || "Изображение",
+        image: imgBase64 ? `data:${imgMime};base64,${imgBase64}` : null
       });
 
-      if (overrideText === null && input) {
-        input.value = '';
+      if (overrideText === null) {
+        input.value = "";
+        removeAttachedImage();
+        updateActionButton();
       }
-      clearAttachedImage();
-      updateActionButtonState();
 
-      const wantImage = !attached && isImageGenerationRequest(text);
+      // Если во время голосового разговора попросили код или картинку — сворачиваем в чат
+      if (fromVoice && voiceState.active && !voiceState.docked) {
+        if (/(код|html|скрипт|сайт|картинк|фото|нарисуй)/i.test(text)) {
+          dockVoiceCall();
+        }
+      }
 
-      chat.messages.push({
-        role: 'model',
-        text: '',
-        isStreaming: !wantImage,
-        isImagePending: wantImage,
-        generatedImageUrl: null,
-      });
-
-      chat.updatedAt = Date.now();
+      state.isGenerating = true;
+      chat.messages.push({ role: "model", text: "Думаю над ответом...", isThinking: true });
       saveChats();
-      renderSidebarHistory();
-      renderChatMessages();
-
-      setGeneratingUI(true);
-      state.abortController = new AbortController();
+      renderMessages();
 
       try {
-        if (wantImage) {
-          await generateImageResponse(chat, text, state.abortController.signal);
-        } else {
-          await generateTextResponse(chat, state.abortController.signal);
+        const contents = chat.messages
+          .filter(m => !m.isThinking)
+          .slice(-10)
+          .map(m => {
+            const parts = [];
+            if (m.text) parts.push({ text: m.text });
+            if (m.image && m.role === "user" && m === chat.messages[chat.messages.length - 2] && imgBase64) {
+              parts.push({ inline_data: { mime_type: imgMime, data: imgBase64 } });
+            }
+            return { role: m.role, parts };
+          });
+
+        const payload = {
+          systemInstruction: {
+            parts: [{ text: "Ты Maf GPT — быстрый, умный и дружелюбный ИИ-помощник. Отвечай всегда на русском языке, чётко и по делу." }]
+          },
+          contents
+        };
+
+        const replyText = await callGeminiAPI(payload);
+
+        chat.messages.pop();
+        chat.messages.push({ role: "model", text: replyText });
+        saveChats();
+        renderMessages();
+
+        if (fromVoice && voiceState.active) {
+          speakText(replyText);
         }
       } catch (err) {
-        if (err && err.name === 'AbortError') return;
-        const msg = err && err.message ? err.message : 'Ошибка соединения';
-        const last = chat.messages[chat.messages.length - 1];
-        if (last && last.role === 'model') {
-          last.isStreaming = false;
-          last.isImagePending = false;
-          last.isKeyError = /api key|not valid|permission|unauthenticated|401|403/i.test(msg);
-          last.text = `Не удалось получить ответ (${escapePlainError(msg)}). Попробуйте ещё раз.`;
+        chat.messages.pop();
+        chat.messages.push({
+          role: "model",
+          text: `Не удалось получить ответ (${err.message}). Проверьте, что ключ в Google AI Studio не заблокирован.`
+        });
+        saveChats();
+        renderMessages();
+
+        if (fromVoice && voiceState.active) {
+          speakText("Произошла ошибка при получении ответа.");
         }
       } finally {
-        setGeneratingUI(false);
-        state.abortController = null;
-        saveChats();
-        renderChatMessages();
+        state.isGenerating = false;
       }
     }
 
-    async function generateImageResponse(chat, promptText, signal) {
-      // 1. Пробуем Imagen 3 через единый шлюз (чистый заголовок x-goog-api-key без дублирования ?key=)
-      const { res, data } = await geminiApiRequest(
-        'imagen-3.0-generate-002:predict',
-        {
-          instances: [{ prompt: promptText }],
-          parameters: { sampleCount: 1 },
-        },
-        signal
-      );
+    // --- РЕНДЕР СООБЩЕНИЙ И БЛОКОВ КОДА ---
+    function renderMessages() {
+      const container = document.getElementById("messagesContainer");
+      const chat = state.chats.find(c => c.id === state.currentChatId);
 
-      if (res && res.ok) {
-        const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
-        const mime = data?.predictions?.[0]?.mimeType || 'image/png';
-        if (b64) {
-          const last = chat.messages[chat.messages.length - 1];
-          if (last && last.role === 'model') {
-            last.isImagePending = false;
-            last.isStreaming = false;
-            last.generatedImageUrl = `data:${mime};base64,${b64}`;
-            last.text = '';
-          }
-          return;
-        }
+      if (!chat || chat.messages.length === 0) {
+        container.innerHTML = `
+          <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center text-center px-4 pb-12">
+            <div class="w-14 h-14 mb-5 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/25">
+              <svg class="w-8 h-8 text-white" viewBox="0 0 32 32" fill="none">
+                <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="16" cy="7" r="2.2" fill="#93c5fd"/>
+              </svg>
+            </div>
+            <h2 id="dynamicGreeting" class="text-2xl md:text-3xl font-semibold tracking-tight text-white greeting-fade greeting-visible">
+              ${GREETINGS[state.greetingIndex]}
+            </h2>
+            <p class="text-sm text-neutral-500 mt-2 max-w-md">
+              Задайте любой вопрос текстом, прикрепите фото или нажмите синюю кнопку справа для живого голосового разговора.
+            </p>
+          </div>
+        `;
+        return;
       }
 
-      // 2. Резервная генерация изображения через Gemini Image (если Imagen 3 недоступен для ключа)
-      const imgFallback = await geminiApiRequest(
-        'gemini-2.5-flash-image:generateContent',
-        {
-          contents: [{ parts: [{ text: promptText }] }],
-          generationConfig: { responseModalities: ['IMAGE'] },
-        },
-        signal
-      );
-
-      if (imgFallback.res && imgFallback.res.ok) {
-        const parts = imgFallback.data?.candidates?.[0]?.content?.parts || [];
-        const imgPart = parts.find((p) => p.inlineData && p.inlineData.data);
-        if (imgPart) {
-          const last = chat.messages[chat.messages.length - 1];
-          if (last && last.role === 'model') {
-            last.isImagePending = false;
-            last.isStreaming = false;
-            last.generatedImageUrl = `data:${imgPart.inlineData.mimeType || 'image/png'};base64,${imgPart.inlineData.data}`;
-            last.text = '';
+      container.innerHTML = `<div class="max-w-3xl mx-auto space-y-5">` + chat.messages.map(msg => {
+        if (msg.role === "user") {
+          return `
+            <div class="flex justify-end msg-appear">
+              <div class="max-w-[82%] bg-[#242424] text-white rounded-3xl rounded-br-md px-4 py-3 text-[15px] leading-relaxed shadow-sm">
+                ${msg.image ? `<img src="${msg.image}" class="max-h-56 rounded-xl mb-2 object-contain" />` : ""}
+                <div class="whitespace-pre-wrap select-text">${escapeHtml(msg.text)}</div>
+              </div>
+            </div>
+          `;
+        } else {
+          if (msg.isThinking) {
+            return `
+              <div class="flex items-start gap-3 msg-appear">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 text-white" viewBox="0 0 32 32" fill="none">
+                    <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="text-sm text-neutral-400 italic py-1">Думаю над ответом...</div>
+              </div>
+            `;
           }
-          return;
+          return `
+            <div class="flex items-start gap-3 msg-appear">
+              <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-4 h-4 text-white" viewBox="0 0 32 32" fill="none">
+                  <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="flex-1 prose-maf text-[15px] select-text overflow-hidden">
+                ${formatMarkdown(msg.text)}
+              </div>
+            </div>
+          `;
         }
-      }
+      }).join("") + `</div>`;
 
-      throw new Error(data?.error?.message || imgFallback.data?.error?.message || `HTTP ${res ? res.status : 400}`);
+      container.scrollTop = container.scrollHeight;
     }
 
-    async function generateTextResponse(chat, signal) {
-      const systemInstruction = {
-        parts: [
-          {
-            text: 'Ты — Maf GPT, умный и лаконичный AI-ассистент. Отвечай на русском языке чётко, по делу и хорошо структурированно. Никогда не выводи внутренние рассуждения (<thought>) и JSON-промпты генерации изображений (dalle.text2im). Если просят код, выдавай полный рабочий код в тройных обратных кавычках с указанием языка.',
+    function formatMarkdown(text) {
+      const codeBlocks = [];
+      let processed = text.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+        const idx = codeBlocks.length;
+        codeBlocks.push({ lang: lang || "code", code });
+        return `@@CODEBLOCK_${idx}@@`;
+      });
+
+      processed = escapeHtml(processed)
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+        .replace(/\n\n+/g, "</p><p>")
+        .replace(/\n/g, "<br/>");
+
+      processed = `<p>${processed}</p>`;
+
+      codeBlocks.forEach((blk, i) => {
+        const encoded = encodeURIComponent(blk.code);
+        const blockHtml = `
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>${escapeHtml(blk.lang)}</span>
+              <button onclick="copyCodeBlock(this, '${encoded}')" class="px-2.5 py-1 rounded-lg bg-[#333333] hover:bg-[#444444] text-xs text-white cursor-pointer">
+                Копировать
+              </button>
+            </div>
+            <pre class="code-body"><code>${escapeHtml(blk.code)}</code></pre>
+          </div>
+        `;
+        processed = processed.replace(`@@CODEBLOCK_${i}@@`, blockHtml);
+      });
+
+      return processed;
+    }
+
+    function copyCodeBlock(btn, encoded) {
+      navigator.clipboard.writeText(decodeURIComponent(encoded));
+      const old = btn.textContent;
+      btn.textContent = "Скопировано!";
+      setTimeout(() => (btn.textContent = old), 1500);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // --- ГОЛОСОВОЙ РАЗГОВОР (ЗАХВАТ WAV + GEMINI + ОЗВУЧКА) ---
+    async function startVoiceCall() {
+      const overlay = document.getElementById("liveCallOverlay");
+      overlay.classList.remove("hidden");
+      overlay.classList.add("flex");
+      requestAnimationFrame(() => {
+        overlay.classList.remove("fade-hidden");
+        overlay.classList.add("fade-visible");
+      });
+
+      voiceState.active = true;
+      voiceState.docked = false;
+      voiceState.muted = false;
+      voiceState.isProcessing = false;
+      voiceState.isSpeaking = false;
+
+      updateVoiceStatus("Подключаю микрофон...", "Разрешите доступ к микрофону в браузере");
+
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!voiceState.audioCtx) {
+          voiceState.audioCtx = new AudioContextClass();
+        }
+        if (voiceState.audioCtx.state === "suspended") {
+          await voiceState.audioCtx.resume();
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+
+        voiceState.mediaStream = stream;
+        const source = voiceState.audioCtx.createMediaStreamSource(stream);
+        const processor = voiceState.audioCtx.createScriptProcessor(4096, 1, 1);
+
+        voiceState.pcmChunks = [];
+        voiceState.speechStarted = false;
+        voiceState.silenceStart = 0;
+
+        processor.onaudioprocess = (e) => {
+          if (!voiceState.active || voiceState.muted || voiceState.isProcessing || voiceState.isSpeaking) {
+            document.getElementById("micLevelBar").style.width = "3%";
+            return;
+          }
+
+          const inputData = e.inputBuffer.getChannelData(0);
+          let sum = 0;
+          for (let i = 0; i < inputData.length; i++) {
+            sum += inputData[i] * inputData[i];
+          }
+          const rms = Math.sqrt(sum / inputData.length) * 100;
+          const levelPct = Math.min(100, Math.max(4, rms * 14));
+          document.getElementById("micLevelBar").style.width = levelPct + "%";
+
+          const now = Date.now();
+          if (rms > 1.4) {
+            if (!voiceState.speechStarted) {
+              voiceState.speechStarted = true;
+              voiceState.pcmChunks = [];
+              updateVoiceStatus("Слушаю вас...", "Продолжайте говорить...");
+            }
+            voiceState.silenceStart = now;
+            voiceState.pcmChunks.push(new Float32Array(inputData));
+          } else if (voiceState.speechStarted) {
+            voiceState.pcmChunks.push(new Float32Array(inputData));
+            if (now - voiceState.silenceStart > 700) {
+              voiceState.speechStarted = false;
+              const recorded = voiceState.pcmChunks.slice();
+              voiceState.pcmChunks = [];
+              processRecordedSpeech(recorded, voiceState.audioCtx.sampleRate);
+            }
+          }
+        };
+
+        source.connect(processor);
+        processor.connect(voiceState.audioCtx.destination);
+        voiceState.processor = processor;
+
+        updateVoiceStatus("Говорите...", "Я вас внимательно слушаю");
+      } catch (err) {
+        updateVoiceStatus("Нет доступа к микрофону", "Проверьте разрешения микрофона для сайта: " + err.message);
+      }
+    }
+
+    async function processRecordedSpeech(chunks, sampleRate) {
+      if (!chunks.length || voiceState.isProcessing) return;
+      voiceState.isProcessing = true;
+      updateVoiceStatus("Распознаю и думаю...", "Обрабатываю ваш вопрос...");
+
+      try {
+        const wavBase64 = encodeWavBase64(chunks, sampleRate);
+        const payload = {
+          systemInstruction: {
+            parts: [{
+              text: "Пользователь говорит голосом на русском языке. Сначала запиши в первой строке ровно то, что сказал пользователь в формате: ВОПРОС: <текст вопроса>. Затем со следующей строки напиши краткий, живой и естественный ответ на русском языке в формате: ОТВЕТ: <твой ответ>. Если слышен только шум и слов нет, верни ровно: ПУСТО"
+            }]
           },
-        ],
-      };
+          contents: [{
+            role: "user",
+            parts: [
+              { inline_data: { mime_type: "audio/wav", data: wavBase64 } },
+              { text: "Распознай речь и ответь." }
+            ]
+          }]
+        };
 
-      const contents = [];
-      for (let i = 0; i < chat.messages.length - 1; i++) {
-        const m = chat.messages[i];
-        const parts = [];
-        if (m.imageBase64) {
-          parts.push({
-            inlineData: {
-              mimeType: m.imageMimeType || 'image/jpeg',
-              data: m.imageBase64,
-            },
-          });
-        }
-        if (m.text) {
-          parts.push({ text: m.text });
-        }
-        if (parts.length) {
-          contents.push({
-            role: m.role === 'user' ? 'user' : 'model',
-            parts,
-          });
-        }
-      }
-
-      const bodyPayload = {
-        systemInstruction,
-        contents,
-        generationConfig: {
-          temperature: 0.7,
-        },
-      };
-
-      const modelsToTry = ['gemini-2.5-flash', 'gemini-3-flash-preview', 'gemini-2.0-flash'];
-      let lastError = null;
-
-      for (const modelName of modelsToTry) {
-        try {
-          const { res, data } = await geminiApiRequest(`${modelName}:generateContent`, bodyPayload, signal);
-          if (!res || !res.ok) {
-            throw new Error(data?.error?.message || `HTTP ${res ? res.status : 400}`);
-          }
-          const replyText =
-            data?.candidates?.[0]?.content?.parts
-              ?.map((p) => p.text || '')
-              .join('') || '';
-          if (!replyText) {
-            throw new Error('Пустой ответ модели');
-          }
-          const last = chat.messages[chat.messages.length - 1];
-          if (last && last.role === 'model') {
-            last.text = sanitizeModelOutput(replyText);
-            last.isStreaming = false;
-          }
+        const result = await callGeminiAPI(payload);
+        if (!result || result.trim() === "ПУСТО") {
+          voiceState.isProcessing = false;
+          updateVoiceStatus("Говорите...", "Я слушаю вас");
           return;
-        } catch (err) {
-          if (err && err.name === 'AbortError') throw err;
-          lastError = err;
-          if (/api key|not valid|permission denied|forbidden|403|401/i.test(err?.message || '')) {
-            throw err;
+        }
+
+        const qMatch = result.match(/ВОПРОС:\s*(.+)/i);
+        const aMatch = result.match(/ОТВЕТ:\s*([\s\S]+)/i);
+
+        const userQuestion = qMatch ? qMatch[1].trim() : "Голосовой запрос";
+        const aiAnswer = aMatch ? aMatch[1].trim() : result.trim();
+
+        const chat = getCurrentChat();
+        if (chat.messages.length === 0) {
+          chat.title = userQuestion.slice(0, 36);
+        }
+        chat.messages.push({ role: "user", text: userQuestion });
+        chat.messages.push({ role: "model", text: aiAnswer });
+        saveChats();
+        renderMessages();
+
+        document.getElementById("liveTranscriptText").textContent = `Вы: «${userQuestion}»`;
+        speakText(aiAnswer);
+      } catch (err) {
+        updateVoiceStatus("Ошибка связи", err.message);
+        voiceState.isProcessing = false;
+      }
+    }
+
+    function speakText(text) {
+      if (!voiceState.active) {
+        voiceState.isProcessing = false;
+        return;
+      }
+
+      const cleanText = text.replace(/```[\s\S]*?```/g, "Код готов в чате.").replace(/[*#`]/g, "");
+      voiceState.isSpeaking = true;
+      updateVoiceStatus("Говорит Maf GPT...", cleanText.slice(0, 110));
+      document.getElementById("liveOrb").classList.add("voice-orb-speaking");
+
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(cleanText);
+        utter.lang = "ru-RU";
+        utter.rate = 1.05;
+        utter.onend = () => {
+          voiceState.isSpeaking = false;
+          voiceState.isProcessing = false;
+          document.getElementById("liveOrb").classList.remove("voice-orb-speaking");
+          if (voiceState.active) {
+            updateVoiceStatus("Говорите...", "Я слушаю вас");
           }
-        }
+        };
+        utter.onerror = () => {
+          voiceState.isSpeaking = false;
+          voiceState.isProcessing = false;
+          document.getElementById("liveOrb").classList.remove("voice-orb-speaking");
+        };
+        window.speechSynthesis.speak(utter);
+      } else {
+        voiceState.isSpeaking = false;
+        voiceState.isProcessing = false;
       }
-
-      throw lastError || new Error('Не удалось связаться с моделью');
     }
 
-    /**
-     * Живой голосовой разговор (звонок) — прямой захват PCM/WAV с микрофона + быстрый ответ и озвучка
-     */
-    const liveState = {
-      active: false,
-      muted: false,
-      collapsed: false,
-      mediaStream: null,
-      audioCtx: null,
-      analyser: null,
-      scriptNode: null,
-      vadFrameId: null,
-      pcmBuffers: [],
-      preRollBuffers: [],
-      sampleRate: 16000,
-      speechStarted: false,
-      speechStartTime: 0,
-      lastVoiceTime: 0,
-      isSpeaking: false,
-      isProcessing: false,
-      recognition: null,
-      sttFinalBuffer: '',
-      sttSilenceTimer: null,
-      currentAudio: null,
-      lastHandledTranscript: '',
-      lastHandledAt: 0,
-    };
-
-    function base64ToUint8Array(base64) {
-      const binaryString = atob(base64);
-      const len = binaryString.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      return bytes;
-    }
-
-    function pcmToWavBlob(pcmBytes, sampleRate = 24000, numChannels = 1) {
-      const dataLength = pcmBytes.byteLength;
-      const buffer = new ArrayBuffer(44 + dataLength);
-      const view = new DataView(buffer);
-
-      const writeStr = (offset, str) => {
-        for (let i = 0; i < str.length; i++) {
-          view.setUint8(offset + i, str.charCodeAt(i));
-        }
-      };
-
-      writeStr(0, 'RIFF');
-      view.setUint32(4, 36 + dataLength, true);
-      writeStr(8, 'WAVE');
-      writeStr(12, 'fmt ');
-      view.setUint32(16, 16, true);
-      view.setUint16(20, 1, true);
-      view.setUint16(22, numChannels, true);
-      view.setUint32(24, sampleRate, true);
-      view.setUint32(28, sampleRate * numChannels * 2, true);
-      view.setUint16(32, numChannels * 2, true);
-      view.setUint16(34, 16, true);
-      writeStr(36, 'data');
-      view.setUint32(40, dataLength, true);
-
-      new Uint8Array(buffer, 44).set(pcmBytes);
-      return new Blob([buffer], { type: 'audio/wav' });
-    }
-
-    function float32ChunksToWavBlob(chunks, inputSampleRate) {
-      let totalLen = 0;
-      for (const c of chunks) totalLen += c.length;
-      const merged = new Float32Array(totalLen);
+    function encodeWavBase64(chunks, sampleRate) {
+      let totalLength = 0;
+      for (const c of chunks) totalLength += c.length;
+      const samples = new Float32Array(totalLength);
       let offset = 0;
       for (const c of chunks) {
-        merged.set(c, offset);
+        samples.set(c, offset);
         offset += c.length;
       }
 
-      // Даунсэмплинг до 16000 Гц для быстрой отправки и 100% совместимости с Gemini
-      const targetRate = 16000;
-      const ratio = inputSampleRate / targetRate;
-      const outLen = Math.max(1, Math.floor(merged.length / ratio));
-      const pcm16 = new Int16Array(outLen);
-      for (let i = 0; i < outLen; i++) {
-        const idx = Math.min(merged.length - 1, Math.floor(i * ratio));
-        const s = Math.max(-1, Math.min(1, merged[idx]));
-        pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+      const buffer = new ArrayBuffer(44 + samples.length * 2);
+      const view = new DataView(buffer);
+
+      const writeStr = (off, str) => {
+        for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i));
+      };
+
+      writeStr(0, "RIFF");
+      view.setUint32(4, 36 + samples.length * 2, true);
+      writeStr(8, "WAVE");
+      writeStr(12, "fmt ");
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeStr(36, "data");
+      view.setUint32(40, samples.length * 2, true);
+
+      let pos = 44;
+      for (let i = 0; i < samples.length; i++, pos += 2) {
+        const s = Math.max(-1, Math.min(1, samples[i]));
+        view.setInt16(pos, s < 0 ? s * 0x8000 : s * 0x7fff, true);
       }
-      return pcmToWavBlob(new Uint8Array(pcm16.buffer), targetRate, 1);
+
+      let binary = "";
+      const bytes = new Uint8Array(buffer);
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
     }
 
-    function stopCurrentTtsAudio() {
-      if (liveState.currentAudio) {
-        try {
-          liveState.currentAudio.pause();
-          liveState.currentAudio.src = '';
-        } catch (_) {}
-        liveState.currentAudio = null;
-      }
-      if ('speechSynthesis' in window) {
-        try { window.speechSynthesis.cancel(); } catch (_) {}
-      }
-      liveState.isSpeaking = false;
-      const orb1 = document.getElementById('liveVoiceOrb');
-      const orb2 = document.getElementById('dockedVoiceOrb');
-      if (orb1) orb1.classList.remove('voice-orb-speaking');
-      if (orb2) orb2.classList.remove('voice-orb-speaking');
+    function updateVoiceStatus(title, subtitle) {
+      document.getElementById("liveStatusTitle").textContent = title;
+      if (subtitle) document.getElementById("liveTranscriptText").textContent = subtitle;
+      document.getElementById("dockedStatusText").textContent = title;
     }
 
-    function blobToBase64Raw(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const res = String(reader.result || '');
-          const idx = res.indexOf(',');
-          resolve(idx !== -1 ? res.slice(idx + 1) : res);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
+    function toggleMute() {
+      voiceState.muted = !voiceState.muted;
+      document.getElementById("micOnIcon").classList.toggle("hidden", voiceState.muted);
+      document.getElementById("micOffIcon").classList.toggle("hidden", !voiceState.muted);
+      updateVoiceStatus(voiceState.muted ? "Микрофон выключен" : "Говорите...", voiceState.muted ? "Нажмите на микрофон, чтобы продолжить" : "Я слушаю вас");
+    }
+
+    function dockVoiceCall() {
+      voiceState.docked = true;
+      const overlay = document.getElementById("liveCallOverlay");
+      overlay.classList.remove("fade-visible");
+      overlay.classList.add("fade-hidden");
+      setTimeout(() => {
+        overlay.classList.add("hidden");
+        overlay.classList.remove("flex");
+      }, 300);
+      document.getElementById("dockedCallBar").classList.remove("hidden");
+    }
+
+    function expandVoiceCall() {
+      voiceState.docked = false;
+      document.getElementById("dockedCallBar").classList.add("hidden");
+      const overlay = document.getElementById("liveCallOverlay");
+      overlay.classList.remove("hidden");
+      overlay.classList.add("flex");
+      requestAnimationFrame(() => {
+        overlay.classList.remove("fade-hidden");
+        overlay.classList.add("fade-visible");
       });
     }
 
-    function showLiveOverlayAnimated(show) {
-      const overlay = document.getElementById('liveCallOverlay');
-      if (!overlay) return;
-      if (show) {
-        overlay.classList.remove('hidden');
-        overlay.classList.add('flex');
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            overlay.classList.remove('screen-hidden');
-            overlay.classList.add('screen-visible');
-          });
-        });
-      } else {
-        overlay.classList.remove('screen-visible');
-        overlay.classList.add('screen-hidden');
-        setTimeout(() => {
-          if (!liveState.active || liveState.collapsed) {
-            overlay.classList.add('hidden');
-            overlay.classList.remove('flex');
-          }
-        }, 320);
+    function endVoiceCall() {
+      voiceState.active = false;
+      voiceState.docked = false;
+      voiceState.isSpeaking = false;
+      voiceState.isProcessing = false;
+
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (voiceState.processor) {
+        voiceState.processor.disconnect();
+        voiceState.processor = null;
       }
+      if (voiceState.mediaStream) {
+        voiceState.mediaStream.getTracks().forEach(t => t.stop());
+        voiceState.mediaStream = null;
+      }
+
+      document.getElementById("dockedCallBar").classList.add("hidden");
+      const overlay = document.getElementById("liveCallOverlay");
+      overlay.classList.remove("fade-visible");
+      overlay.classList.add("fade-hidden");
+      setTimeout(() => {
+        overlay.classList.add("hidden");
+        overlay.classList.remove("flex");
+      }, 300);
     }
 
-    function showDockedBarAnimated(show) {
-      const dockedBar = document.getElementById('dockedCallBar');
-      if (!dockedBar) return;
-      if (show) {
-        dockedBar.classList.remove('hidden');
-        dockedBar.classList.add('flex');
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            dockedBar.classList.remove('docked-hidden');
-            dockedBar.classList.add('docked-visible');
-          });
-        });
-      } else {
-        dockedBar.classList.remove('docked-visible');
-        dockedBar.classList.add('docked-hidden');
-        setTimeout(() => {
-          if (!liveState.active || !liveState.collapsed) {
-            dockedBar.classList.add('hidden');
-            dockedBar.classList.remove('flex');
-          }
-        }, 280);
-      }
-    }
-
-    async function startLiveCall() {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const hasMedia = Boolean(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-
-      if (!SpeechRec && !hasMedia) {
-        showToast('Микрофон не поддерживается в этом браузере');
-        return;
-      }
-
-      if ('speechSynthesis' in window) {
-        try {
-          const warmup = new SpeechSynthesisUtterance('');
-          warmup.volume = 0;
-          window.speechSynthesis.speak(warmup);
-        } catch (_) {}
-      }
-
-      stopCurrentTtsAudio();
-      liveState.active = true;
-      liveState.muted = false;
-      liveState.collapsed = false;
-      liveState.isProcessing = false;
-      liveState.speechStarted = false;
-      liveState.pcmBuffers = [];
-      liveState.preRollBuffers = [];
-      liveState.sttFinalBuffer = '';
-      liveState.lastHandledTranscript = '';
-      liveState.lastHandledAt = 0;
-
-      showLiveOverlayAnimated(true);
-      const sub = document.getElementById('liveCallSubtitle');
-      if (sub) sub.textContent = '';
-
-      updateLiveCallStatus('Подключение микрофона...');
-      updateLiveMuteUI();
-
-      if (hasMedia) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true,
-            },
-          });
-
-          if (!liveState.active) {
-            stream.getTracks().forEach((t) => t.stop());
-            return;
-          }
-
-          liveState.mediaStream = stream;
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          liveState.audioCtx = new AudioCtx();
-          if (liveState.audioCtx.state === 'suspended') {
-            await liveState.audioCtx.resume();
-          }
-          liveState.sampleRate = liveState.audioCtx.sampleRate || 48000;
-
-          const source = liveState.audioCtx.createMediaStreamSource(stream);
-          const analyser = liveState.audioCtx.createAnalyser();
-          analyser.fftSize = 1024;
-          analyser.smoothingTimeConstant = 0.15;
-
-          // Захват сырого PCM-потока напрямую из микрофона (без сбоев MediaRecorder/WebM)
-          const scriptNode = liveState.audioCtx.createScriptProcessor(4096, 1, 1);
-          const muteGain = liveState.audioCtx.createGain();
-          muteGain.gain.value = 0;
-
-          scriptNode.onaudioprocess = (e) => {
-            if (!liveState.active || liveState.muted || liveState.isProcessing) return;
-            const input = e.inputBuffer.getChannelData(0);
-            const copy = new Float32Array(input.length);
-            copy.set(input);
-
-            if (liveState.speechStarted) {
-              liveState.pcmBuffers.push(copy);
-            } else {
-              liveState.preRollBuffers.push(copy);
-              if (liveState.preRollBuffers.length > 5) {
-                liveState.preRollBuffers.shift();
-              }
-            }
-          };
-
-          source.connect(analyser);
-          source.connect(scriptNode);
-          scriptNode.connect(muteGain);
-          muteGain.connect(liveState.audioCtx.destination);
-
-          liveState.analyser = analyser;
-          liveState.scriptNode = scriptNode;
-
-          updateLiveCallStatus('Говорите...');
-          startVoiceActivityDetection();
-          return;
-        } catch (err) {
-          if (!SpeechRec) {
-            showToast('Разрешите доступ к микрофону');
-            stopLiveCall();
-            return;
-          }
-        }
-      }
-
-      if (SpeechRec) {
-        startBrowserSpeechRecognition(SpeechRec);
-        updateLiveCallStatus('Говорите...');
-      }
-    }
-
-    function startBrowserSpeechRecognition(SpeechRec) {
-      try {
-        const rec = new SpeechRec();
-        rec.lang = 'ru-RU';
-        rec.continuous = true;
-        rec.interimResults = true;
-        rec.maxAlternatives = 1;
-
-        rec.onresult = (event) => {
-          if (!liveState.active || liveState.muted || liveState.isProcessing) return;
-          if (liveState.isSpeaking) stopCurrentTtsAudio();
-
-          let interimText = '';
-          let newFinal = '';
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const res = event.results[i];
-            const txt = res[0] ? res[0].transcript : '';
-            if (res.isFinal) newFinal += txt + ' ';
-            else interimText += txt;
-          }
-
-          if (newFinal) {
-            liveState.sttFinalBuffer = (liveState.sttFinalBuffer + ' ' + newFinal).trim();
-          }
-
-          const preview = (liveState.sttFinalBuffer + ' ' + interimText).trim();
-          if (preview) {
-            updateLiveCallStatus('Слушаю вас...');
-            const sub = document.getElementById('liveCallSubtitle');
-            if (sub) sub.textContent = preview;
-          }
-
-          clearTimeout(liveState.sttSilenceTimer);
-          liveState.sttSilenceTimer = setTimeout(() => {
-            const readyText = (liveState.sttFinalBuffer || interimText).trim();
-            liveState.sttFinalBuffer = '';
-            if (readyText && liveState.active && !liveState.muted && !liveState.isProcessing) {
-              handleLiveVoiceUtterance(readyText);
-            }
-          }, 550);
-        };
-
-        rec.onerror = () => {};
-        rec.onend = () => {
-          if (liveState.active && !liveState.muted) {
-            setTimeout(() => {
-              if (liveState.active && !liveState.muted && liveState.recognition) {
-                try { liveState.recognition.start(); } catch (_) {}
-              }
-            }, 150);
-          }
-        };
-
-        liveState.recognition = rec;
-        rec.start();
-      } catch (_) {}
-    }
-
-    function startVoiceActivityDetection() {
-      if (!liveState.analyser) return;
-      const dataArray = new Uint8Array(liveState.analyser.fftSize);
-      const SILENCE_HANGOVER_MS = 650;
-      const MIN_SPEECH_MS = 220;
-      const MAX_SEGMENT_MS = 9000;
-
-      const tick = () => {
-        if (!liveState.active) return;
-        liveState.vadFrameId = requestAnimationFrame(tick);
-
-        liveState.analyser.getByteTimeDomainData(dataArray);
-        let sumSquares = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          const v = dataArray[i] - 128;
-          sumSquares += v * v;
-        }
-        const rms = Math.sqrt(sumSquares / dataArray.length);
-
-        const fill = document.getElementById('micLevelFill');
-        if (fill) {
-          const pct = liveState.muted ? 0 : Math.min(100, Math.round(rms * 8));
-          fill.style.width = pct + '%';
-        }
-
-        const orb1 = document.getElementById('liveVoiceOrb');
-        const orb2 = document.getElementById('dockedVoiceOrb');
-        if (!liveState.muted && !liveState.isSpeaking) {
-          const scale = 1 + Math.min(0.28, Math.max(0, (rms - 0.8) * 0.025));
-          if (orb1) orb1.style.transform = `scale(${scale.toFixed(3)})`;
-          if (orb2) orb2.style.transform = `scale(${scale.toFixed(3)})`;
-        } else {
-          if (orb1) orb1.style.transform = '';
-          if (orb2) orb2.style.transform = '';
-        }
-
-        if (liveState.muted || liveState.isProcessing) {
-          return;
-        }
-
-        const threshold = liveState.isSpeaking ? 9.0 : 1.35;
-        const now = performance.now();
-
-        if (rms > threshold) {
-          if (liveState.isSpeaking) {
-            stopCurrentTtsAudio();
-          }
-          if (!liveState.speechStarted) {
-            liveState.speechStarted = true;
-            liveState.speechStartTime = now;
-            liveState.pcmBuffers = liveState.preRollBuffers.slice();
-            liveState.preRollBuffers = [];
-            updateLiveCallStatus('Слушаю вас...');
-          }
-          liveState.lastVoiceTime = now;
-
-          if (now - liveState.speechStartTime > MAX_SEGMENT_MS) {
-            const captured = liveState.pcmBuffers.slice();
-            liveState.pcmBuffers = [];
-            liveState.speechStarted = false;
-            processCapturedPcmSegment(captured);
-          }
-        } else if (liveState.speechStarted) {
-          if (now - liveState.lastVoiceTime > SILENCE_HANGOVER_MS) {
-            const duration = now - liveState.speechStartTime;
-            const captured = liveState.pcmBuffers.slice();
-            liveState.pcmBuffers = [];
-            liveState.speechStarted = false;
-
-            if (duration >= MIN_SPEECH_MS && captured.length > 0) {
-              processCapturedPcmSegment(captured);
-            } else {
-              updateLiveCallStatus('Говорите...');
-            }
-          }
-        }
-      };
-
-      liveState.vadFrameId = requestAnimationFrame(tick);
-    }
-
-    async function processCapturedPcmSegment(pcmChunks) {
-      if (liveState.isProcessing || !liveState.active || !pcmChunks.length) return;
-      liveState.isProcessing = true;
-      updateLiveCallStatus('Распознаю речь...');
-
-      try {
-        const wavBlob = float32ChunksToWavBlob(pcmChunks, liveState.sampleRate);
-        const audioBase64 = await blobToBase64Raw(wavBlob);
-
-        const { res, data } = await geminiApiRequest('gemini-3.8-flash:generateContent', {
-          contents: [
-            {
-              role: 'user',
-              parts: [
-                {
-                  text: 'Расшифруй точно на русском языке, что сказал человек в этой аудиозаписи. Верни ТОЛЬКО произнесённый текст без кавычек и пояснений. Если речи нет и слышна только тишина или шум, верни слово ТИШИНА.',
-                },
-                {
-                  inlineData: {
-                    mimeType: 'audio/wav',
-                    data: audioBase64,
-                  },
-                },
-              ],
-            },
-          ],
-          generationConfig: { temperature: 0.0, maxOutputTokens: 256 },
-        });
-
-        if (!res || !res.ok) {
-          const errMsg = data?.error?.message || `Ошибка ${res ? res.status : 400}`;
-          const sub = document.getElementById('liveCallSubtitle');
-          if (sub) sub.textContent = errMsg;
-          liveState.isProcessing = false;
-          if (liveState.active) updateLiveCallStatus('Говорите...');
-          return;
-        }
-
-        const rawTranscript = (
-          data?.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('') || ''
-        ).trim();
-
-        if (!rawTranscript || /^тишина\.?$/i.test(rawTranscript)) {
-          liveState.isProcessing = false;
-          if (liveState.active) updateLiveCallStatus('Говорите...');
-          return;
-        }
-
-        await handleLiveVoiceUtterance(rawTranscript);
-      } catch (err) {
-        const sub = document.getElementById('liveCallSubtitle');
-        if (sub) sub.textContent = 'Ошибка сети при распознавании';
-        liveState.isProcessing = false;
-        if (liveState.active) updateLiveCallStatus('Говорите...');
-      }
-    }
-
-    async function handleLiveVoiceUtterance(spokenText) {
-      const normalized = String(spokenText || '').trim();
-      if (!normalized) {
-        liveState.isProcessing = false;
-        if (liveState.active) updateLiveCallStatus('Говорите...');
-        return;
-      }
-
-      const now = Date.now();
-      if (
-        normalized.toLowerCase() === liveState.lastHandledTranscript.toLowerCase() &&
-        now - liveState.lastHandledAt < 3000
-      ) {
-        liveState.isProcessing = false;
-        return;
-      }
-      liveState.lastHandledTranscript = normalized;
-      liveState.lastHandledAt = now;
-
-      liveState.isProcessing = true;
-      updateLiveCallStatus('Думаю...');
-      const sub = document.getElementById('liveCallSubtitle');
-      if (sub) sub.textContent = normalized;
-
-      const wantImg = isImageGenerationRequest(normalized);
-      const wantCode = !wantImg && isCodeRequest(normalized);
-
-      if (wantImg || wantCode) {
-        setLiveCallCollapsed(true);
-        const announce = wantImg
-          ? 'Я создаю фото по вашему запросу, ожидайте!'
-          : 'Я создаю код по вашему запросу, ожидайте!';
-        speakLiveText(announce);
-        await sendMessage(normalized);
-        const doneMsg = wantImg
-          ? 'Я создал фото по вашему запросу, посмотрите в чате!'
-          : 'Я создал код по вашему запросу, он уже в чате!';
-        await speakLiveText(doneMsg);
-        liveState.isProcessing = false;
-        if (liveState.active) updateLiveCallStatus('Говорите...');
-        return;
-      }
-
-      await sendMessage(normalized);
-      const chat = getActiveChat();
-      const last = chat && chat.messages[chat.messages.length - 1];
-      const answerText = last && last.role === 'model' ? last.text : '';
-      if (answerText && liveState.active) {
-        const plain = answerText
-          .replace(/```[\s\S]*?```/g, 'Код отправлен в чат.')
-          .replace(/[#*`_]/g, '')
-          .trim();
-        await speakLiveText(plain.slice(0, 650));
-      }
-      liveState.isProcessing = false;
-      if (liveState.active) updateLiveCallStatus('Говорите...');
-    }
-
-    async function speakLiveText(text) {
-      if (!text || !liveState.active) return;
-      stopCurrentTtsAudio();
-
-      liveState.isSpeaking = true;
-      updateLiveCallStatus('Говорит Maf GPT...');
-      const orb1 = document.getElementById('liveVoiceOrb');
-      const orb2 = document.getElementById('dockedVoiceOrb');
-      if (orb1) orb1.classList.add('voice-orb-speaking');
-      if (orb2) orb2.classList.add('voice-orb-speaking');
-
-      const finishSpeaking = () => {
-        liveState.isSpeaking = false;
-        if (orb1) orb1.classList.remove('voice-orb-speaking');
-        if (orb2) orb2.classList.remove('voice-orb-speaking');
-        if (liveState.active && !liveState.muted) {
-          updateLiveCallStatus('Говорите...');
-        }
-      };
-
-      // 1. Живой мужской голос Gemini TTS (Puck)
-      try {
-        const { res, data } = await geminiApiRequest('gemini-2.5-flash-preview-tts:generateContent', {
-          contents: [
-            {
-              parts: [{ text: `Произнеси естественно, живо и по-дружески в разговорном темпе: ${text}` }],
-            },
-          ],
-          generationConfig: {
-            responseModalities: ['AUDIO'],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: { voiceName: 'Puck' },
-              },
-            },
-          },
-        });
-
-        const part = data?.candidates?.[0]?.content?.parts?.[0];
-        const audioData = part?.inlineData?.data;
-        const mimeType = part?.inlineData?.mimeType || '';
-
-        if (res && res.ok && audioData && liveState.active) {
-          const rateMatch = mimeType.match(/rate=(\d+)/);
-          const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
-          const pcmBytes = base64ToUint8Array(audioData);
-          const wavBlob = pcmToWavBlob(pcmBytes, sampleRate, 1);
-          const audioUrl = URL.createObjectURL(wavBlob);
-
-          await new Promise((resolve) => {
-            const audio = new Audio(audioUrl);
-            audio.playbackRate = 1.1;
-            liveState.currentAudio = audio;
-            audio.onended = () => {
-              URL.revokeObjectURL(audioUrl);
-              liveState.currentAudio = null;
-              finishSpeaking();
-              resolve();
-            };
-            audio.onerror = () => {
-              URL.revokeObjectURL(audioUrl);
-              liveState.currentAudio = null;
-              finishSpeaking();
-              resolve();
-            };
-            audio.play().catch(() => {
-              URL.revokeObjectURL(audioUrl);
-              liveState.currentAudio = null;
-              finishSpeaking();
-              resolve();
-            });
-          });
-          return;
-        }
-      } catch (_) {}
-
-      // 2. Резервный встроенный голос браузера
-      if ('speechSynthesis' in window && liveState.active) {
-        await new Promise((resolve) => {
-          try {
-            window.speechSynthesis.cancel();
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = 'ru-RU';
-            utter.rate = 1.12;
-            utter.pitch = 1.0;
-            utter.onend = () => {
-              finishSpeaking();
-              resolve();
-            };
-            utter.onerror = () => {
-              finishSpeaking();
-              resolve();
-            };
-            window.speechSynthesis.speak(utter);
-          } catch (_) {
-            finishSpeaking();
-            resolve();
-          }
-        });
-      } else {
-        finishSpeaking();
-      }
-    }
-
-    function updateLiveCallStatus(text) {
-      const s1 = document.getElementById('liveCallStatus');
-      const s2 = document.getElementById('dockedCallStatus');
-      if (s1) s1.textContent = text;
-      if (s2) s2.textContent = text;
-    }
-
-    function updateLiveMuteUI() {
-      const on1 = document.getElementById('micOnIcon');
-      const off1 = document.getElementById('micOffIcon');
-      const on2 = document.getElementById('dockedMicOnIcon');
-      const off2 = document.getElementById('dockedMicOffIcon');
-      if (liveState.muted) {
-        if (on1) on1.classList.add('hidden');
-        if (off1) off1.classList.remove('hidden');
-        if (on2) on2.classList.add('hidden');
-        if (off2) off2.classList.remove('hidden');
-        updateLiveCallStatus('Микрофон выключен');
-      } else {
-        if (off1) off1.classList.add('hidden');
-        if (on1) on1.classList.remove('hidden');
-        if (off2) off2.classList.add('hidden');
-        if (on2) on2.classList.remove('hidden');
-        updateLiveCallStatus('Говорите...');
-      }
-    }
-
-    function toggleLiveMute() {
-      liveState.muted = !liveState.muted;
-      updateLiveMuteUI();
-      if (liveState.muted) {
-        liveState.speechStarted = false;
-        liveState.pcmBuffers = [];
-        liveState.preRollBuffers = [];
-        liveState.sttFinalBuffer = '';
-        clearTimeout(liveState.sttSilenceTimer);
-        if (liveState.recognition) {
-          try { liveState.recognition.stop(); } catch (_) {}
-        }
-      } else if (liveState.recognition && liveState.active) {
-        try { liveState.recognition.start(); } catch (_) {}
-      }
-    }
-
-    function setLiveCallCollapsed(collapsed) {
-      liveState.collapsed = collapsed;
-      const dockedControls = document.getElementById('dockedCallControls');
-      const sendBtn = document.getElementById('sendBtn');
-
-      if (collapsed) {
-        showLiveOverlayAnimated(false);
-        showDockedBarAnimated(true);
-        if (dockedControls) {
-          dockedControls.classList.remove('hidden');
-          dockedControls.classList.add('flex');
-        }
-        if (sendBtn) sendBtn.classList.add('hidden');
-      } else {
-        showDockedBarAnimated(false);
-        if (dockedControls) {
-          dockedControls.classList.add('hidden');
-          dockedControls.classList.remove('flex');
-        }
-        if (sendBtn) sendBtn.classList.remove('hidden');
-        if (liveState.active) {
-          showLiveOverlayAnimated(true);
-        }
-      }
-    }
-
-    function stopLiveCall() {
-      liveState.active = false;
-      liveState.muted = false;
-      liveState.collapsed = false;
-      liveState.isProcessing = false;
-      liveState.speechStarted = false;
-      liveState.pcmBuffers = [];
-      liveState.preRollBuffers = [];
-      liveState.sttFinalBuffer = '';
-      clearTimeout(liveState.sttSilenceTimer);
-
-      stopCurrentTtsAudio();
-
-      if (liveState.recognition) {
-        try { liveState.recognition.stop(); } catch (_) {}
-        liveState.recognition = null;
-      }
-      if (liveState.vadFrameId) {
-        cancelAnimationFrame(liveState.vadFrameId);
-        liveState.vadFrameId = null;
-      }
-      if (liveState.scriptNode) {
-        try { liveState.scriptNode.disconnect(); } catch (_) {}
-        liveState.scriptNode = null;
-      }
-      if (liveState.mediaStream) {
-        liveState.mediaStream.getTracks().forEach((t) => t.stop());
-        liveState.mediaStream = null;
-      }
-      if (liveState.audioCtx) {
-        try { liveState.audioCtx.close(); } catch (_) {}
-        liveState.audioCtx = null;
-      }
-      liveState.analyser = null;
-
-      const dockedControls = document.getElementById('dockedCallControls');
-      const sendBtn = document.getElementById('sendBtn');
-
-      showLiveOverlayAnimated(false);
-      showDockedBarAnimated(false);
-      if (dockedControls) {
-        dockedControls.classList.add('hidden');
-        dockedControls.classList.remove('flex');
-      }
-      if (sendBtn) sendBtn.classList.remove('hidden');
-      updateActionButtonState();
-    }
-
-    function escapePlainError(msg) {
-      return String(msg || 'ошибка сети').replace(/[`*]/g, '');
-    }
-
-    function initPwaAppMode() {
-      try {
-        const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0a0a0a"/><path d="M112 376V152L256 280L400 152V376" fill="none" stroke="#60a5fa" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/><circle cx="256" cy="120" r="32" fill="#ffffff"/></svg>`;
-        const iconDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(iconSvg);
-        const touchIcon = document.getElementById('appleTouchIconLink');
-        if (touchIcon) touchIcon.href = iconDataUrl;
-
-        const manifest = {
-          name: 'Maf GPT',
-          short_name: 'Maf GPT',
-          start_url: '.',
-          display: 'standalone',
-          background_color: '#000000',
-          theme_color: '#000000',
-          icons: [
-            {
-              src: iconDataUrl,
-              sizes: '512x512',
-              type: 'image/svg+xml',
-              purpose: 'any maskable',
-            },
-          ],
-        };
-        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-        const manifestLink = document.getElementById('pwaManifestLink');
-        if (manifestLink) manifestLink.href = URL.createObjectURL(manifestBlob);
-      } catch (_) {}
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initPwaAppMode();
-      loadChats();
-      renderSidebarHistory();
-      renderChatMessages();
-      updateActionButtonState();
+    // --- РОТАЦИЯ ПРИВЕТСТВИЙ ---
+    setInterval(() => {
+      const el = document.getElementById("dynamicGreeting");
+      if (!el) return;
+      el.classList.remove("greeting-visible");
+      el.classList.add("greeting-hidden");
+      setTimeout(() => {
+        state.greetingIndex = (state.greetingIndex + 1) % GREETINGS.length;
+        el.textContent = GREETINGS[state.greetingIndex];
+        el.classList.remove("greeting-hidden");
+        el.classList.add("greeting-visible");
+      }, 480);
+    }, 3600);
+
+    // ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+    document.addEventListener("DOMContentLoaded", () => {
+      renderHistoryList();
+      renderMessages();
     });
   </script>
 </body>
