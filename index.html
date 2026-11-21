@@ -192,7 +192,6 @@
 </head>
 <body class="flex flex-col md:flex-row bg-black text-white select-none">
 
-  <!-- МОДАЛЬНОЕ ОКНО ПРОСМОТРА СОХРАНЁННОГО КОДА -->
   <div id="codeMemoryModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 screen-transition screen-hidden">
     <div class="w-full max-w-2xl bg-[#141414] border border-[#2c2c2c] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[82dvh]">
       <div class="px-5 py-3.5 bg-[#1c1c1c] border-b border-[#2a2a2a] flex items-center justify-between gap-2">
@@ -216,10 +215,8 @@
     </div>
   </div>
 
-  <!-- ЗАТЕМНЕНИЕ ДЛЯ МОБИЛЬНОГО МЕНЮ -->
   <div id="mobileBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/70 z-30 hidden md:hidden backdrop-blur-xs"></div>
 
-  <!-- БОКОВАЯ ПАНЕЛЬ -->
   <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 bg-[#0d0d0d] border-r border-[#1f1f1f] flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-out safe-top safe-bottom">
     <div class="px-4 py-3 flex items-center justify-between border-b border-[#1c1c1c]">
       <div class="flex items-center gap-2.5">
@@ -243,7 +240,6 @@
       </button>
     </div>
 
-    <!-- ПАМЯТЬ КОДА -->
     <div class="px-4 pt-1 pb-1 flex items-center justify-between">
       <span class="text-[11px] font-semibold uppercase tracking-wider text-blue-400/90">Память кода</span>
       <button onclick="clearCodeMemory()" class="text-[11px] text-neutral-500 hover:text-neutral-300 cursor-pointer">Сброс</button>
@@ -263,7 +259,6 @@
     </div>
   </aside>
 
-  <!-- ОСНОВНОЙ ЭКРАН -->
   <main class="flex-1 flex flex-col h-full relative bg-black">
     <header class="safe-top px-4 pb-2.5 flex items-center justify-between border-b border-[#161616] bg-black/90 backdrop-blur-md z-20">
       <div class="flex items-center gap-2.5 min-w-0">
@@ -302,7 +297,6 @@
       </div>
     </div>
 
-    <!-- СВЁРНУТАЯ ПАНЕЛЬ ЗВОНКА НАД ПОЛЕМ ВВОДА -->
     <div id="dockedCallBar" class="hidden px-4 pb-2 screen-transition screen-hidden">
       <div class="max-w-3xl mx-auto bg-[#161a24] border border-blue-500/30 rounded-2xl px-4 py-2.5 flex items-center justify-between shadow-lg">
         <div onclick="expandVoiceCall()" class="flex items-center gap-3 cursor-pointer flex-1">
@@ -323,7 +317,6 @@
       </div>
     </div>
 
-    <!-- КОМПОЗЕР -->
     <div class="safe-bottom px-4 pt-1 bg-black">
       <div class="max-w-3xl mx-auto">
         <div id="imagePreviewBar" class="hidden mb-2 px-3 py-2 rounded-2xl bg-[#181818] border border-[#2c2c2c] flex items-center justify-between">
@@ -362,7 +355,6 @@
     </div>
   </main>
 
-  <!-- ПОЛНОЭКРАННЫЙ ГОЛОСОВОЙ РАЗГОВОР -->
   <div id="liveCallOverlay" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl hidden flex-col justify-between p-6 safe-top safe-bottom screen-transition screen-hidden">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2.5">
@@ -405,15 +397,7 @@
   </div>
 
   <script>
-    const CF_API_TOKEN = "cfut_aJp6seVwxS2NrBw7G2zucYt21hnE92HCF5eQ1LSQ717bb5f7";
-    const CF_ACCOUNT_ID = "f5bca8813396aebc47dc363a13cd4802";
-    localStorage.setItem("mafgpt_cf_account_id_v1", CF_ACCOUNT_ID);
-
-    const CF_TEXT_MODELS = [
-      "@cf/meta/llama-3.1-8b-instruct",
-      "@cf/mistral/mistral-7b-instruct-v0.1"
-    ];
-    const CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell";
+    const WORKER_URL = "https://mafgpt-proxy.mmmxfff2310.workers.dev";
 
     const SYSTEM_PROMPT =
       "Ты Maf GPT — дерзкий, живой и полезный ИИ-ассистент. " +
@@ -450,6 +434,14 @@
       recognition: null
     };
 
+    function getWorkerEndpoint() {
+      const clean = (WORKER_URL || "").trim().replace(/\/+$/, "");
+      if (!clean) {
+        throw new Error("Не указан WORKER_URL.");
+      }
+      return clean;
+    }
+
     function isImageGenerationRequest(text) {
       return /^(нарисуй|сделай\s+фото|сгенерируй\s+(фото|картинку|изображение)|создай\s+(фото|картинку|изображение)|фото\s+|картинка\s+)/i.test(text.trim());
     }
@@ -460,60 +452,34 @@
         .trim() || promptText.trim();
     }
 
-    async function generateImageWithCloudflare(promptText) {
+    async function generateImageViaWorker(promptText) {
+      const endpoint = getWorkerEndpoint();
       const cleaned = cleanImagePrompt(promptText);
-      const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(CF_ACCOUNT_ID)}/ai/run/${CF_IMAGE_MODEL}`;
 
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 35000);
 
       try {
-        const res = await fetch(url, {
+        const res = await fetch(endpoint, {
           method: "POST",
-          headers: {
-            "Authorization": `Bearer ${CF_API_TOKEN}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            prompt: cleaned,
-            num_steps: 4
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: "image", prompt: cleaned }),
           signal: controller.signal
         });
         clearTimeout(timer);
 
-        const contentType = res.headers.get("content-type") || "";
-        if (contentType.includes("image/")) {
-          const blob = await res.blob();
-          return await blobToDataUrl(blob);
-        }
-
         const data = await res.json().catch(() => ({}));
-        const b64 = data?.result?.image || data?.result?.[0]?.image;
-        if (res.ok && b64) {
-          return b64.startsWith("data:") ? b64 : `data:image/jpeg;base64,${b64}`;
+        if (res.ok && data?.image) {
+          return data.image;
         }
-
-        throw new Error(data?.errors?.[0]?.message || `HTTP ${res.status}`);
+        throw new Error(data?.error || `HTTP ${res.status}`);
       } catch (err) {
         clearTimeout(timer);
         if (err.name === "AbortError") {
           throw new Error("Превышено время ожидания генерации фото");
         }
-        if (err instanceof TypeError) {
-          throw new Error("Запрос заблокирован браузером (CORS или сеть). Подключите Cloudflare Worker.");
-        }
-        throw err;
+        throw new Error(err.message || "Ошибка запроса к воркеру");
       }
-    }
-
-    function blobToDataUrl(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
     }
 
     function saveCodeMemory() {
@@ -626,52 +592,34 @@
     }
 
     async function callAssistantAPI(messagesArray) {
-      let lastErr = "Ошибка соединения";
+      const endpoint = getWorkerEndpoint();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 25000);
 
-      for (const modelId of CF_TEXT_MODELS) {
-        const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(CF_ACCOUNT_ID)}/ai/run/${modelId}`;
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 25000);
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: "chat", messages: messagesArray }),
+          signal: controller.signal
+        });
+        clearTimeout(timer);
 
-        try {
-          const res = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${CF_API_TOKEN}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              messages: messagesArray,
-              temperature: 0.7
-            }),
-            signal: controller.signal
-          });
-          clearTimeout(timer);
-
-          const data = await res.json().catch(() => ({}));
-          const replyText = data?.result?.response || data?.result?.choices?.[0]?.message?.content;
-
-          if (res.ok && replyText) {
-            return String(replyText);
-          }
-
-          lastErr = data?.errors?.[0]?.message || `HTTP ${res.status}`;
-        } catch (err) {
-          clearTimeout(timer);
-          if (err.name === "AbortError") {
-            lastErr = "Превышено время ожидания";
-          } else if (err instanceof TypeError) {
-            lastErr = "Запрос заблокирован браузером (CORS или сеть). Подключите Cloudflare Worker.";
-          } else {
-            lastErr = err.message || "Сбой сети";
-          }
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data?.reply) {
+          return String(data.reply);
         }
+        throw new Error(data?.error || `HTTP ${res.status}`);
+      } catch (err) {
+        clearTimeout(timer);
+        if (!navigator.onLine) {
+          throw new Error("Нет интернета. Проверьте подключение к сети.");
+        }
+        if (err.name === "AbortError") {
+          throw new Error("Превышено время ожидания ответа");
+        }
+        throw new Error(err.message || "Ошибка связи с воркером");
       }
-
-      if (!navigator.onLine) {
-        throw new Error("Нет интернета. Проверьте подключение к сети.");
-      }
-      throw new Error(lastErr);
     }
 
     function saveChats() {
@@ -824,7 +772,7 @@
 
       try {
         if (!imgBase64 && isImageGenerationRequest(text)) {
-          const imgDataUrl = await generateImageWithCloudflare(text);
+          const imgDataUrl = await generateImageViaWorker(text);
           chat.messages.pop();
           chat.messages.push({
             role: "assistant",
