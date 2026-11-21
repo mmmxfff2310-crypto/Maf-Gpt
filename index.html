@@ -185,82 +185,51 @@
 </head>
 <body class="flex flex-col md:flex-row bg-black text-white select-none">
 
-  <!-- ЭКРАН НАСТРОЙКИ ДВИЖКА И API KEY -->
-  <div id="activationScreen" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-5 screen-transition screen-visible overflow-y-auto">
+  <!-- МОДАЛЬНОЕ ОКНО НАСТРОЙКИ МОДЕЛИ И ХАРАКТЕРА -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl hidden items-center justify-center p-5 screen-transition screen-hidden overflow-y-auto">
     <div class="w-full max-w-md bg-[#141414] border border-[#2b2b2b] rounded-3xl p-6 text-left shadow-2xl my-auto">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0">
-          <svg class="w-7 h-7 text-white" viewBox="0 0 32 32" fill="none">
-            <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="16" cy="7" r="2.2" fill="#93c5fd"/>
-          </svg>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0">
+            <svg class="w-6 h-6 text-white" viewBox="0 0 32 32" fill="none">
+              <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="16" cy="7" r="2.2" fill="#93c5fd"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold tracking-tight">Автонастройка Maf GPT</h2>
+            <p class="text-xs text-neutral-400">Модели подбираются автоматически</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight">Maf GPT • Без ограничений</h1>
-          <p class="text-xs text-neutral-400">OpenAI-совместимый движок (не Gemini)</p>
-        </div>
+        <button onclick="closeSettingsModal()" class="w-8 h-8 rounded-xl bg-[#222222] hover:bg-[#303030] text-neutral-300 flex items-center justify-center cursor-pointer">
+          ×
+        </button>
       </div>
 
       <div class="space-y-3.5">
         <div>
-          <label class="block text-xs font-medium text-neutral-400 mb-1.5">Движок / Провайдер</label>
-          <select id="providerSelect" onchange="onProviderChange()" class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
-            <option value="groq">Groq (Молниеносная скорость, бесплатно)</option>
-            <option value="openrouter">OpenRouter (Бесплатные + Uncensored модели)</option>
-            <option value="ollama">Локальная Ollama (Без ключа и без лимитов)</option>
-            <option value="custom">Свой URL (Любой OpenAI API)</option>
-          </select>
-        </div>
-
-        <div id="customUrlGroup" class="hidden">
-          <label class="block text-xs font-medium text-neutral-400 mb-1.5">Endpoint URL</label>
-          <input
-            id="endpointUrlInput"
-            type="text"
-            placeholder="http://localhost:11434/v1/chat/completions"
-            class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none select-text"
-          />
-        </div>
-
-        <div id="apiKeyGroup">
-          <label class="block text-xs font-medium text-neutral-400 mb-1.5">API Key</label>
-          <input
-            id="sessionApiKeyInput"
-            type="password"
-            autocomplete="off"
-            placeholder="gsk_... или sk-or-v1-..."
-            onkeydown="if(event.key==='Enter') activateMafGpt()"
-            class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none select-text"
-          />
-        </div>
-
-        <div>
           <div class="flex items-center justify-between mb-1.5">
-            <label class="text-xs font-medium text-neutral-400">Модель</label>
-            <select id="modelPresetSelect" onchange="applyModelPreset()" class="bg-[#1e1e1e] text-[11px] text-blue-400 rounded-lg px-2 py-0.5 focus:outline-none"></select>
+            <label class="text-xs font-medium text-neutral-400">Активная модель</label>
+            <button onclick="autoDetectBestModel(true)" class="text-[11px] text-blue-400 hover:text-blue-300 cursor-pointer">
+              Автоподбор
+            </button>
           </div>
-          <input
-            id="modelNameInput"
-            type="text"
-            placeholder="Название модели..."
-            class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2.5 text-sm font-mono text-white placeholder-neutral-500 focus:outline-none select-text"
-          />
+          <select id="modelSelect" class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none"></select>
         </div>
 
         <div>
           <label class="block text-xs font-medium text-neutral-400 mb-1.5">Характер ИИ (Системный промпт)</label>
           <textarea
             id="systemPromptInput"
-            rows="2"
+            rows="3"
             class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none resize-none select-text"
-          >Ты Maf GPT — дерзкий, умный и максимально полезный ИИ без лишней воды и морализаторства. Отвечай на русском языке чётко, энергично и сразу по делу.</textarea>
+          ></textarea>
         </div>
       </div>
 
-      <button onclick="activateMafGpt()" class="w-full mt-5 py-3 px-6 rounded-2xl bg-white text-black font-semibold text-base hover:bg-neutral-200 cursor-pointer">
-        Сохранить и запустить
+      <button onclick="saveSettingsModal()" class="w-full mt-5 py-3 px-6 rounded-2xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 cursor-pointer">
+        Сохранить изменения
       </button>
-      <p id="keyErrorMsg" class="text-xs text-red-400 mt-2.5 min-h-[16px] text-center"></p>
     </div>
   </div>
 
@@ -313,10 +282,10 @@
         <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
         Новый чат
       </button>
-      <button onclick="openKeyModal()" class="w-full py-2 px-3.5 rounded-xl bg-[#141414] hover:bg-[#202020] text-neutral-300 text-xs font-medium flex items-center justify-between gap-2 cursor-pointer">
+      <button onclick="openSettingsModal()" class="w-full py-2 px-3.5 rounded-xl bg-[#141414] hover:bg-[#202020] text-neutral-300 text-xs font-medium flex items-center justify-between gap-2 cursor-pointer">
         <span class="flex items-center gap-2 truncate">
           <svg class="w-3.5 h-3.5 text-blue-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span id="sidebarEngineLabel" class="truncate">Движок и модель</span>
+          <span id="sidebarEngineLabel" class="truncate">Автомодель</span>
         </span>
       </button>
     </div>
@@ -358,8 +327,8 @@
             </svg>
           </div>
           <span class="font-semibold text-base tracking-tight shrink-0">Maf GPT</span>
-          <button onclick="openKeyModal()" id="headerModelBadge" class="ml-1 px-2.5 py-0.5 rounded-full bg-[#181818] hover:bg-[#242424] text-[11px] font-mono text-blue-400 truncate cursor-pointer">
-            Groq
+          <button onclick="openSettingsModal()" id="headerModelBadge" class="ml-1 px-2.5 py-0.5 rounded-full bg-[#181818] hover:bg-[#242424] text-[11px] font-mono text-blue-400 truncate cursor-pointer">
+            Автомодель
           </button>
         </div>
       </div>
@@ -486,65 +455,28 @@
   </div>
 
   <script>
-    const CONFIG_STORAGE_KEY = "mafgpt_engine_config_v3";
+    const CONFIG_STORAGE_KEY = "mafgpt_auto_config_v4";
     const BUILTIN_GROQ_KEY = "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";
+    const CHAT_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+    const MODELS_ENDPOINT = "https://api.groq.com/openai/v1/models";
+
+    const PREFERRED_MODEL_ORDER = [
+      "llama-3.3-70b-versatile",
+      "llama-3.1-8b-instant",
+      "gemma2-9b-it",
+      "deepseek-r1-distill-llama-70b",
+      "qwen-qwq-32b"
+    ];
+
     let activeModalSnippetId = null;
 
-    const PROVIDER_PRESETS = {
-      groq: {
-        name: "Groq",
-        url: "https://api.groq.com/openai/v1/chat/completions",
-        requiresKey: true,
-        models: [
-          { label: "Llama 3.3 70B Versatile", id: "llama-3.3-70b-versatile" },
-          { label: "Qwen QWQ 32B", id: "qwen-qwq-32b" },
-          { label: "Llama 3.1 8B Instant", id: "llama-3.1-8b-instant" }
-        ]
-      },
-      openrouter: {
-        name: "OpenRouter",
-        url: "https://openrouter.ai/api/v1/chat/completions",
-        requiresKey: true,
-        models: [
-          { label: "Dolphin Venice Uncensored (Free)", id: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free" },
-          { label: "DeepSeek V3 0324 (Free)", id: "deepseek/deepseek-chat-v3-0324:free" },
-          { label: "Llama 3.3 70B (Free)", id: "meta-llama/llama-3.3-70b-instruct:free" },
-          { label: "Qwen 2.5 Coder 32B (Free)", id: "qwen/qwen-2.5-coder-32b-instruct:free" }
-        ]
-      },
-      ollama: {
-        name: "Ollama (Локально)",
-        url: "http://localhost:11434/v1/chat/completions",
-        requiresKey: false,
-        models: [
-          { label: "Dolphin Llama 3 (Uncensored)", id: "dolphin-llama3" },
-          { label: "Qwen 2.5 7B", id: "qwen2.5:7b" },
-          { label: "Mistral", id: "mistral" }
-        ]
-      },
-      custom: {
-        name: "Custom API",
-        url: "",
-        requiresKey: false,
-        models: [
-          { label: "Своя модель", id: "gpt-4o-mini" }
-        ]
-      }
-    };
-
-    const defaultConfig = {
-      provider: "groq",
-      url: PROVIDER_PRESETS.groq.url,
+    let engineConfig = JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY) || "null") || {
       apiKey: BUILTIN_GROQ_KEY,
-      model: PROVIDER_PRESETS.groq.models[0].id,
-      systemPrompt: "Ты Maf GPT — дерзкий, умный и максимально полезный ИИ без лишней воды и морализаторства. Отвечай на русском языке чётко, энергично и сразу по делу.",
-      configured: true
+      model: "",
+      availableModels: [],
+      systemPrompt: "Ты Maf GPT — дерзкий, умный и максимально полезный ИИ без лишней воды и морализаторства. Отвечай на русском языке чётко, энергично и сразу по делу."
     };
-
-    let engineConfig = JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY) || "null") || defaultConfig;
-    if (!engineConfig.apiKey && engineConfig.provider === "groq") {
-      engineConfig.apiKey = BUILTIN_GROQ_KEY;
-    }
+    if (!engineConfig.apiKey) engineConfig.apiKey = BUILTIN_GROQ_KEY;
 
     const GREETINGS = [
       "Можем начинать.",
@@ -558,7 +490,7 @@
     let state = {
       chats: JSON.parse(localStorage.getItem("mafgpt_chats_v8") || "[]"),
       codeMemory: JSON.parse(localStorage.getItem("mafgpt_code_memory_v1") || "[]"),
-      currentChatId: null,
+      currentChatId: localStorage.getItem("mafgpt_current_chat_id_v1") || null,
       attachedImageBase64: null,
       attachedImageMime: null,
       isGenerating: false,
@@ -574,45 +506,93 @@
       recognition: null
     };
 
-    function populatePresetsForProvider(providerKey, keepCurrentModel = false) {
-      const preset = PROVIDER_PRESETS[providerKey] || PROVIDER_PRESETS.groq;
-      const selectEl = document.getElementById("modelPresetSelect");
-      selectEl.innerHTML = preset.models
-        .map(m => `<option value="${escapeHtml(m.id)}">${escapeHtml(m.label)}</option>`)
-        .join("");
-
-      const customUrlGroup = document.getElementById("customUrlGroup");
-      const apiKeyGroup = document.getElementById("apiKeyGroup");
-      const urlInput = document.getElementById("endpointUrlInput");
-      const modelInput = document.getElementById("modelNameInput");
-
-      customUrlGroup.classList.toggle("hidden", providerKey !== "custom" && providerKey !== "ollama");
-      apiKeyGroup.classList.toggle("hidden", providerKey === "ollama");
-
-      if (!keepCurrentModel) {
-        urlInput.value = preset.url;
-        modelInput.value = preset.models[0]?.id || "";
-      }
-    }
-
-    function onProviderChange() {
-      const providerKey = document.getElementById("providerSelect").value;
-      populatePresetsForProvider(providerKey, false);
-    }
-
-    function applyModelPreset() {
-      const val = document.getElementById("modelPresetSelect").value;
-      if (val) document.getElementById("modelNameInput").value = val;
+    function saveEngineConfig() {
+      localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(engineConfig));
+      updateEngineBadges();
+      populateModelSelect();
     }
 
     function updateEngineBadges() {
-      const presetName = PROVIDER_PRESETS[engineConfig.provider]?.name || "Custom";
-      const shortModel = (engineConfig.model || "").split("/").pop().replace(":free", "");
-      const badgeText = `${presetName} • ${shortModel}`;
+      const label = engineConfig.model || "Автоподбор...";
       const headerBadge = document.getElementById("headerModelBadge");
       const sidebarLabel = document.getElementById("sidebarEngineLabel");
-      if (headerBadge) headerBadge.textContent = badgeText;
-      if (sidebarLabel) sidebarLabel.textContent = badgeText;
+      if (headerBadge) headerBadge.textContent = label;
+      if (sidebarLabel) sidebarLabel.textContent = label;
+    }
+
+    function populateModelSelect() {
+      const select = document.getElementById("modelSelect");
+      if (!select) return;
+      const list = Array.from(new Set([
+        ...(engineConfig.model ? [engineConfig.model] : []),
+        ...(engineConfig.availableModels || []),
+        ...PREFERRED_MODEL_ORDER
+      ]));
+      select.innerHTML = list.map(id => `<option value="${escapeHtml(id)}">${escapeHtml(id)}</option>`).join("");
+      if (engineConfig.model) select.value = engineConfig.model;
+    }
+
+    async function autoDetectBestModel(forceShowStatus = false) {
+      try {
+        const res = await fetch(MODELS_ENDPOINT, {
+          headers: {
+            "Authorization": `Bearer ${engineConfig.apiKey}`,
+            "Content-Type": "application/json"
+          }
+        });
+        const data = await res.json().catch(() => ({}));
+        const ids = Array.isArray(data?.data)
+          ? data.data.map(m => m.id).filter(id => id && !/whisper|guard|tts|audio/i.test(id))
+          : [];
+
+        if (ids.length > 0) {
+          engineConfig.availableModels = ids;
+          const preferred = PREFERRED_MODEL_ORDER.find(p => ids.includes(p));
+          if (!engineConfig.model || !ids.includes(engineConfig.model)) {
+            engineConfig.model = preferred || ids[0];
+          }
+          saveEngineConfig();
+          return engineConfig.model;
+        }
+      } catch (e) {}
+
+      if (!engineConfig.model) {
+        engineConfig.model = "llama-3.1-8b-instant";
+        saveEngineConfig();
+      }
+      if (forceShowStatus) populateModelSelect();
+      return engineConfig.model;
+    }
+
+    function openSettingsModal() {
+      populateModelSelect();
+      document.getElementById("systemPromptInput").value = engineConfig.systemPrompt || "";
+      const modal = document.getElementById("settingsModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      requestAnimationFrame(() => {
+        modal.classList.remove("screen-hidden");
+        modal.classList.add("screen-visible");
+      });
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById("settingsModal");
+      modal.classList.remove("screen-visible");
+      modal.classList.add("screen-hidden");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }, 250);
+    }
+
+    function saveSettingsModal() {
+      const chosenModel = document.getElementById("modelSelect").value.trim();
+      const chosenPrompt = document.getElementById("systemPromptInput").value.trim();
+      if (chosenModel) engineConfig.model = chosenModel;
+      if (chosenPrompt) engineConfig.systemPrompt = chosenPrompt;
+      saveEngineConfig();
+      closeSettingsModal();
     }
 
     function saveCodeMemory() {
@@ -724,131 +704,73 @@
       return `\n\nСохранённый в памяти код пользователя (помни и учитывай его при ответах и правках):\n${recentSnippets}`;
     }
 
-    function hideActivationScreenImmediate() {
-      const screen = document.getElementById("activationScreen");
-      if (!screen) return;
-      screen.classList.remove("screen-visible");
-      screen.classList.add("screen-hidden");
-      screen.style.display = "none";
-    }
-
-    function openKeyModal() {
-      document.getElementById("keyErrorMsg").textContent = "";
-      document.getElementById("providerSelect").value = engineConfig.provider;
-      populatePresetsForProvider(engineConfig.provider, true);
-      document.getElementById("endpointUrlInput").value = engineConfig.url || "";
-      document.getElementById("sessionApiKeyInput").value = engineConfig.apiKey || "";
-      document.getElementById("modelNameInput").value = engineConfig.model || "";
-      document.getElementById("systemPromptInput").value = engineConfig.systemPrompt || "";
-
-      const screen = document.getElementById("activationScreen");
-      screen.style.display = "flex";
-      requestAnimationFrame(() => {
-        screen.classList.remove("screen-hidden");
-        screen.classList.add("screen-visible");
-      });
-    }
-
-    function activateMafGpt() {
-      const provider = document.getElementById("providerSelect").value;
-      const preset = PROVIDER_PRESETS[provider] || PROVIDER_PRESETS.groq;
-      const customUrl = document.getElementById("endpointUrlInput").value.trim();
-      const apiKey = document.getElementById("sessionApiKeyInput").value.trim();
-      const model = document.getElementById("modelNameInput").value.trim();
-      const systemPrompt = document.getElementById("systemPromptInput").value.trim();
-      const errEl = document.getElementById("keyErrorMsg");
-
-      const finalUrl = (provider === "custom" || provider === "ollama") ? (customUrl || preset.url) : preset.url;
-
-      if (!finalUrl) {
-        errEl.textContent = "Укажите URL сервера API.";
-        return;
-      }
-      if (preset.requiresKey && !apiKey) {
-        errEl.textContent = `Введите API Key для ${preset.name}.`;
-        return;
-      }
-      if (!model) {
-        errEl.textContent = "Укажите название модели.";
-        return;
+    async function callGroqWithAutoFallback(messagesArray) {
+      if (!engineConfig.model) {
+        await autoDetectBestModel();
       }
 
-      engineConfig = {
-        provider,
-        url: finalUrl,
-        apiKey,
-        model,
-        systemPrompt: systemPrompt || "Ты Maf GPT. Отвечай на русском языке чётко и по делу.",
-        configured: true
-      };
+      const candidates = Array.from(new Set([
+        engineConfig.model,
+        ...(engineConfig.availableModels || []),
+        ...PREFERRED_MODEL_ORDER
+      ].filter(Boolean)));
 
-      localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(engineConfig));
-      updateEngineBadges();
-      errEl.textContent = "";
+      let lastErr = "Ошибка запроса";
 
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.getVoices();
-      }
+      for (const modelId of candidates) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 30000);
 
-      const screen = document.getElementById("activationScreen");
-      screen.classList.remove("screen-visible");
-      screen.classList.add("screen-hidden");
-      setTimeout(() => { screen.style.display = "none"; }, 320);
-    }
+        try {
+          const res = await fetch(CHAT_ENDPOINT, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${engineConfig.apiKey}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              model: modelId,
+              messages: messagesArray,
+              temperature: 0.85
+            }),
+            signal: controller.signal
+          });
 
-    async function callUniversalAI(messagesArray) {
-      if (!engineConfig.configured) {
-        openKeyModal();
-        throw new Error("Движок не настроен.");
-      }
+          clearTimeout(timer);
+          const data = await res.json().catch(() => ({}));
 
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 35000);
+          if (res.ok && data?.choices?.[0]?.message?.content) {
+            if (engineConfig.model !== modelId) {
+              engineConfig.model = modelId;
+              saveEngineConfig();
+            }
+            return data.choices[0].message.content;
+          }
 
-      const headers = {
-        "Content-Type": "application/json"
-      };
-      if (engineConfig.apiKey) {
-        headers["Authorization"] = `Bearer ${engineConfig.apiKey}`;
-      }
-      if (engineConfig.provider === "openrouter") {
-        headers["HTTP-Referer"] = window.location.origin || "https://mafgpt.local";
-        headers["X-Title"] = "Maf GPT";
-      }
+          const msg = data?.error?.message || `HTTP ${res.status}`;
+          lastErr = msg;
 
-      try {
-        const res = await fetch(engineConfig.url, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            model: engineConfig.model,
-            messages: messagesArray,
-            temperature: 0.85
-          }),
-          signal: controller.signal
-        });
-
-        clearTimeout(timer);
-        const data = await res.json().catch(() => ({}));
-
-        if (res.ok && data?.choices?.[0]?.message?.content) {
-          return data.choices[0].message.content;
+          if (/does not exist|decommissioned|not found|access/i.test(msg)) {
+            continue;
+          }
+          throw new Error(msg);
+        } catch (err) {
+          clearTimeout(timer);
+          lastErr = err.name === "AbortError" ? "Превышено время ожидания" : err.message;
+          if (!/does not exist|decommissioned|not found|access/i.test(lastErr)) {
+            throw new Error(lastErr);
+          }
         }
-
-        const errMsg = data?.error?.message || data?.message || `HTTP ${res.status}`;
-        throw new Error(errMsg);
-      } catch (err) {
-        clearTimeout(timer);
-        if (err.name === "AbortError") {
-          throw new Error("Превышено время ожидания ответа от сервера");
-        }
-        throw err;
       }
+
+      throw new Error(lastErr);
     }
 
     function saveChats() {
       localStorage.setItem("mafgpt_chats_v8", JSON.stringify(state.chats));
+      if (state.currentChatId) {
+        localStorage.setItem("mafgpt_current_chat_id_v1", state.currentChatId);
+      }
       renderHistoryList();
     }
 
@@ -873,6 +795,7 @@
 
     function selectChat(id) {
       state.currentChatId = id;
+      saveChats();
       renderMessages();
       renderHistoryList();
       toggleMobileSidebar(false);
@@ -881,6 +804,7 @@
     function clearAllHistory() {
       state.chats = [];
       state.currentChatId = null;
+      localStorage.removeItem("mafgpt_current_chat_id_v1");
       saveChats();
       renderMessages();
     }
@@ -961,10 +885,6 @@
 
     async function sendTextMessage() {
       if (state.isGenerating) return;
-      if (!engineConfig.configured) {
-        openKeyModal();
-        return;
-      }
 
       const input = document.getElementById("promptInput");
       const text = input.value.trim();
@@ -1020,7 +940,7 @@
           }
         });
 
-        const reply = await callUniversalAI(apiMessages);
+        const reply = await callGroqWithAutoFallback(apiMessages);
 
         extractAndSaveCode(reply, "Maf GPT");
         chat.messages.pop();
@@ -1029,7 +949,7 @@
         chat.messages.pop();
         chat.messages.push({
           role: "assistant",
-          text: `Ошибка движка (${err.message}). Проверь настройки API или смени модель в меню слева.`
+          text: `Ошибка (${err.message}).`
         });
       } finally {
         state.isGenerating = false;
@@ -1167,11 +1087,6 @@
     }
 
     function startVoiceCall() {
-      if (!engineConfig.configured) {
-        openKeyModal();
-        return;
-      }
-
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRec) {
         alert("Ваш браузер не поддерживает голосовое распознавание речи. Используйте Chrome, Яндекс Браузер или Safari.");
@@ -1276,7 +1191,7 @@
           }))
         ];
 
-        const answer = await callUniversalAI(apiMessages);
+        const answer = await callGroqWithAutoFallback(apiMessages);
 
         extractAndSaveCode(answer, "Maf GPT");
         chat.messages.push({ role: "assistant", text: answer });
@@ -1422,21 +1337,16 @@
       }, 480);
     }, 3600);
 
-    document.addEventListener("DOMContentLoaded", () => {
-      populatePresetsForProvider(engineConfig.provider, true);
-      document.getElementById("providerSelect").value = engineConfig.provider;
-      document.getElementById("endpointUrlInput").value = engineConfig.url || "";
-      document.getElementById("sessionApiKeyInput").value = engineConfig.apiKey || "";
-      document.getElementById("modelNameInput").value = engineConfig.model || "";
-      document.getElementById("systemPromptInput").value = engineConfig.systemPrompt || "";
-      updateEngineBadges();
-
-      if (engineConfig.configured && engineConfig.apiKey) {
-        hideActivationScreenImmediate();
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (!state.currentChatId && state.chats.length > 0) {
+        state.currentChatId = state.chats[0].id;
       }
+      updateEngineBadges();
+      populateModelSelect();
       renderCodeMemoryList();
       renderHistoryList();
       renderMessages();
+      await autoDetectBestModel();
     });
   </script>
 </body>
