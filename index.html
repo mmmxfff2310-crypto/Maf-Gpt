@@ -32,6 +32,11 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow: hidden;
       -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    #messagesContainer, #chatHistoryList, #codeMemoryList, #codeModalBody {
+      -webkit-overflow-scrolling: touch;
     }
 
     .safe-top {
@@ -44,6 +49,7 @@
     button {
       border: none !important;
       outline: none !important;
+      touch-action: manipulation;
       transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.22s ease, color 0.22s ease, opacity 0.22s ease, box-shadow 0.22s ease;
     }
     button:active {
@@ -173,8 +179,9 @@
 
     textarea#promptInput {
       field-sizing: content;
-      max-height: 200px;
+      max-height: 160px;
       min-height: 26px;
+      font-size: 16px;
       caret-color: #ffffff;
     }
 
@@ -185,65 +192,17 @@
 </head>
 <body class="flex flex-col md:flex-row bg-black text-white select-none">
 
-  <!-- МОДАЛЬНОЕ ОКНО НАСТРОЙКИ МОДЕЛИ И ХАРАКТЕРА -->
-  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl hidden items-center justify-center p-5 screen-transition screen-hidden overflow-y-auto">
-    <div class="w-full max-w-md bg-[#141414] border border-[#2b2b2b] rounded-3xl p-6 text-left shadow-2xl my-auto">
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0">
-            <svg class="w-6 h-6 text-white" viewBox="0 0 32 32" fill="none">
-              <path d="M6 23V9L16 18L26 9V23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="16" cy="7" r="2.2" fill="#93c5fd"/>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-lg font-bold tracking-tight">Автонастройка Maf GPT</h2>
-            <p class="text-xs text-neutral-400">Модели подбираются автоматически</p>
-          </div>
-        </div>
-        <button onclick="closeSettingsModal()" class="w-8 h-8 rounded-xl bg-[#222222] hover:bg-[#303030] text-neutral-300 flex items-center justify-center cursor-pointer">
-          ×
-        </button>
-      </div>
-
-      <div class="space-y-3.5">
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <label class="text-xs font-medium text-neutral-400">Активная модель</label>
-            <button onclick="autoDetectBestModel(true)" class="text-[11px] text-blue-400 hover:text-blue-300 cursor-pointer">
-              Автоподбор
-            </button>
-          </div>
-          <select id="modelSelect" class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none"></select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-medium text-neutral-400 mb-1.5">Характер ИИ (Системный промпт)</label>
-          <textarea
-            id="systemPromptInput"
-            rows="3"
-            class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none resize-none select-text"
-          ></textarea>
-        </div>
-      </div>
-
-      <button onclick="saveSettingsModal()" class="w-full mt-5 py-3 px-6 rounded-2xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 cursor-pointer">
-        Сохранить изменения
-      </button>
-    </div>
-  </div>
-
   <!-- МОДАЛЬНОЕ ОКНО ПРОСМОТРА СОХРАНЁННОГО КОДА -->
   <div id="codeMemoryModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 screen-transition screen-hidden">
     <div class="w-full max-w-2xl bg-[#141414] border border-[#2c2c2c] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[82dvh]">
-      <div class="px-5 py-3.5 bg-[#1c1c1c] border-b border-[#2a2a2a] flex items-center justify-between">
-        <div>
-          <div id="codeModalTitle" class="text-sm font-semibold text-white">Сохранённый код</div>
-          <div id="codeModalMeta" class="text-[11px] text-neutral-400">lang</div>
+      <div class="px-5 py-3.5 bg-[#1c1c1c] border-b border-[#2a2a2a] flex items-center justify-between gap-2">
+        <div class="min-w-0">
+          <div id="codeModalTitle" class="text-sm font-semibold text-white truncate">Сохранённый код</div>
+          <div id="codeModalMeta" class="text-[11px] text-neutral-400 truncate">lang</div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 shrink-0">
           <button onclick="insertSavedCodeToPrompt()" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-medium text-white cursor-pointer">
-            Вставить в запрос
+            Вставить
           </button>
           <button onclick="copySavedCodeModal()" class="px-3 py-1.5 rounded-xl bg-[#2a2a2a] hover:bg-[#363636] text-xs font-medium text-white cursor-pointer">
             Копировать
@@ -277,21 +236,15 @@
       </button>
     </div>
 
-    <div class="p-3 space-y-2">
+    <div class="p-3">
       <button onclick="createNewChat()" class="w-full py-2.5 px-3.5 rounded-xl bg-[#1b1b1b] hover:bg-[#262626] text-white text-sm font-medium flex items-center gap-2.5 cursor-pointer">
         <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
         Новый чат
       </button>
-      <button onclick="openSettingsModal()" class="w-full py-2 px-3.5 rounded-xl bg-[#141414] hover:bg-[#202020] text-neutral-300 text-xs font-medium flex items-center justify-between gap-2 cursor-pointer">
-        <span class="flex items-center gap-2 truncate">
-          <svg class="w-3.5 h-3.5 text-blue-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span id="sidebarEngineLabel" class="truncate">Автомодель</span>
-        </span>
-      </button>
     </div>
 
     <!-- ПАМЯТЬ КОДА -->
-    <div class="px-4 pt-2 pb-1 flex items-center justify-between">
+    <div class="px-4 pt-1 pb-1 flex items-center justify-between">
       <span class="text-[11px] font-semibold uppercase tracking-wider text-blue-400/90">Память кода</span>
       <button onclick="clearCodeMemory()" class="text-[11px] text-neutral-500 hover:text-neutral-300 cursor-pointer">Сброс</button>
     </div>
@@ -303,7 +256,7 @@
     <div id="chatHistoryList" class="flex-1 overflow-y-auto px-2.5 space-y-1"></div>
 
     <div class="p-3 border-t border-[#1c1c1c] flex items-center justify-between text-xs text-neutral-500">
-      <span>Голос: Мужской • Быстро</span>
+      <span>Maf GPT</span>
       <button onclick="clearAllHistory()" class="text-neutral-400 hover:text-white px-2 py-1 rounded-lg hover:bg-[#1c1c1c] cursor-pointer">
         Очистить
       </button>
@@ -326,10 +279,7 @@
               <circle cx="16" cy="7" r="2.3" fill="#93c5fd"/>
             </svg>
           </div>
-          <span class="font-semibold text-base tracking-tight shrink-0">Maf GPT</span>
-          <button onclick="openSettingsModal()" id="headerModelBadge" class="ml-1 px-2.5 py-0.5 rounded-full bg-[#181818] hover:bg-[#242424] text-[11px] font-mono text-blue-400 truncate cursor-pointer">
-            Автомодель
-          </button>
+          <span class="font-semibold text-base tracking-tight truncate">Maf GPT</span>
         </div>
       </div>
 
@@ -394,7 +344,7 @@
             id="promptInput"
             rows="1"
             placeholder="Спросить Maf GPT..."
-            class="flex-1 bg-transparent text-white placeholder-neutral-500 text-[15px] leading-relaxed resize-none focus:outline-none py-1.5 select-text"
+            class="flex-1 bg-transparent text-white placeholder-neutral-500 text-[16px] leading-relaxed resize-none focus:outline-none py-1.5 select-text"
             oninput="updateActionButton()"
             onkeydown="handleInputKeydown(event)"
           ></textarea>
@@ -424,7 +374,7 @@
         </div>
         <div>
           <div class="font-semibold text-sm">Maf GPT Live</div>
-          <div class="text-[11px] text-blue-400">Мужской голос • Быстрый темп</div>
+          <div class="text-[11px] text-blue-400">Голосовой режим</div>
         </div>
       </div>
 
@@ -455,36 +405,29 @@
   </div>
 
   <script>
-    const CONFIG_STORAGE_KEY = "mafgpt_auto_config_v5";
     const BUILTIN_GROQ_KEY = "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";
-    const CHAT_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
-    const MODELS_ENDPOINT = "https://api.groq.com/openai/v1/models";
+    const DIRECT_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions";
+    const DIRECT_MODELS_URL = "https://api.groq.com/openai/v1/models";
+    const PROXY_URLS = [
+      "https://corsproxy.io/?" + encodeURIComponent(DIRECT_CHAT_URL),
+      "https://api.allorigins.win/raw?url=" + encodeURIComponent(DIRECT_CHAT_URL)
+    ];
 
-    const STRICT_RU_SYSTEM_BASE =
+    const SYSTEM_PROMPT =
       "Ты Maf GPT — дерзкий, живой и полезный ИИ-ассистент. " +
-      "КРИТИЧЕСКОЕ ПРАВИЛО: ВСЕГДА отвечай ТОЛЬКО на русском языке, даже если сообщение пользователя короткое, странное, с опечатками или с цифрами (например 'лай фото 67'). Никогда не переходи на арабский, английский или другой язык, если тебя прямо не попросили сделать перевод. " +
+      "КРИТИЧЕСКОЕ ПРАВИЛО: ВСЕГДА отвечай ТОЛЬКО на русском языке, даже если сообщение пользователя короткое, странное, с опечатками или с цифрами. Никогда не переходи на арабский, английский или другой язык, если тебя прямо не попросили сделать перевод. " +
       "Если просят сгенерировать картинку или фото — честно и по-русски напиши, что текстовый движок картинки не рисует, но ты можешь написать код, идею или промпт. Отвечай чётко, энергично и без лишней воды.";
 
     const PREFERRED_MODEL_ORDER = [
-      "llama-3.3-70b-versatile",
       "llama-3.1-8b-instant",
+      "llama-3.3-70b-versatile",
       "gemma2-9b-it",
-      "deepseek-r1-distill-llama-70b",
       "qwen-qwq-32b"
     ];
 
+    let activeModelId = localStorage.getItem("mafgpt_active_model_v1") || "llama-3.1-8b-instant";
+    let cachedModelList = JSON.parse(localStorage.getItem("mafgpt_model_list_v1") || "[]");
     let activeModalSnippetId = null;
-
-    let engineConfig = JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY) || "null") || {
-      apiKey: BUILTIN_GROQ_KEY,
-      model: "",
-      availableModels: [],
-      systemPrompt: STRICT_RU_SYSTEM_BASE
-    };
-    if (!engineConfig.apiKey) engineConfig.apiKey = BUILTIN_GROQ_KEY;
-    if (!engineConfig.systemPrompt || !engineConfig.systemPrompt.includes("ТОЛЬКО на русском языке")) {
-      engineConfig.systemPrompt = STRICT_RU_SYSTEM_BASE;
-    }
 
     const GREETINGS = [
       "Можем начинать.",
@@ -514,97 +457,34 @@
       recognition: null
     };
 
-    function getFullSystemPrompt(extra = "") {
-      return `${STRICT_RU_SYSTEM_BASE}\n\nДополнительные инструкции:\n${engineConfig.systemPrompt}${extra}${buildCodeContextInstruction()}`;
+    function persistModelState() {
+      if (activeModelId) localStorage.setItem("mafgpt_active_model_v1", activeModelId);
+      if (cachedModelList.length) localStorage.setItem("mafgpt_model_list_v1", JSON.stringify(cachedModelList));
     }
 
-    function saveEngineConfig() {
-      localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(engineConfig));
-      updateEngineBadges();
-      populateModelSelect();
-    }
-
-    function updateEngineBadges() {
-      const label = engineConfig.model || "Автоподбор...";
-      const headerBadge = document.getElementById("headerModelBadge");
-      const sidebarLabel = document.getElementById("sidebarEngineLabel");
-      if (headerBadge) headerBadge.textContent = label;
-      if (sidebarLabel) sidebarLabel.textContent = label;
-    }
-
-    function populateModelSelect() {
-      const select = document.getElementById("modelSelect");
-      if (!select) return;
-      const list = Array.from(new Set([
-        ...(engineConfig.model ? [engineConfig.model] : []),
-        ...(engineConfig.availableModels || []),
-        ...PREFERRED_MODEL_ORDER
-      ]));
-      select.innerHTML = list.map(id => `<option value="${escapeHtml(id)}">${escapeHtml(id)}</option>`).join("");
-      if (engineConfig.model) select.value = engineConfig.model;
-    }
-
-    async function autoDetectBestModel(forceShowStatus = false) {
+    async function resolveModel() {
       try {
-        const res = await fetch(MODELS_ENDPOINT, {
+        const res = await fetch(DIRECT_MODELS_URL, {
+          method: "GET",
           headers: {
-            "Authorization": `Bearer ${engineConfig.apiKey}`,
-            "Content-Type": "application/json"
+            "Authorization": `Bearer ${BUILTIN_GROQ_KEY}`
           }
         });
         const data = await res.json().catch(() => ({}));
         const ids = Array.isArray(data?.data)
           ? data.data.map(m => m.id).filter(id => id && !/whisper|guard|tts|audio/i.test(id))
           : [];
-
         if (ids.length > 0) {
-          engineConfig.availableModels = ids;
+          cachedModelList = ids;
           const preferred = PREFERRED_MODEL_ORDER.find(p => ids.includes(p));
-          if (!engineConfig.model || !ids.includes(engineConfig.model)) {
-            engineConfig.model = preferred || ids[0];
+          if (!activeModelId || !ids.includes(activeModelId)) {
+            activeModelId = preferred || ids[0];
           }
-          saveEngineConfig();
-          return engineConfig.model;
+          persistModelState();
+          return activeModelId;
         }
       } catch (e) {}
-
-      if (!engineConfig.model) {
-        engineConfig.model = "llama-3.1-8b-instant";
-        saveEngineConfig();
-      }
-      if (forceShowStatus) populateModelSelect();
-      return engineConfig.model;
-    }
-
-    function openSettingsModal() {
-      populateModelSelect();
-      document.getElementById("systemPromptInput").value = engineConfig.systemPrompt || STRICT_RU_SYSTEM_BASE;
-      const modal = document.getElementById("settingsModal");
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-      requestAnimationFrame(() => {
-        modal.classList.remove("screen-hidden");
-        modal.classList.add("screen-visible");
-      });
-    }
-
-    function closeSettingsModal() {
-      const modal = document.getElementById("settingsModal");
-      modal.classList.remove("screen-visible");
-      modal.classList.add("screen-hidden");
-      setTimeout(() => {
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-      }, 250);
-    }
-
-    function saveSettingsModal() {
-      const chosenModel = document.getElementById("modelSelect").value.trim();
-      const chosenPrompt = document.getElementById("systemPromptInput").value.trim();
-      if (chosenModel) engineConfig.model = chosenModel;
-      if (chosenPrompt) engineConfig.systemPrompt = chosenPrompt;
-      saveEngineConfig();
-      closeSettingsModal();
+      return activeModelId || "llama-3.1-8b-instant";
     }
 
     function saveCodeMemory() {
@@ -689,7 +569,7 @@
     function copySavedCodeModal() {
       const item = state.codeMemory.find(c => c.id === activeModalSnippetId);
       if (!item) return;
-      navigator.clipboard.writeText(item.code);
+      navigator.clipboard?.writeText(item.code).catch(() => {});
     }
 
     function insertSavedCodeToPrompt() {
@@ -716,65 +596,84 @@
       return `\n\nСохранённый в памяти код пользователя (помни и учитывай его при ответах и правках):\n${recentSnippets}`;
     }
 
-    async function callGroqWithAutoFallback(messagesArray) {
-      if (!engineConfig.model) {
-        await autoDetectBestModel();
+    async function postJsonToEndpoint(url, payloadBody, timeoutMs = 25000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          mode: "cors",
+          credentials: "omit",
+          headers: {
+            "Authorization": `Bearer ${BUILTIN_GROQ_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payloadBody),
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+        const data = await res.json().catch(() => ({}));
+        return { ok: res.ok, status: res.status, data };
+      } catch (err) {
+        clearTimeout(timer);
+        throw err;
       }
+    }
 
+    async function callAssistantAPI(messagesArray) {
       const candidates = Array.from(new Set([
-        engineConfig.model,
-        ...(engineConfig.availableModels || []),
+        activeModelId,
+        ...(cachedModelList || []),
         ...PREFERRED_MODEL_ORDER
       ].filter(Boolean)));
 
-      let lastErr = "Ошибка запроса";
+      const endpoints = [DIRECT_CHAT_URL, ...PROXY_URLS];
+      let lastErr = "Ошибка соединения";
+      let hadNetworkBlock = false;
 
       for (const modelId of candidates) {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 30000);
+        const payloadBody = {
+          model: modelId,
+          messages: messagesArray,
+          temperature: 0.7
+        };
 
-        try {
-          const res = await fetch(CHAT_ENDPOINT, {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${engineConfig.apiKey}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              model: modelId,
-              messages: messagesArray,
-              temperature: 0.7
-            }),
-            signal: controller.signal
-          });
-
-          clearTimeout(timer);
-          const data = await res.json().catch(() => ({}));
-
-          if (res.ok && data?.choices?.[0]?.message?.content) {
-            if (engineConfig.model !== modelId) {
-              engineConfig.model = modelId;
-              saveEngineConfig();
+        for (const endpoint of endpoints) {
+          try {
+            const { ok, status, data } = await postJsonToEndpoint(endpoint, payloadBody);
+            if (ok && data?.choices?.[0]?.message?.content) {
+              if (activeModelId !== modelId) {
+                activeModelId = modelId;
+                persistModelState();
+              }
+              return data.choices[0].message.content;
             }
-            return data.choices[0].message.content;
-          }
 
-          const msg = data?.error?.message || `HTTP ${res.status}`;
-          lastErr = msg;
+            const apiMsg = data?.error?.message || `HTTP ${status}`;
+            lastErr = apiMsg;
 
-          if (/does not exist|decommissioned|not found|access/i.test(msg)) {
-            continue;
-          }
-          throw new Error(msg);
-        } catch (err) {
-          clearTimeout(timer);
-          lastErr = err.name === "AbortError" ? "Превышено время ожидания" : err.message;
-          if (!/does not exist|decommissioned|not found|access/i.test(lastErr)) {
-            throw new Error(lastErr);
+            if (/does not exist|decommissioned|not found|access/i.test(apiMsg)) {
+              break;
+            }
+          } catch (err) {
+            const raw = err.name === "AbortError" ? "Превышено время ожидания" : (err.message || "Load failed");
+            if (/load failed|failed to fetch|networkerror/i.test(raw)) {
+              hadNetworkBlock = true;
+            }
+            lastErr = raw;
           }
         }
       }
 
+      if (!navigator.onLine) {
+        throw new Error("Нет интернета на телефоне. Проверьте Wi-Fi или мобильную сеть.");
+      }
+      if (hadNetworkBlock && location.protocol === "file:") {
+        throw new Error("Safari блокирует запросы из локального файла. Загрузите index.html на GitHub Pages и откройте по ссылке https://.");
+      }
+      if (hadNetworkBlock) {
+        throw new Error("Мобильная сеть или провайдер блокирует запрос (Load failed). Попробуйте включить VPN или открыть через Wi-Fi.");
+      }
       throw new Error(lastErr);
     }
 
@@ -878,11 +777,18 @@
       const reader = new FileReader();
       reader.onload = () => {
         const res = reader.result;
+        if (typeof res !== "string" || !res.includes(",")) return;
         state.attachedImageBase64 = res.split(",")[1];
         state.attachedImageMime = file.type || "image/jpeg";
         document.getElementById("imagePreviewThumb").src = res;
         document.getElementById("imagePreviewBar").classList.remove("hidden");
         updateActionButton();
+      };
+      reader.onerror = () => {
+        const chat = getCurrentChat();
+        chat.messages.push({ role: "assistant", text: "Не удалось прочитать выбранный файл." });
+        saveChats();
+        renderMessages();
       };
       reader.readAsDataURL(file);
     }
@@ -929,11 +835,14 @@
         const apiMessages = [
           {
             role: "system",
-            content: getFullSystemPrompt()
+            content: SYSTEM_PROMPT + buildCodeContextInstruction()
           }
         ];
 
-        const historySlice = chat.messages.filter(m => !m.isThinking).slice(-12);
+        const historySlice = chat.messages
+          .filter(m => !m.isThinking && !(m.role === "assistant" && /^Ошибка \(/.test(m.text)))
+          .slice(-10);
+
         historySlice.forEach((m, idx) => {
           const role = m.role === "model" ? "assistant" : m.role;
           if (m.image && role === "user" && idx === historySlice.length - 1) {
@@ -952,7 +861,7 @@
           }
         });
 
-        const reply = await callGroqWithAutoFallback(apiMessages);
+        const reply = await callAssistantAPI(apiMessages);
 
         extractAndSaveCode(reply, "Maf GPT");
         chat.messages.pop();
@@ -1066,7 +975,7 @@
     }
 
     function copyCodeBlock(btn, encoded) {
-      navigator.clipboard.writeText(decodeURIComponent(encoded));
+      navigator.clipboard?.writeText(decodeURIComponent(encoded)).catch(() => {});
       const prev = btn.textContent;
       btn.textContent = "Скопировано";
       setTimeout(() => (btn.textContent = prev), 1400);
@@ -1101,7 +1010,13 @@
     function startVoiceCall() {
       const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRec) {
-        alert("Ваш браузер не поддерживает голосовое распознавание речи. Используйте Chrome, Яндекс Браузер или Safari.");
+        const chat = getCurrentChat();
+        chat.messages.push({
+          role: "assistant",
+          text: "Голосовой ввод в этом браузере телефона не поддерживается — напишите сообщение текстом."
+        });
+        saveChats();
+        renderMessages();
         return;
       }
 
@@ -1195,15 +1110,18 @@
         const apiMessages = [
           {
             role: "system",
-            content: getFullSystemPrompt(" Отвечай коротко, бодро и разговорно на русском языке, так как ответ будет озвучен вслух.")
+            content: SYSTEM_PROMPT + " Отвечай коротко, бодро и разговорно на русском языке, так как ответ будет озвучен вслух." + buildCodeContextInstruction()
           },
-          ...chat.messages.slice(-8).map(m => ({
-            role: m.role === "model" ? "assistant" : m.role,
-            content: m.text
-          }))
+          ...chat.messages
+            .filter(m => !(m.role === "assistant" && /^Ошибка \(/.test(m.text)))
+            .slice(-8)
+            .map(m => ({
+              role: m.role === "model" ? "assistant" : m.role,
+              content: m.text
+            }))
         ];
 
-        const answer = await callGroqWithAutoFallback(apiMessages);
+        const answer = await callAssistantAPI(apiMessages);
 
         extractAndSaveCode(answer, "Maf GPT");
         chat.messages.push({ role: "assistant", text: answer });
@@ -1242,22 +1160,26 @@
       };
 
       if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(clean);
-        const chosenVoice = pickEnergeticMaleVoice();
-        if (chosenVoice) {
-          utter.voice = chosenVoice;
-          utter.lang = chosenVoice.lang || "ru-RU";
-        } else {
-          utter.lang = "ru-RU";
-        }
-        utter.rate = 1.24;
-        utter.pitch = 0.86;
-        utter.volume = 1.0;
+        try {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(clean);
+          const chosenVoice = pickEnergeticMaleVoice();
+          if (chosenVoice) {
+            utter.voice = chosenVoice;
+            utter.lang = chosenVoice.lang || "ru-RU";
+          } else {
+            utter.lang = "ru-RU";
+          }
+          utter.rate = 1.24;
+          utter.pitch = 0.86;
+          utter.volume = 1.0;
 
-        utter.onend = finishSpeaking;
-        utter.onerror = finishSpeaking;
-        window.speechSynthesis.speak(utter);
+          utter.onend = finishSpeaking;
+          utter.onerror = finishSpeaking;
+          window.speechSynthesis.speak(utter);
+        } catch (e) {
+          finishSpeaking();
+        }
       } else {
         finishSpeaking();
       }
@@ -1320,7 +1242,9 @@
       voiceState.docked = false;
       voiceState.isSpeaking = false;
       voiceState.isProcessing = false;
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if ("speechSynthesis" in window) {
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+      }
       if (voiceState.recognition) {
         try { voiceState.recognition.stop(); } catch (e) {}
         voiceState.recognition = null;
@@ -1353,12 +1277,10 @@
       if (!state.currentChatId && state.chats.length > 0) {
         state.currentChatId = state.chats[0].id;
       }
-      updateEngineBadges();
-      populateModelSelect();
       renderCodeMemoryList();
       renderHistoryList();
       renderMessages();
-      await autoDetectBestModel();
+      await resolveModel();
     });
   </script>
 </body>
