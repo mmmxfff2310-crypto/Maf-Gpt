@@ -455,10 +455,15 @@
   </div>
 
   <script>
-    const CONFIG_STORAGE_KEY = "mafgpt_auto_config_v4";
+    const CONFIG_STORAGE_KEY = "mafgpt_auto_config_v5";
     const BUILTIN_GROQ_KEY = "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";
     const CHAT_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
     const MODELS_ENDPOINT = "https://api.groq.com/openai/v1/models";
+
+    const STRICT_RU_SYSTEM_BASE =
+      "Ты Maf GPT — дерзкий, живой и полезный ИИ-ассистент. " +
+      "КРИТИЧЕСКОЕ ПРАВИЛО: ВСЕГДА отвечай ТОЛЬКО на русском языке, даже если сообщение пользователя короткое, странное, с опечатками или с цифрами (например 'лай фото 67'). Никогда не переходи на арабский, английский или другой язык, если тебя прямо не попросили сделать перевод. " +
+      "Если просят сгенерировать картинку или фото — честно и по-русски напиши, что текстовый движок картинки не рисует, но ты можешь написать код, идею или промпт. Отвечай чётко, энергично и без лишней воды.";
 
     const PREFERRED_MODEL_ORDER = [
       "llama-3.3-70b-versatile",
@@ -474,9 +479,12 @@
       apiKey: BUILTIN_GROQ_KEY,
       model: "",
       availableModels: [],
-      systemPrompt: "Ты Maf GPT — дерзкий, умный и максимально полезный ИИ без лишней воды и морализаторства. Отвечай на русском языке чётко, энергично и сразу по делу."
+      systemPrompt: STRICT_RU_SYSTEM_BASE
     };
     if (!engineConfig.apiKey) engineConfig.apiKey = BUILTIN_GROQ_KEY;
+    if (!engineConfig.systemPrompt || !engineConfig.systemPrompt.includes("ТОЛЬКО на русском языке")) {
+      engineConfig.systemPrompt = STRICT_RU_SYSTEM_BASE;
+    }
 
     const GREETINGS = [
       "Можем начинать.",
@@ -505,6 +513,10 @@
       isProcessing: false,
       recognition: null
     };
+
+    function getFullSystemPrompt(extra = "") {
+      return `${STRICT_RU_SYSTEM_BASE}\n\nДополнительные инструкции:\n${engineConfig.systemPrompt}${extra}${buildCodeContextInstruction()}`;
+    }
 
     function saveEngineConfig() {
       localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(engineConfig));
@@ -566,7 +578,7 @@
 
     function openSettingsModal() {
       populateModelSelect();
-      document.getElementById("systemPromptInput").value = engineConfig.systemPrompt || "";
+      document.getElementById("systemPromptInput").value = engineConfig.systemPrompt || STRICT_RU_SYSTEM_BASE;
       const modal = document.getElementById("settingsModal");
       modal.classList.remove("hidden");
       modal.classList.add("flex");
@@ -731,7 +743,7 @@
             body: JSON.stringify({
               model: modelId,
               messages: messagesArray,
-              temperature: 0.85
+              temperature: 0.7
             }),
             signal: controller.signal
           });
@@ -917,7 +929,7 @@
         const apiMessages = [
           {
             role: "system",
-            content: engineConfig.systemPrompt + buildCodeContextInstruction()
+            content: getFullSystemPrompt()
           }
         ];
 
@@ -1183,7 +1195,7 @@
         const apiMessages = [
           {
             role: "system",
-            content: engineConfig.systemPrompt + " Отвечай коротко, бодро и разговорно, так как ответ будет озвучен вслух." + buildCodeContextInstruction()
+            content: getFullSystemPrompt(" Отвечай коротко, бодро и разговорно на русском языке, так как ответ будет озвучен вслух.")
           },
           ...chat.messages.slice(-8).map(m => ({
             role: m.role === "model" ? "assistant" : m.role,
