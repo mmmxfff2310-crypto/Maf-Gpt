@@ -408,7 +408,9 @@
     const BUILTIN_GROQ_KEY = "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";
     const DIRECT_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions";
     const DIRECT_MODELS_URL = "https://api.groq.com/openai/v1/models";
-    const PROXY_URLS = [
+
+    const FALLBACK_CHAT_ENDPOINTS = [
+      DIRECT_CHAT_URL,
       "https://corsproxy.io/?" + encodeURIComponent(DIRECT_CHAT_URL),
       "https://api.allorigins.win/raw?url=" + encodeURIComponent(DIRECT_CHAT_URL)
     ];
@@ -416,7 +418,7 @@
     const SYSTEM_PROMPT =
       "Ты Maf GPT — дерзкий, живой и полезный ИИ-ассистент. " +
       "КРИТИЧЕСКОЕ ПРАВИЛО: ВСЕГДА отвечай ТОЛЬКО на русском языке, даже если сообщение пользователя короткое, странное, с опечатками или с цифрами. Никогда не переходи на арабский, английский или другой язык, если тебя прямо не попросили сделать перевод. " +
-      "Если просят сгенерировать картинку или фото — честно и по-русски напиши, что текстовый движок картинки не рисует, но ты можешь написать код, идею или промпт. Отвечай чётко, энергично и без лишней воды.";
+      "Если просят сгенерировать картинку или фото — честно и по-русски напиши, что картинки рисовать не умеешь, но можешь написать код, идею или промпт. Отвечай чётко, энергично и без лишней воды.";
 
     const PREFERRED_MODEL_ORDER = [
       "llama-3.1-8b-instant",
@@ -596,7 +598,7 @@
       return `\n\nСохранённый в памяти код пользователя (помни и учитывай его при ответах и правках):\n${recentSnippets}`;
     }
 
-    async function postJsonToEndpoint(url, payloadBody, timeoutMs = 25000) {
+    async function postJsonToEndpoint(url, payloadBody, timeoutMs = 20000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -627,9 +629,7 @@
         ...PREFERRED_MODEL_ORDER
       ].filter(Boolean)));
 
-      const endpoints = [DIRECT_CHAT_URL, ...PROXY_URLS];
       let lastErr = "Ошибка соединения";
-      let hadNetworkBlock = false;
 
       for (const modelId of candidates) {
         const payloadBody = {
@@ -638,7 +638,7 @@
           temperature: 0.7
         };
 
-        for (const endpoint of endpoints) {
+        for (const endpoint of FALLBACK_CHAT_ENDPOINTS) {
           try {
             const { ok, status, data } = await postJsonToEndpoint(endpoint, payloadBody);
             if (ok && data?.choices?.[0]?.message?.content) {
@@ -656,23 +656,13 @@
               break;
             }
           } catch (err) {
-            const raw = err.name === "AbortError" ? "Превышено время ожидания" : (err.message || "Load failed");
-            if (/load failed|failed to fetch|networkerror/i.test(raw)) {
-              hadNetworkBlock = true;
-            }
-            lastErr = raw;
+            lastErr = err.name === "AbortError" ? "Превышено время ожидания" : (err.message || "Сбой сети");
           }
         }
       }
 
       if (!navigator.onLine) {
-        throw new Error("Нет интернета на телефоне. Проверьте Wi-Fi или мобильную сеть.");
-      }
-      if (hadNetworkBlock && location.protocol === "file:") {
-        throw new Error("Safari блокирует запросы из локального файла. Загрузите index.html на GitHub Pages и откройте по ссылке https://.");
-      }
-      if (hadNetworkBlock) {
-        throw new Error("Мобильная сеть или провайдер блокирует запрос (Load failed). Попробуйте включить VPN или открыть через Wi-Fi.");
+        throw new Error("Нет интернета. Проверьте подключение к сети.");
       }
       throw new Error(lastErr);
     }
