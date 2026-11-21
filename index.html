@@ -205,8 +205,8 @@
         <div>
           <label class="block text-xs font-medium text-neutral-400 mb-1.5">Движок / Провайдер</label>
           <select id="providerSelect" onchange="onProviderChange()" class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
-            <option value="openrouter">OpenRouter (Бесплатные + Uncensored модели)</option>
             <option value="groq">Groq (Молниеносная скорость, бесплатно)</option>
+            <option value="openrouter">OpenRouter (Бесплатные + Uncensored модели)</option>
             <option value="ollama">Локальная Ollama (Без ключа и без лимитов)</option>
             <option value="custom">Свой URL (Любой OpenAI API)</option>
           </select>
@@ -228,7 +228,7 @@
             id="sessionApiKeyInput"
             type="password"
             autocomplete="off"
-            placeholder="sk-or-v1-... или gsk_..."
+            placeholder="gsk_... или sk-or-v1-..."
             onkeydown="if(event.key==='Enter') activateMafGpt()"
             class="w-full bg-[#1e1e1e] border border-[#343434] focus:border-blue-500 rounded-2xl px-3.5 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none select-text"
           />
@@ -359,7 +359,7 @@
           </div>
           <span class="font-semibold text-base tracking-tight shrink-0">Maf GPT</span>
           <button onclick="openKeyModal()" id="headerModelBadge" class="ml-1 px-2.5 py-0.5 rounded-full bg-[#181818] hover:bg-[#242424] text-[11px] font-mono text-blue-400 truncate cursor-pointer">
-            OpenRouter
+            Groq
           </button>
         </div>
       </div>
@@ -486,10 +486,21 @@
   </div>
 
   <script>
-    const CONFIG_STORAGE_KEY = "mafgpt_engine_config_v2";
+    const CONFIG_STORAGE_KEY = "mafgpt_engine_config_v3";
+    const BUILTIN_GROQ_KEY = "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";
     let activeModalSnippetId = null;
 
     const PROVIDER_PRESETS = {
+      groq: {
+        name: "Groq",
+        url: "https://api.groq.com/openai/v1/chat/completions",
+        requiresKey: true,
+        models: [
+          { label: "Llama 3.3 70B Versatile", id: "llama-3.3-70b-versatile" },
+          { label: "Qwen QWQ 32B", id: "qwen-qwq-32b" },
+          { label: "Llama 3.1 8B Instant", id: "llama-3.1-8b-instant" }
+        ]
+      },
       openrouter: {
         name: "OpenRouter",
         url: "https://openrouter.ai/api/v1/chat/completions",
@@ -499,16 +510,6 @@
           { label: "DeepSeek V3 0324 (Free)", id: "deepseek/deepseek-chat-v3-0324:free" },
           { label: "Llama 3.3 70B (Free)", id: "meta-llama/llama-3.3-70b-instruct:free" },
           { label: "Qwen 2.5 Coder 32B (Free)", id: "qwen/qwen-2.5-coder-32b-instruct:free" }
-        ]
-      },
-      groq: {
-        name: "Groq",
-        url: "https://api.groq.com/openai/v1/chat/completions",
-        requiresKey: true,
-        models: [
-          { label: "Llama 3.3 70B Versatile", id: "llama-3.3-70b-versatile" },
-          { label: "Qwen QWQ 32B", id: "qwen-qwq-32b" },
-          { label: "Llama 3.1 8B Instant", id: "llama-3.1-8b-instant" }
         ]
       },
       ollama: {
@@ -531,14 +532,19 @@
       }
     };
 
-    let engineConfig = JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY) || "null") || {
-      provider: "openrouter",
-      url: PROVIDER_PRESETS.openrouter.url,
-      apiKey: "",
-      model: PROVIDER_PRESETS.openrouter.models[0].id,
+    const defaultConfig = {
+      provider: "groq",
+      url: PROVIDER_PRESETS.groq.url,
+      apiKey: BUILTIN_GROQ_KEY,
+      model: PROVIDER_PRESETS.groq.models[0].id,
       systemPrompt: "Ты Maf GPT — дерзкий, умный и максимально полезный ИИ без лишней воды и морализаторства. Отвечай на русском языке чётко, энергично и сразу по делу.",
-      configured: false
+      configured: true
     };
+
+    let engineConfig = JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY) || "null") || defaultConfig;
+    if (!engineConfig.apiKey && engineConfig.provider === "groq") {
+      engineConfig.apiKey = BUILTIN_GROQ_KEY;
+    }
 
     const GREETINGS = [
       "Можем начинать.",
@@ -569,7 +575,7 @@
     };
 
     function populatePresetsForProvider(providerKey, keepCurrentModel = false) {
-      const preset = PROVIDER_PRESETS[providerKey] || PROVIDER_PRESETS.openrouter;
+      const preset = PROVIDER_PRESETS[providerKey] || PROVIDER_PRESETS.groq;
       const selectEl = document.getElementById("modelPresetSelect");
       selectEl.innerHTML = preset.models
         .map(m => `<option value="${escapeHtml(m.id)}">${escapeHtml(m.label)}</option>`)
@@ -745,7 +751,7 @@
 
     function activateMafGpt() {
       const provider = document.getElementById("providerSelect").value;
-      const preset = PROVIDER_PRESETS[provider] || PROVIDER_PRESETS.openrouter;
+      const preset = PROVIDER_PRESETS[provider] || PROVIDER_PRESETS.groq;
       const customUrl = document.getElementById("endpointUrlInput").value.trim();
       const apiKey = document.getElementById("sessionApiKeyInput").value.trim();
       const model = document.getElementById("modelNameInput").value.trim();
@@ -1425,7 +1431,7 @@
       document.getElementById("systemPromptInput").value = engineConfig.systemPrompt || "";
       updateEngineBadges();
 
-      if (engineConfig.configured) {
+      if (engineConfig.configured && engineConfig.apiKey) {
         hideActivationScreenImmediate();
       }
       renderCodeMemoryList();
