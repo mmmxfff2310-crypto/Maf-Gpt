@@ -406,8 +406,8 @@
 
   <script>
     const CF_API_TOKEN = "cfut_aJp6seVwxS2NrBw7G2zucYt21hnE92HCF5eQ1LSQ717bb5f7";
-    // Вставьте сюда 32-символьный Account ID из блока "Get Account ID" на странице Workers AI
-    let CF_ACCOUNT_ID = localStorage.getItem("mafgpt_cf_account_id_v1") || "";
+    const CF_ACCOUNT_ID = "f5bca8813396aebc47dc363a13cd4802";
+    localStorage.setItem("mafgpt_cf_account_id_v1", CF_ACCOUNT_ID);
 
     const CF_TEXT_MODELS = [
       "@cf/meta/llama-3.1-8b-instruct",
@@ -450,26 +450,6 @@
       recognition: null
     };
 
-    async function ensureAccountId() {
-      if (/^[a-f0-9]{32}$/i.test(CF_ACCOUNT_ID.trim())) {
-        CF_ACCOUNT_ID = CF_ACCOUNT_ID.trim();
-        return CF_ACCOUNT_ID;
-      }
-      try {
-        const res = await fetch("https://api.cloudflare.com/client/v4/accounts", {
-          headers: { "Authorization": `Bearer ${CF_API_TOKEN}` }
-        });
-        const data = await res.json().catch(() => ({}));
-        const foundId = data?.result?.[0]?.id;
-        if (foundId && /^[a-f0-9]{32}$/i.test(foundId)) {
-          CF_ACCOUNT_ID = foundId;
-          localStorage.setItem("mafgpt_cf_account_id_v1", foundId);
-          return foundId;
-        }
-      } catch (e) {}
-      return "";
-    }
-
     function isImageGenerationRequest(text) {
       return /^(нарисуй|сделай\s+фото|сгенерируй\s+(фото|картинку|изображение)|создай\s+(фото|картинку|изображение)|фото\s+|картинка\s+)/i.test(text.trim());
     }
@@ -481,12 +461,8 @@
     }
 
     async function generateImageWithCloudflare(promptText) {
-      const accId = await ensureAccountId();
-      if (!accId) {
-        throw new Error("Не указан 32-символьный Account ID из раздела Workers AI в Cloudflare.");
-      }
       const cleaned = cleanImagePrompt(promptText);
-      const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accId)}/ai/run/${CF_IMAGE_MODEL}`;
+      const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(CF_ACCOUNT_ID)}/ai/run/${CF_IMAGE_MODEL}`;
 
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 35000);
@@ -521,6 +497,12 @@
         throw new Error(data?.errors?.[0]?.message || `HTTP ${res.status}`);
       } catch (err) {
         clearTimeout(timer);
+        if (err.name === "AbortError") {
+          throw new Error("Превышено время ожидания генерации фото");
+        }
+        if (err instanceof TypeError) {
+          throw new Error("Запрос заблокирован браузером (CORS или сеть). Подключите Cloudflare Worker.");
+        }
         throw err;
       }
     }
@@ -644,15 +626,10 @@
     }
 
     async function callAssistantAPI(messagesArray) {
-      const accId = await ensureAccountId();
-      if (!accId) {
-        throw new Error("Не найден 32-символьный Account ID из раздела Workers AI в Cloudflare.");
-      }
-
       let lastErr = "Ошибка соединения";
 
       for (const modelId of CF_TEXT_MODELS) {
-        const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accId)}/ai/run/${modelId}`;
+        const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(CF_ACCOUNT_ID)}/ai/run/${modelId}`;
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 25000);
 
@@ -681,7 +658,13 @@
           lastErr = data?.errors?.[0]?.message || `HTTP ${res.status}`;
         } catch (err) {
           clearTimeout(timer);
-          lastErr = err.name === "AbortError" ? "Превышено время ожидания" : (err.message || "Сбой сети");
+          if (err.name === "AbortError") {
+            lastErr = "Превышено время ожидания";
+          } else if (err instanceof TypeError) {
+            lastErr = "Запрос заблокирован браузером (CORS или сеть). Подключите Cloudflare Worker.";
+          } else {
+            lastErr = err.message || "Сбой сети";
+          }
         }
       }
 
@@ -1292,14 +1275,13 @@
       }, 480);
     }, 3600);
 
-    document.addEventListener("DOMContentLoaded", async () => {
+    document.addEventListener("DOMContentLoaded", () => {
       if (!state.currentChatId && state.chats.length > 0) {
         state.currentChatId = state.chats[0].id;
       }
       renderCodeMemoryList();
       renderHistoryList();
       renderMessages();
-      await ensureAccountId();
     });
   </script>
 </body>
